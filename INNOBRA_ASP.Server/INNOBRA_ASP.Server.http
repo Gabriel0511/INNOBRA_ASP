@@ -1,0 +1,6 @@
+@INNOBRA_ASP.Server_HostAddress = http://localhost:5277
+
+GET {{INNOBRA_ASP.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
