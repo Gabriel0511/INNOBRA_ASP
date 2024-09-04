@@ -6,7 +6,7 @@ using INNOBRA_ASP.DB.Data.Entity;
 namespace INNOBRA_ASP.Server.Controllers
 {
     [ApiController]
-    [Route("Api/Presupuesto")]
+    [Route("Api/Presupuestos")]
     public class PresupuestosControllers : ControllerBase
     {
         private readonly Context context;
