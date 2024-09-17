@@ -21,6 +21,17 @@ namespace INNOBRA_ASP.Server.Controllers
             return await context.Avances.ToListAsync();
         }
 
+        [HttpGet("GetById/{id:int}")] //api/Avance/2
+        public async Task<ActionResult<Avance>> GetById(int id)
+        {
+            var Verif = await context.Avances.FirstOrDefaultAsync(x => x.Id == id);
+            if (Verif == null)
+            {
+                return NotFound();
+            }
+            return Verif;
+        }
+
         [HttpPost]
         public async Task<ActionResult<int>> Post(Avance entidad)
         {
@@ -36,7 +47,7 @@ namespace INNOBRA_ASP.Server.Controllers
             }
         }
 
-        [HttpPut("{id:int}")] //api/Avances/2
+        [HttpPut("{id:int}")] //api/Avance/2
         public async Task<ActionResult> Put(int Id, [FromBody] Avance entidad)
         {
             if (Id != entidad.Id)
@@ -44,7 +55,7 @@ namespace INNOBRA_ASP.Server.Controllers
                 return BadRequest("Datos Incorrectos");
             }
             var Verif = await context.Avances
-                .Where(e => e.Id == Id).FirstOrDefaultAsync();
+                .Where(reg => reg.Id == Id).FirstOrDefaultAsync();
 
             if (Verif == null)
             {
@@ -66,6 +77,23 @@ namespace INNOBRA_ASP.Server.Controllers
 
                 return BadRequest(e.Message);
             }
+        }
+
+        [HttpDelete("{id:int}")] //api/Avance/2
+        public async Task<ActionResult> Delete(int id)
+        {
+            var existe = await context.Avances.AnyAsync(x => x.Id == id);
+            if (!existe)
+            {
+                return NotFound($" El avance {id} no existe.");
+            }
+
+            Avance EntidadABorrar = new Avance();
+            EntidadABorrar.Id = id;
+
+            context.Remove(EntidadABorrar);
+            await context.SaveChangesAsync();
+            return Ok();
 
         }
     }

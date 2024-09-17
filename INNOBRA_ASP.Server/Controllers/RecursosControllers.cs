@@ -21,6 +21,28 @@ namespace INNOBRA_ASP.Server.Controllers
             return await context.Recursos.ToListAsync();
         }
 
+        [HttpGet("GetById/{id:int}")] //api/Recurso/2
+        public async Task<ActionResult<Recurso>> GetById(int id)
+        {
+            var Verif = await context.Recursos.FirstOrDefaultAsync(x => x.Id == id);
+            if(Verif == null)
+            {
+                return NotFound();
+            }
+            return Verif;
+        }
+
+        [HttpGet("GetByNom/{nom}")] //api/Recurso/2
+        public async Task<ActionResult<Recurso>> GetByNom(string nom)
+        {
+            var Verif = await context.Recursos.FirstOrDefaultAsync(x => x.Nombre == nom);
+            if (Verif == null)
+            {
+                return NotFound();
+            }
+            return Verif;
+        }
+
         [HttpPost]
         public async Task<ActionResult<int>> Post(Recurso entidad)
         {
@@ -44,7 +66,7 @@ namespace INNOBRA_ASP.Server.Controllers
                 return BadRequest("Datos Incorrectos");
             }
             var Verif = await context.Recursos
-                .Where(e => e.Id == Id).FirstOrDefaultAsync();
+                .Where(reg => reg.Id == Id).FirstOrDefaultAsync();
 
             if (Verif == null)
             {
@@ -67,6 +89,24 @@ namespace INNOBRA_ASP.Server.Controllers
 
                 return BadRequest(e.Message);
             }
+        }
+
+        [HttpDelete("{id:int}")] //api/Recurso/2
+        public async Task<ActionResult> Delete(int id)
+        {
+            var existe = await context.Recursos.AnyAsync(x => x.Id == id);
+            if (!existe)
+            {
+                return NotFound($" El recurso {id} no existe.");
+            }
+
+            Recurso EntidadABorrar = new Recurso();
+            EntidadABorrar.Id = id;
+
+            context.Remove(EntidadABorrar);
+            await context.SaveChangesAsync();
+            return Ok();
+
         }
     }
 }
