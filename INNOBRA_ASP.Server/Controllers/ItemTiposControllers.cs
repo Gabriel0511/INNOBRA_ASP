@@ -1,34 +1,57 @@
-﻿using INNOBRA_ASP.DB.Data;
+﻿using AutoMapper;
+using INNOBRA.SHARED.DTO;
+using INNOBRA_ASP.DB.Data;
 using INNOBRA_ASP.DB.Data.Entity;
+using INNOBRA_ASP.Server.Repositorio;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace INNOBRA_ASP.Server.Controllers
 {
     [ApiController]
-    [Route("api/Unidades")]
+    [Route("api/ItemTipos")]
     public class ItemTiposControllers : ControllerBase
     {
-        private readonly Context context;
-        public ItemTiposControllers(Context context)
+        private readonly IMapper mapper;
+        private readonly IRepositorio<ItemTipo> repositorio;
+
+        public ItemTiposControllers(IMapper mapper, IRepositorio<ItemTipo> repositorio)
         {
-            this.context = context;
+            this.mapper = mapper;
+            this.repositorio = repositorio;
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<ItemTipo>>> get()
+        public async Task<ActionResult<List<ItemTipo>>> Get()
         {
-            return await context.ItemTipos.ToListAsync();
+            return await repositorio.Select();
+        }
+
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<ItemTipo>> Get(int id)
+        {
+            ItemTipo? sel = await repositorio.SelectById(id);
+            if (sel == null)
+            {
+                return NotFound();
+            }
+            return sel;
+        }
+
+        [HttpGet("existe/{id:int}")]
+        public async Task<ActionResult<bool>> Existe(int id)
+        {
+            var existe = await repositorio.Existe(id);
+            return existe;
         }
 
         [HttpPost]
-        public async Task<ActionResult<int>> Post(ItemTipo entidad)
+        public async Task<ActionResult<int>> Posts(CrearItemTipoDTO entidadDTO)
         {
             try
             {
-                context.ItemTipos.Add(entidad);
-                await context.SaveChangesAsync();
-                return entidad.Id;
+                ItemTipo entidad = mapper.Map<ItemTipo>(entidadDTO);
+                return await repositorio.Insert(entidad);
             }
             catch (Exception e)
             {
@@ -36,36 +59,56 @@ namespace INNOBRA_ASP.Server.Controllers
             }
         }
 
-        [HttpPut("{id:int}")] //api/ItemTipos/2
-        public async Task<ActionResult> Put(int Id, [FromBody] ItemTipo entidad)
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult> Put(int id, [FromBody] ItemTipo entidad)
         {
-            if (Id != entidad.Id)
+            if (id != entidad.Id)
             {
-                return BadRequest("Datos Incorrectos");
-            }
-            var Verif = await context.ItemTipos
-                .Where(e => e.Id == Id).FirstOrDefaultAsync();
-
-            if (Verif == null)
-            {
-                return NotFound("No existe el Item buscado.");
+                return BadRequest("Datos incorrectos");
             }
 
-            Verif. = entidad.Codigo;
-            Verif.Nombre = entidad.Nombre;
-            Verif.Unidad_Id = entidad.Unidad_Id;
+            var sel = await repositorio.SelectById(id);
+            if (sel == null)
+            {
+                return NotFound("El item no existe.");
+            }
 
+            mapper.Map(entidad, sel);
 
             try
             {
-                context.ItemTipos.Update(Verif);
-                await context.SaveChangesAsync();
-                return Ok();
+                var actualizado = await repositorio.Update(id, sel);
+                if (actualizado)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest("No se pudo actualizar los datos.");
+                }
             }
             catch (Exception e)
             {
-
                 return BadRequest(e.Message);
+            }
+        }
+
+        [HttpDelete("{id:int}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            var existe = await repositorio.Existe(id);
+            if (!existe)
+            {
+                return NotFound($"El Item {id} no existe");
+            }
+
+            if (await repositorio.Delete(id))
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
             }
         }
     }
