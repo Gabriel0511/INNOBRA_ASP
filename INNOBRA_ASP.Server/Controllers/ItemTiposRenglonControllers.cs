@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using INNOBRA_ASP.Shared.DTO;
 using INNOBRA_ASP.Server.Repositorio;
+using ItemTipoRenglon = INNOBRA_ASP.DB.Data.Entity.ItemTipoRenglon; //Me recomendo usar este using
 
 namespace INNOBRA_ASP.Server.Controllers
 {
@@ -15,10 +16,10 @@ namespace INNOBRA_ASP.Server.Controllers
         private readonly IMapper mapper;
         private readonly IRepositorio<ItemTipoRenglon> repositorio;
 
-        public ItemTiposRenglonControllers(IMapper mapper, IRepositorio<ItemTipoRenglon> repositorio)
+        public ItemTiposRenglonControllers(IItemTipoRenglonRepositorio repositorio, IMapper mapper)
         {
             this.mapper = mapper;
-            this.repositorio = repositorio;
+            this.repositorio = (IRepositorio<ItemTipoRenglon>?)repositorio;//Le agregue que acepte nulos por que me daba error
         }
 
         [HttpGet]
