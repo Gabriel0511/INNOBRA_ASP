@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using INNOBRA_ASP.DB.Data.Entity;
-using INNOBRA.SHARED.DTO;
+using INNOBRA_ASP.Shared.DTO;
 
 namespace INNOBRA_ASP.Server.Util
 {
@@ -11,6 +11,10 @@ namespace INNOBRA_ASP.Server.Util
             //CreateMap<CrearObraDTO, Obra>();
 
             //CreateMap<EditarObraDTO, Obra>();
+
+            CreateMap <CrearItemRenglonTipoDTO, ItemRenglon>();
+            CreateMap<CrearItemTipoDTO, ItemRenglon>();
+            CreateMap<CrearUnidadDTO, ItemRenglon>();
         }
     }
 }

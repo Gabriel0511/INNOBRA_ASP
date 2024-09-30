@@ -15,7 +15,7 @@ namespace INNOBRA_ASP.Server.Controllers
         private readonly IMapper mapper;
         private readonly IRepositorio<ItemTipo> repositorio;
 
-        public ItemTiposControllers(IMapper mapper, IRepositorio<ItemTipo> repositorio)
+        public ItemTiposControllers(IItemTipoRepositorio repositorio, IMapper mapper)
         {
             this.mapper = mapper;
             this.repositorio = repositorio;

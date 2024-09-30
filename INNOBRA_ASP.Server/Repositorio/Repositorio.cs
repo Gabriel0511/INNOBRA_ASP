@@ -5,13 +5,8 @@ using System.Threading.Tasks;
 using INNOBRA_ASP.DB.Data;
 
 namespace INNOBRA_ASP.Server.Repositorio
-{
-    public interface IEntity
-    {
-        int Id { get; set; }
-    }
-
-    public class Repositorio<E> where E : class, IEntity
+{ 
+    public class Repositorio<E> : IRepositorio<E> where E: class, IEntityBase
     {
         private readonly Context context;
 
