@@ -2,11 +2,12 @@
 using INNOBRA_ASP.DB.Data;
 using Microsoft.EntityFrameworkCore;
 using INNOBRA_ASP.DB.Data.Entity;
+using INNOBRA_ASP.Shared.DTO;
 
 namespace INNOBRA_ASP.Server.Controllers
 {
     [ApiController]
-    [Route("Api/Item")]
+    [Route("Api/Obras")]
     public class ObrasControllers : ControllerBase
     {
         private readonly Context context;

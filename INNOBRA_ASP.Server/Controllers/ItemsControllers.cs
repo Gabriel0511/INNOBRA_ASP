@@ -7,29 +7,29 @@ using INNOBRA_ASP.Shared.DTO;
 namespace INNOBRA_ASP.Server.Controllers
 {
     [ApiController]
-    [Route("Api/Presupuestos")]
-    public class PresupuestosControllers : ControllerBase
+    [Route("Api/Items")]
+    public class ItemsControllers : ControllerBase
     {
         private readonly Context context;
 
-        public PresupuestosControllers(Context context)
+        public ItemsControllers(Context context)
         {
             this.context = context;
         }
 
         [HttpGet]
 
-        public async Task<ActionResult<List<Presupuesto>>> Get()
+        public async Task<ActionResult<List<Item>>> Get()
         {
-            return await context.Presupuestos.ToListAsync();
+            return await context.Items.ToListAsync();
         }
 
         [HttpPost]
-        public async Task<ActionResult<int>> Post(Presupuesto entidad)
+        public async Task<ActionResult<int>> Post(Item entidad)
         {
             try
             {
-                context.Presupuestos.Add(entidad);
+                context.Items.Add(entidad);
                 await context.SaveChangesAsync();
                 return entidad.Id;
             }
@@ -40,7 +40,7 @@ namespace INNOBRA_ASP.Server.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult> Put(int id, [FromBody] Presupuesto entidad)
+        public async Task<ActionResult> Put(int id, [FromBody] Item entidad)
         {
 
             if (id != entidad.Id)
@@ -48,21 +48,19 @@ namespace INNOBRA_ASP.Server.Controllers
                 return BadRequest("Datos incorrectos.");
             }
 
-            // En vez de var puede ser Presupuesto :D
-            var verif = await context.Presupuestos.Where(e => e.Id == id).FirstOrDefaultAsync();
+            var verif = await context.Items.Where(e => e.Id == id).FirstOrDefaultAsync();
 
             if (verif == null)
             {
-                return NotFound("No existe el presupuesto buscado.");
+                return NotFound("No existe la obra buscada.");
             }
 
-            verif.Nombre = entidad.Nombre;
-            verif.FechaInicioPrevista = entidad.FechaInicioPrevista;
-            verif.FechaFinPrevista = entidad.FechaFinPrevista;
+            verif.Tiempo_estimado = entidad.Tiempo_estimado;
+            verif.Material_estimado = entidad.Material_estimado;
 
             try
             {
-                context.Presupuestos.Update(verif);
+                context.Items.Update(verif);
                 await context.SaveChangesAsync();
                 return Ok();
             }

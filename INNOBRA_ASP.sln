@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35013.160
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "INNOBRA_ASP.Server", "INNOBRA_ASP.Server\INNOBRA_ASP.Server.csproj", "{AB4A869E-028A-49BA-911A-00FF656B56ED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "INNOBRA_ASP.Server", "INNOBRA_ASP.Server\INNOBRA_ASP.Server.csproj", "{AB4A869E-028A-49BA-911A-00FF656B56ED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "INNOBRA_ASP.DB", "INNOBRA_ASP.DB\INNOBRA_ASP.DB.csproj", "{E1EB0AB5-CBB3-4850-84AB-259976074925}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "INNOBRA_ASP.DB", "INNOBRA_ASP.DB\INNOBRA_ASP.DB.csproj", "{E1EB0AB5-CBB3-4850-84AB-259976074925}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "INNOBRA_ASP.Shared", "INNOBRA_ASP.Shared\INNOBRA_ASP.Shared.csproj", "{2252602B-8504-4F89-B683-213A30F95575}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{E1EB0AB5-CBB3-4850-84AB-259976074925}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E1EB0AB5-CBB3-4850-84AB-259976074925}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E1EB0AB5-CBB3-4850-84AB-259976074925}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2252602B-8504-4F89-B683-213A30F95575}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2252602B-8504-4F89-B683-213A30F95575}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2252602B-8504-4F89-B683-213A30F95575}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2252602B-8504-4F89-B683-213A30F95575}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
