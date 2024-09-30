@@ -2,6 +2,7 @@
 using INNOBRA_ASP.DB.Data.Entity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using INNOBRA_ASP.Shared.DTO;
 
 namespace INNOBRA_ASP.Server.Controllers
 {

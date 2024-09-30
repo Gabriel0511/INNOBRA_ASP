@@ -3,7 +3,7 @@ using INNOBRA_ASP.DB.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
-using INNOBRA.SHARED.DTO;
+using INNOBRA_ASP.Shared.DTO;
 using INNOBRA_ASP.Server.Repositorio;
 
 namespace INNOBRA_ASP.Server.Controllers

@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using INNOBRA.SHARED.DTO;
+using INNOBRA_ASP.Shared.DTO;
 using INNOBRA_ASP.DB.Data;
 using INNOBRA_ASP.DB.Data.Entity;
 using INNOBRA_ASP.Server.Repositorio;

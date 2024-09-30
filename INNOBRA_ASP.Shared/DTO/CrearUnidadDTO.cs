@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INNOBRA.SHARED.DTO
+namespace INNOBRA_ASP.Shared.DTO
 {
     public class CrearUnidadDTO
     {

@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace INNOBRA_ASP.DB.Data
+﻿namespace INNOBRA_ASP.DB.Data
 {
-    public class IEntityBase
+    public interface IEntityBase
     {
-        public int ID { get; set; }
+        int Id { get; set; }
     }
 }
