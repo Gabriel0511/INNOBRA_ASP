@@ -13,8 +13,9 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<Context>(op => op.UseSqlServer("name=conn"));
 builder.Services.AddAutoMapper(typeof (Program));
-builder.Services.AddScoped<IItemTipoRepositorio, ItemTipoRepositorio>();
-
+builder.Services.AddScoped<IItemTipoRepositorio, IItemTipoRepositorio>();
+builder.Services.AddScoped<IItemTipoRenglonRepositorio,IItemTipoRenglonRepositorio>();
+builder.Services.AddScoped<IUnidadRepositorio, IUnidadRepositorio>();
 
 //------------------------------------------------------------------------------
 //Construccion de la aplicacion
