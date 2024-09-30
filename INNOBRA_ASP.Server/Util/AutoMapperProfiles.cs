@@ -16,6 +16,10 @@ namespace INNOBRA_ASP.Server.Util
             //STEFANO
             CreateMap<CrearAvanceDTO, Avance>();
             CreateMap<CrearRecursoDTO, Recurso>();
+
+            //GABRIEL
+            CreateMap<CrearObraDTO, Obra>();
+            CreateMap<CrearPresupuestoDTO, Presupuesto>();
         }
     }
 }

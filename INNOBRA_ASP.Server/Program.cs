@@ -25,6 +25,10 @@ builder.Services.AddScoped<IUnidadRepositorio, UnidadRepositorio>();
 builder.Services.AddScoped<IAvanceRepositorio, AvanceRepositorio>();
 builder.Services.AddScoped<IRecursoRepositorio, RecursoRepositorio>();
 
+//GABRIEL
+builder.Services.AddScoped<IObraRepositorio, ObraRepositorio>();
+builder.Services.AddScoped<IPresupuestoRepositorio, PresupuestoRepositorio>();
+
 //------------------------------------------------------------------------------
 //Construccion de la aplicacion
 var app = builder.Build();

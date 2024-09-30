@@ -3,6 +3,8 @@ using INNOBRA_ASP.DB.Data;
 using Microsoft.EntityFrameworkCore;
 using INNOBRA_ASP.DB.Data.Entity;
 using INNOBRA_ASP.Shared.DTO;
+using AutoMapper;
+using INNOBRA_ASP.Server.Repositorio;
 
 namespace INNOBRA_ASP.Server.Controllers
 {
@@ -10,28 +12,48 @@ namespace INNOBRA_ASP.Server.Controllers
     [Route("Api/Presupuestos")]
     public class PresupuestosControllers : ControllerBase
     {
-        private readonly Context context;
+        private readonly IPresupuestoRepositorio repositorio;
+        private readonly IMapper mapper;
 
-        public PresupuestosControllers(Context context)
+        public PresupuestosControllers(IPresupuestoRepositorio repositorio, IMapper mapper)
         {
-            this.context = context;
+            this.repositorio = repositorio;
+            this.mapper = mapper;
         }
 
         [HttpGet]
 
         public async Task<ActionResult<List<Presupuesto>>> Get()
         {
-            return await context.Presupuestos.ToListAsync();
+            return await repositorio.Select();
+        }
+
+        [HttpGet("GetById/{id:int}")] //api/Presupuesto/2
+        public async Task<ActionResult<Presupuesto>> GetById(int id)
+        {
+            var Verif = await repositorio.SelectById(id);
+            if (Verif == null)
+            {
+                return NotFound();
+            }
+            return Verif;
+        }
+
+        [HttpGet("existe/{id:int}")] //api/Presupuesto/existe/2
+        public async Task<ActionResult<bool>> Existe(int id)
+        {
+            var existe = await repositorio.Existe(id);
+            return existe;
         }
 
         [HttpPost]
-        public async Task<ActionResult<int>> Post(Presupuesto entidad)
+        public async Task<ActionResult<int>> Post(CrearPresupuestoDTO entidadDTO)
         {
             try
             {
-                context.Presupuestos.Add(entidad);
-                await context.SaveChangesAsync();
-                return entidad.Id;
+                Presupuesto entidad = mapper.Map<Presupuesto>(entidadDTO);
+
+                return await repositorio.Insert(entidad);
             }
             catch (Exception e)
             {
@@ -48,22 +70,18 @@ namespace INNOBRA_ASP.Server.Controllers
                 return BadRequest("Datos incorrectos.");
             }
 
-            // En vez de var puede ser Presupuesto :D
-            var verif = await context.Presupuestos.Where(e => e.Id == id).FirstOrDefaultAsync();
+            var verif = await repositorio.SelectById(id);
 
             if (verif == null)
             {
                 return NotFound("No existe el presupuesto buscado.");
             }
 
-            verif.Nombre = entidad.Nombre;
-            verif.FechaInicioPrevista = entidad.FechaInicioPrevista;
-            verif.FechaFinPrevista = entidad.FechaFinPrevista;
+                mapper.Map(verif, entidad);
 
             try
             {
-                context.Presupuestos.Update(verif);
-                await context.SaveChangesAsync();
+                await repositorio.Update(id, verif);
                 return Ok();
             }
             catch (Exception)
@@ -71,6 +89,20 @@ namespace INNOBRA_ASP.Server.Controllers
 
                 throw;
             }
+
+        }
+
+        [HttpDelete("{id:int}")] //api/Presupuesto/2
+        public async Task<ActionResult> Delete(int id)
+        {
+            var resp = await repositorio.Delete(id);
+
+            if (!resp)
+            {
+                return BadRequest("El presupuesto no se pudo borrar");
+
+            }
+            return Ok();
 
         }
     }
