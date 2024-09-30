@@ -46,7 +46,7 @@ namespace INNOBRA_ASP.Server.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<int>> Posts(CrearItemTipoDTO entidadDTO)
+        public async Task<ActionResult<int>> Post(CrearItemTipoDTO entidadDTO)
         {
             try
             {
