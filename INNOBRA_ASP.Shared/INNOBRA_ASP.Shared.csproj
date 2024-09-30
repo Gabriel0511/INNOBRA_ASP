@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\INNOBRA_ASP.DB\INNOBRA_ASP.DB.csproj" />
+  </ItemGroup>
+
 </Project>

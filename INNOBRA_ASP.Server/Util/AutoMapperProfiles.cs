@@ -8,13 +8,14 @@ namespace INNOBRA_ASP.Server.Util
     {
         public AutoMapperProfiles()
         {
-            //CreateMap<CrearObraDTO, Obra>();
-
-            //CreateMap<EditarObraDTO, Obra>();
-
+            //PABLO
             CreateMap <CrearItemRenglonTipoDTO, ItemTipoRenglon>();
             CreateMap<CrearItemTipoDTO, ItemTipo>();
             CreateMap<CrearUnidadDTO, Unidad>();
+
+            //STEFANO
+            CreateMap<CrearAvanceDTO, Avance>();
+            CreateMap<CrearRecursoDTO, Recurso>();
         }
     }
 }

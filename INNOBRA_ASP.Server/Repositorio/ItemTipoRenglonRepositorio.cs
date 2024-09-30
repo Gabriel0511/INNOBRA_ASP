@@ -4,14 +4,13 @@ using INNOBRA_ASP.DB.Data.Entity;
 namespace INNOBRA_ASP.Server.Repositorio
   
 {
-    public class ItemTipoRenglon : Repositorio<ItemTipoRenglon>, IItemTipoRenglonRepositorio
+    public class ItemTipoRenglonRepositorio : Repositorio<ItemTipoRenglon>, IItemTipoRenglonRepositorio
     {
         private readonly Context context;
-        public ItemTipoRenglon(Context context) : base(context)
+        public ItemTipoRenglonRepositorio(Context context) : base(context)
         {
             this.context = context;
         }
-            
-        
+          
     }
 }
