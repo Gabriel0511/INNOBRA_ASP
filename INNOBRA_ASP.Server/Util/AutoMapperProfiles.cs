@@ -20,6 +20,10 @@ namespace INNOBRA_ASP.Server.Util
             //GABRIEL
             CreateMap<CrearObraDTO, Obra>();
             CreateMap<CrearPresupuestoDTO, Presupuesto>();
+
+            //LUCIA
+            CreateMap<CrearItemDTO, Item>();
+            CreateMap<CrearItemRenglonDTO, ItemRenglon>();
         }
     }
 }

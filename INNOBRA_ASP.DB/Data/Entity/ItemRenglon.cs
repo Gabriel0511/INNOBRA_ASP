@@ -16,6 +16,8 @@ namespace INNOBRA_ASP.DB.Data.Entity
         [Required(ErrorMessage = "El MaterialPrevisto es obligatorio.")]
         public string Cantidad { get; set; }
 
+        //Clave Foranea
+
         public int Items_idItems { get; set; }
 
         public Item Item { get; set; }
