@@ -3,6 +3,8 @@ using INNOBRA_ASP.DB.Data;
 using Microsoft.EntityFrameworkCore;
 using INNOBRA_ASP.DB.Data.Entity;
 using INNOBRA_ASP.Shared.DTO;
+using AutoMapper;
+using INNOBRA_ASP.Server.Repositorio;
 
 namespace INNOBRA_ASP.Server.Controllers
 {
@@ -10,28 +12,48 @@ namespace INNOBRA_ASP.Server.Controllers
     [Route("Api/ItemRenglones")]
     public class ItemRenglonesController : ControllerBase
     {
-        private readonly Context context;
+        private readonly IMapper mapper;
+        private readonly IItemRenglonRepositorio repositorio;
 
-        public ItemRenglonesController(Context context)
+        public ItemRenglonesController(IItemRenglonRepositorio repositorio, IMapper mapper)
         {
-            this.context = context;
+            this.repositorio = repositorio;
+            this.mapper = mapper;
         }
 
         [HttpGet]
 
         public async Task<ActionResult<List<ItemRenglon>>> Get()
         {
-            return await context.ItemRenglones.ToListAsync();
+            return await repositorio.Select();
+        }
+
+        [HttpGet("GetById/{id:int}")]
+        public async Task<ActionResult<ItemRenglon>> GetById(int id)
+        {
+            var Verif = await repositorio.SelectById(id);
+            if (Verif == null)
+            {
+                return NotFound();
+            }
+            return Verif;
+        }
+
+        [HttpGet("existe/{id:int}")]
+        public async Task<ActionResult<bool>> Existe(int id)
+        {
+            var existe = await repositorio.Existe(id);
+            return existe;
         }
 
         [HttpPost]
-        public async Task<ActionResult<int>> Post(ItemRenglon entidad)
+        public async Task<ActionResult<int>> Post(CrearItemRenglonDTO entidadDTO)
         {
             try
             {
-                context.ItemRenglones.Add(entidad);
-                await context.SaveChangesAsync();
-                return entidad.Id;
+                ItemRenglon entidad = mapper.Map<ItemRenglon>(entidadDTO);
+
+                return await repositorio.Insert(entidad);
             }
             catch (Exception e)
             {
@@ -48,20 +70,18 @@ namespace INNOBRA_ASP.Server.Controllers
                 return BadRequest("Datos incorrectos.");
             }
 
-            var verif = await context.ItemRenglones.Where(e => e.Id == id).FirstOrDefaultAsync();
+            var verif = await repositorio.SelectById(id);
 
             if (verif == null)
             {
-                return NotFound("No existe la obra buscada.");
+                return NotFound("No existe el Item Renglón buscado.");
             }
 
-            verif.MaterialPrevisto = entidad.MaterialPrevisto;
-            verif.Cantidad = entidad.Cantidad;
+            mapper.Map(verif, entidad);
 
             try
             {
-                context.ItemRenglones.Update(verif);
-                await context.SaveChangesAsync();
+                await repositorio.Update(id, verif);
                 return Ok();
             }
             catch (Exception)
@@ -69,6 +89,20 @@ namespace INNOBRA_ASP.Server.Controllers
 
                 throw;
             }
+
+        }
+
+        [HttpDelete("{id:int}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            var resp = await repositorio.Delete(id);
+
+            if (!resp)
+            {
+                return BadRequest("El Item Renglón no se pudo borrar.");
+
+            }
+            return Ok();
 
         }
     }

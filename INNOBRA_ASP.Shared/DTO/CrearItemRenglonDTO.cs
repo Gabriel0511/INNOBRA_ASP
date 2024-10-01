@@ -1,19 +1,17 @@
-﻿using System;
+﻿using INNOBRA_ASP.DB.Data.Entity;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
 
-
-namespace INNOBRA_ASP.DB.Data.Entity
+namespace INNOBRA_ASP.Shared.DTO
 {
-    public class ItemRenglon : EntityBase
+    public class CrearItemRenglonDTO
     {
-        [Required(ErrorMessage = "El MaterialPrevisto es obligatorio.")]
         public string MaterialPrevisto { get; set; }
 
-        [Required(ErrorMessage = "El MaterialPrevisto es obligatorio.")]
         public string Cantidad { get; set; }
 
         //Clave Foranea
@@ -25,6 +23,5 @@ namespace INNOBRA_ASP.DB.Data.Entity
         public int Recursos_idRecursos { get; set; }
 
         public Recurso Recurso { get; set; }
-
     }
 }

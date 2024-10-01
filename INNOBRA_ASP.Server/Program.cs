@@ -29,6 +29,11 @@ builder.Services.AddScoped<IRecursoRepositorio, RecursoRepositorio>();
 builder.Services.AddScoped<IObraRepositorio, ObraRepositorio>();
 builder.Services.AddScoped<IPresupuestoRepositorio, PresupuestoRepositorio>();
 
+//LUCIA
+builder.Services.AddScoped<IItemRepositorio, ItemRepositorio>();
+builder.Services.AddScoped<IItemRenglonRepositorio, ItemRenglonRepositorio>();
+
+
 //------------------------------------------------------------------------------
 //Construccion de la aplicacion
 var app = builder.Build();
