@@ -54,7 +54,13 @@ namespace INNOBRA_ASP.Server.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e.InnerException.Message);
+                {
+                    if (e.InnerException != null)
+                    {
+                        return BadRequest($"Error: {e.Message}. Inner Exception: {e.InnerException.Message}");
+                    }
+                    return BadRequest(e.Message);
+                }
             }
         }
 
