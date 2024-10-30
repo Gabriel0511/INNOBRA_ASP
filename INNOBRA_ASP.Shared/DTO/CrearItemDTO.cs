@@ -1,27 +1,25 @@
-﻿using System;
+﻿using INNOBRA_ASP.DB.Data.Entity;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INNOBRA_ASP.DB.Data.Entity
+namespace INNOBRA_ASP.Shared.DTO
 {
-    public class Item : EntityBase
+    public class CrearItemDTO
     {
-        [Required(ErrorMessage = "El Tiempo_estimado es obligatorio.")]
         public DateTime Tiempo_estimado { get; set; }
-
-        [Required(ErrorMessage = "El Material_estimado es obligatorio.")]
         public int Material_estimado { get; set; }
 
-        // Clave Foranea
+        // clave foranea
 
         public int ItemTipos_idItemTipos { get; set; }
 
         public ItemTipo ItemTipo { get; set; }
 
-        public int Presupuesto_id {  get; set; }
+        public int Presupuesto_id { get; set; }
 
         public Presupuesto Presupuesto { get; set; }
     }

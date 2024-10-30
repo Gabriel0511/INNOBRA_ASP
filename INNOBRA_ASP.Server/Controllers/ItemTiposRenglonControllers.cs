@@ -1,43 +1,45 @@
-﻿using INNOBRA_ASP.DB.Data;
-using INNOBRA_ASP.DB.Data.Entity;
+﻿using INNOBRA_ASP.DB.Data.Entity;
+using INNOBRA_ASP.DB.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using INNOBRA_ASP.Shared.DTO;
 using AutoMapper;
+using INNOBRA_ASP.Shared.DTO;
 using INNOBRA_ASP.Server.Repositorio;
+using ItemTipoRenglon = INNOBRA_ASP.DB.Data.Entity.ItemTipoRenglon; //Me recomendo usar este using
 
 namespace INNOBRA_ASP.Server.Controllers
 {
     [ApiController]
-    [Route("api/Avances")]
-    public class AvancesControllers : ControllerBase
+    [Route("api/ItemTipoRenglon")]
+    public class ItemTiposRenglonControllers : ControllerBase
     {
-        private readonly IAvanceRepositorio repositorio;
         private readonly IMapper mapper;
-        public AvancesControllers(IAvanceRepositorio repositorio, IMapper mapper)
+        private readonly IRepositorio<ItemTipoRenglon> repositorio;
+
+        public ItemTiposRenglonControllers(IItemTipoRenglonRepositorio repositorio, IMapper mapper)
         {
-            this.repositorio = repositorio;
             this.mapper = mapper;
+            this.repositorio = (IRepositorio<ItemTipoRenglon>?)repositorio;//Le agregue que acepte nulos por que me daba error
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Avance>>> get()
+        public async Task<ActionResult<List<ItemTipoRenglon>>> Get()
         {
             return await repositorio.Select();
         }
 
-        [HttpGet("GetById/{id:int}")] //api/Avances/2
-        public async Task<ActionResult<Avance>> GetById(int id)
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<ItemTipoRenglon>> Get(int id)
         {
-            var Verif = await repositorio.SelectById(id);
-            if (Verif == null)
+            ItemTipoRenglon? sel = await repositorio.SelectById(id);
+            if (sel == null)
             {
                 return NotFound();
             }
-            return Verif;
+            return sel;
         }
 
-        [HttpGet("existe/{id:int}")] //api/Avances/existe/2
+        [HttpGet("existe/{id:int}")]
         public async Task<ActionResult<bool>> Existe(int id)
         {
             var existe = await repositorio.Existe(id);
@@ -45,11 +47,11 @@ namespace INNOBRA_ASP.Server.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<int>> Post(CrearAvanceDTO entidadDTO)
+        public async Task<ActionResult<int>> Posts(CrearItemRenglonTipoDTO entidadDTO)
         {
             try
             {
-                Avance entidad = mapper.Map<Avance>(entidadDTO);
+                ItemTipoRenglon entidad = mapper.Map<ItemTipoRenglon>(entidadDTO);
                 return await repositorio.Insert(entidad);
             }
             catch (Exception e)
@@ -64,25 +66,25 @@ namespace INNOBRA_ASP.Server.Controllers
             }
         }
 
-        [HttpPut("{Id:int}")] //api/Avances/2
-        public async Task<ActionResult> Put(int Id, [FromBody] Avance entidad)
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult> Put(int id, [FromBody] ItemTipoRenglon entidad)
         {
-            if (Id != entidad.Id)
+            if (id != entidad.Id)
             {
                 return BadRequest("Datos incorrectos");
             }
 
-            var sel = await repositorio.SelectById(Id);
+            var sel = await repositorio.SelectById(id);
             if (sel == null)
             {
-                return NotFound("El avance no existe.");
+                return NotFound("El item no existe.");
             }
 
             mapper.Map(entidad, sel);
 
             try
             {
-                var actualizado = await repositorio.Update(Id, sel);
+                var actualizado = await repositorio.Update(id, sel);
                 if (actualizado)
                 {
                     return Ok();
@@ -98,19 +100,23 @@ namespace INNOBRA_ASP.Server.Controllers
             }
         }
 
-        [HttpDelete("{id:int}")] //api/Avances/2
+        [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var resp = await repositorio.Delete(id);
-
-            if (!resp)
+            var existe = await repositorio.Existe(id);
+            if (!existe)
             {
-                return BadRequest("El avance no se pudo borrar");
-
+                return NotFound($"El Item {id} no existe");
             }
-            return Ok();
 
+            if (await repositorio.Delete(id))
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
     }
 }
-

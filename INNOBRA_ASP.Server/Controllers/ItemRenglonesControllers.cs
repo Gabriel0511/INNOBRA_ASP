@@ -9,13 +9,13 @@ using INNOBRA_ASP.Server.Repositorio;
 namespace INNOBRA_ASP.Server.Controllers
 {
     [ApiController]
-    [Route("Api/Obras")]
-    public class ObrasControllers : ControllerBase
+    [Route("Api/ItemRenglones")]
+    public class ItemRenglonesController : ControllerBase
     {
-        private readonly IObraRepositorio repositorio;
         private readonly IMapper mapper;
+        private readonly IItemRenglonRepositorio repositorio;
 
-        public ObrasControllers(IObraRepositorio repositorio, IMapper mapper)
+        public ItemRenglonesController(IItemRenglonRepositorio repositorio, IMapper mapper)
         {
             this.repositorio = repositorio;
             this.mapper = mapper;
@@ -23,13 +23,13 @@ namespace INNOBRA_ASP.Server.Controllers
 
         [HttpGet]
 
-        public async Task<ActionResult<List<Obra>>> Get()
+        public async Task<ActionResult<List<ItemRenglon>>> Get()
         {
             return await repositorio.Select();
         }
 
-        [HttpGet("GetById/{id:int}")] //api/Obra/2
-        public async Task<ActionResult<Obra>> GetById(int id)
+        [HttpGet("GetById/{id:int}")]
+        public async Task<ActionResult<ItemRenglon>> GetById(int id)
         {
             var Verif = await repositorio.SelectById(id);
             if (Verif == null)
@@ -39,7 +39,7 @@ namespace INNOBRA_ASP.Server.Controllers
             return Verif;
         }
 
-        [HttpGet("existe/{id:int}")] //api/Obra/existe/2
+        [HttpGet("existe/{id:int}")]
         public async Task<ActionResult<bool>> Existe(int id)
         {
             var existe = await repositorio.Existe(id);
@@ -47,11 +47,11 @@ namespace INNOBRA_ASP.Server.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<int>> Post(CrearObraDTO entidadDTO)
+        public async Task<ActionResult<int>> Post(CrearItemRenglonDTO entidadDTO)
         {
             try
             {
-                Obra entidad = mapper.Map<Obra>(entidadDTO);
+                ItemRenglon entidad = mapper.Map<ItemRenglon>(entidadDTO);
 
                 return await repositorio.Insert(entidad);
             }
@@ -68,7 +68,7 @@ namespace INNOBRA_ASP.Server.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult> Put(int id, [FromBody] Obra entidad)
+        public async Task<ActionResult> Put(int id, [FromBody] ItemRenglon entidad)
         {
 
             if (id != entidad.Id)
@@ -80,9 +80,9 @@ namespace INNOBRA_ASP.Server.Controllers
 
             if (verif == null)
             {
-                return NotFound("No existe la obra buscada.");
+                return NotFound("No existe el Item Renglón buscado.");
             }
-            
+
             mapper.Map(verif, entidad);
 
             try
@@ -105,7 +105,7 @@ namespace INNOBRA_ASP.Server.Controllers
 
             if (!resp)
             {
-                return BadRequest("La obra no se pudo borrar");
+                return BadRequest("El Item Renglón no se pudo borrar.");
 
             }
             return Ok();
