@@ -7,8 +7,9 @@
 <br />
 <table>
     <tr>
-        <th>Código</th>
         <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Costo</th>
     </tr>
     @if (Mensaje == "")
     {
@@ -25,8 +26,9 @@
             @foreach (var item in listaUnidades)
             {
                 <tr>
-                    <td>@item.Codigo</td>
                     <td>@item.Nombre</td>
+                    <td>@item.Descripcion</td>
+                    <td>@item.Costo</td>
                     <td>
                         <a class="btn btn-primary"
                            href="api/Unidades/editar/@item.Id">
@@ -101,7 +103,7 @@
 
     private async Task Borrar()
     {
-        var respuesta = await http.Delete($"api/Unidades/{unidadBorrar.Id}", unidadBorrar);
+        var respuesta = await http.Delete($"api/Unidades/{unidadBorrar.Id}");
         if (respuesta.Error)
         {
             Mensaje = "No se pudo borrar la unidad";
@@ -109,5 +111,4 @@
         Cancelar();
         await Leer();
     }
-   }
 }

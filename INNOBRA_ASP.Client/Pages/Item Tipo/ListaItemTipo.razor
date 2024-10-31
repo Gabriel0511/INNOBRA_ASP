@@ -103,7 +103,7 @@
 
     private async Task Borrar()
     {
-        var respuesta = await http.Delete($"api/ItemTipos/{itemTipoBorrar.Id}", itemTipoBorrar);
+        var respuesta = await http.Delete($"api/ItemTipos/{itemTipoBorrar.Id}");
         if (respuesta.Error)
         {
             Mensaje = "No se pudo borrar el tipo de ítem";
