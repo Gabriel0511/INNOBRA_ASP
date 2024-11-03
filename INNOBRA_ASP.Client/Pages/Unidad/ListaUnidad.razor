@@ -1,0 +1,114 @@
+﻿@page "/api/Unidades"
+@inject IHttpServicio http
+
+<h3>Lista de Unidades</h3>
+<br />
+<a class="btn btn-primary" href="/api/Unidades/crear">Nueva Unidad</a>
+<br />
+<table>
+    <tr>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Costo</th>
+    </tr>
+    @if (Mensaje == "")
+    {
+        @if (listaUnidades == null)
+        {
+            <p>Buscando....</p>
+        }
+        else if (listaUnidades.Count == 0)
+        {
+            <p>No existen unidades</p>
+        }
+        else
+        {
+            @foreach (var item in listaUnidades)
+            {
+                <tr>
+                    <td>@item.Nombre</td>
+                    <td>@item.Descripcion</td>
+                    <td>@item.Costo</td>
+                    <td>
+                        <a class="btn btn-primary"
+                           href="api/Unidades/editar/@item.Id">
+                            Editar
+                        </a>
+                    </td>
+                    <td>
+                        <button class="btn btn-danger"
+                                @onclick="() => Eliminar(item)">
+                            Borrar
+                        </button>
+                    </td>
+                </tr>
+            }
+        }
+    }
+    else
+    {
+        <p> Error: @Mensaje</p>
+    }
+</table>
+
+<Confirmacion @ref="confirmacion"
+              Titulo="CUIDADO"
+              textCancelar="Salir"
+              onCancel="Cancelar"
+              onConfirm="Borrar">
+    <h5>Está por borrar la unidad</h5>
+    <br />
+    <p>¿Está seguro?</p>
+</Confirmacion>
+
+@code {
+    Confirmacion confirmacion;
+
+    List<Unidad> listaUnidades;
+    Unidad unidad;
+    string Mensaje = "";
+
+    Unidad? unidadBorrar = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await Leer();
+    }
+
+    private async Task Leer()
+    {
+        var resp = await http.Get<List<Unidad>>("api/Unidades");
+        if (!resp.Error)
+        {
+            listaUnidades = resp.Respuesta;
+        }
+        else
+        {
+            Mensaje = await resp.ObtenerError();
+        }
+    }
+
+    private async Task Eliminar(Unidad unidad)
+    {
+        unidadBorrar = unidad;
+        confirmacion.Ver();
+    }
+
+    private void Cancelar()
+    {
+        confirmacion.Ocultar();
+        unidadBorrar = null;
+    }
+
+    private async Task Borrar()
+    {
+        var respuesta = await http.Delete($"api/Unidades/{unidadBorrar.Id}");
+        if (respuesta.Error)
+        {
+            Mensaje = "No se pudo borrar la unidad";
+        }
+        Cancelar();
+        await Leer();
+    }
+}

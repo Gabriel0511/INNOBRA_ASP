@@ -11,4 +11,9 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.6" PrivateAssets="all" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\INNOBRA_ASP.DB\INNOBRA_ASP.DB.csproj" />
+    <ProjectReference Include="..\INNOBRA_ASP.Shared\INNOBRA_ASP.Shared.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -66,11 +66,12 @@ namespace INNOBRA_ASP.Client.Servicios
             }
         }
 
-        public async Task<HttpRespuesta<object>> Delete<T>(string url, T entidad)
+         public async Task<HttpRespuesta<object>> Delete(string url)
         {
             var respuesta = await http.DeleteAsync(url);
-
-            return new HttpRespuesta<object>(null, !respuesta.IsSuccessStatusCode, respuesta);
+            return new HttpRespuesta<object>(null,
+                                             !respuesta.IsSuccessStatusCode,
+                                             respuesta);
         }
 
 
