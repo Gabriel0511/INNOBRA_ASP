@@ -27,5 +27,7 @@ namespace INNOBRA_ASP.Shared.DTO
         public int Unidad_Id { get; set; }
 
         public Unidad Unidad { get; set; }
+
+        public TipoRecurso Tipo { get; set; }
     }
 }
