@@ -1,4 +1,4 @@
-﻿@page "/api/ItemTipo/crear"
+﻿@page "/api/ItemTipos/crear"
 @inject IHttpServicio http
 @using INNOBRA_ASP.Shared.DTO
 @using System.Net.Http.Json
@@ -24,14 +24,12 @@
         <label>Unidad :</label>
         <InputNumber @bind-Value="itemtipo.Unidad_Id" />
     </div>
-    
 
     <button type="submit" class="btn btn-primary">Guardar</button>
     <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
 </EditForm>
 
 <hr />
-
 
 @code {
     private CrearItemTipoDTO itemtipo = new CrearItemTipoDTO();
@@ -45,7 +43,7 @@
     private async Task CargarItemTipo()
     {
         // Llama al servicio para obtener la lista de unidades
-        var respuesta = await http.Get<List<CrearItemTipo>>("api/ItemTipo");
+        var respuesta = await http.Get<List<CrearItemTipo>>("api/ItemTipos");
         if (!respuesta.Error)
         {
             listaItemTipo = respuesta.Respuesta;
@@ -54,17 +52,16 @@
 
     private async Task Grabar()
     {
-        var httpRespuesta = await http.Post<CrearItemTipoDTO>("api/ItemTipos",itemtipo);
+        var httpRespuesta = await http.Post<CrearItemTipoDTO>("api/ItemTipos", itemtipo);
         if (httpRespuesta.Error)
         {
             var body = httpRespuesta.HttpResponseMessage;
         }
-        nav.NavigateTo("/api/ItemTipo");
+        nav.NavigateTo("/api/ItemTipos");
     }
-
 
     private void Cancelar()
     {
-
+        nav.NavigateTo("/api/ItemTipos");
     }
 }

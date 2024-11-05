@@ -1,0 +1,50 @@
+﻿@page "/api/ItemTipoRenglon/crear"
+@inject IHttpServicio http
+@using INNOBRA_ASP.Shared.DTO
+@using System.Net.Http.Json
+@inject NavigationManager nav
+
+<h3>Gestión de Item Tipo Renglon</h3>
+
+<!-- Formulario para Crear ItemTipoRenglon -->
+<EditForm Model="@itemRenglonTipo" OnValidSubmit="Grabar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Item Tipo ID:</label>
+        <InputNumber @bind-Value="itemRenglonTipo.Item_Tipos_Id" />
+    </div>
+
+    <div>
+        <label>Recurso ID:</label>
+        <InputNumber @bind-Value="itemRenglonTipo.Recurso_Id" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+</EditForm>
+
+<hr />
+
+@code {
+    private CrearItemRenglonTipoDTO itemRenglonTipo = new CrearItemRenglonTipoDTO();
+
+    private async Task Grabar()
+    {
+        var httpRespuesta = await http.Post<CrearItemRenglonTipoDTO>("api/ItemTipoRenglon", itemRenglonTipo);
+        if (httpRespuesta.Error)
+        {
+            // Maneja el error si es necesario
+        }
+        else
+        {
+            nav.NavigateTo("/api/ItemTipoRenglon");
+        }
+    }
+
+    private void Cancelar()
+    {
+        nav.NavigateTo("/api/ItemTipoRenglon");
+    }
+}
