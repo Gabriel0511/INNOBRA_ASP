@@ -29,7 +29,7 @@
     <div>
         <label>Tipo de Recurso:</label>
         <InputSelect @bind-Value="recurso.Tipo">
-            @foreach (var tipo in Enum.GetValues(typeof(CrearRecursoDTO.TipoRecurso)))
+            @foreach (var tipo in Enum.GetValues(typeof(CrearRecursoDTO.TipoRecursoDTO)))
             {
                 <option value="@tipo">@tipo</option>
             }

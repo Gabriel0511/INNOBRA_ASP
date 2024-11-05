@@ -10,7 +10,7 @@ namespace INNOBRA_ASP.Shared.DTO
 {
     public class CrearRecursoDTO
     {
-        public enum TipoRecurso
+        public enum TipoRecursoDTO
         {
             Humano,
             Maquinaria,
@@ -28,6 +28,6 @@ namespace INNOBRA_ASP.Shared.DTO
 
         public Unidad Unidad { get; set; }
 
-        public TipoRecurso Tipo { get; set; }
+        public TipoRecursoDTO Tipo { get; set; }
     }
 }
