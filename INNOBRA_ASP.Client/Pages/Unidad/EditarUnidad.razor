@@ -1,0 +1,86 @@
+﻿@page "/api/Unidades/editar/{id:int}"
+@inject IHttpServicio http
+@using INNOBRA_ASP.Shared.DTO
+@using System.Net.Http.Json
+@inject NavigationManager nav
+
+<h3>Editar Unidad</h3>
+
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <div class="alert alert-success">
+        @mensaje
+    </div>
+}
+
+<EditForm Model="@unidad" OnValidSubmit="Actualizar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Nombre:</label>
+        <InputText @bind-Value="unidad.Nombre" />
+        <ValidationMessage For="@(() => unidad.Nombre)" />
+    </div>
+
+    <div>
+        <label>Descripción:</label>
+        <InputText @bind-Value="unidad.Descripcion" />
+    </div>
+
+    <div>
+        <label>Costo:</label>
+        <InputNumber @bind-Value="unidad.Costo" />
+        <ValidationMessage For="@(() => unidad.Costo)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+</EditForm>
+
+<hr />
+
+@code {
+    [Parameter] public int id { get; set; }
+    private CrearUnidadDTO unidad = new CrearUnidadDTO();
+    private string mensaje = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarUnidad();
+    }
+
+    private async Task CargarUnidad()
+    {
+        var respuesta = await http.Get<CrearUnidadDTO>($"api/Unidades/{id}");
+        if (!respuesta.Error)
+        {
+            unidad = respuesta.Respuesta;
+        }
+        else
+        {
+            nav.NavigateTo("/api/Unidades");
+        }
+    }
+
+    private async Task Actualizar()
+    {
+        var respuesta = await http.Put($"api/Unidades/{id}", unidad);
+
+        if (!respuesta.Error)
+        {
+            mensaje = "Se cargó con éxito la unidad.";
+            nav.NavigateTo("/api/Unidades");
+        }
+        else
+        {
+            var errorContent = await respuesta.HttpResponseMessage.Content.ReadAsStringAsync();
+            mensaje = $"Error: {errorContent}"; // Muestra el error
+        }
+    }
+
+    private void Cancelar()
+    {
+        nav.NavigateTo("/api/Unidades");
+    }
+}
