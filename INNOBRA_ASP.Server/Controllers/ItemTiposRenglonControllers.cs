@@ -2,6 +2,10 @@
 using INNOBRA_ASP.DB.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
+using INNOBRA_ASP.Shared.DTO;
+using INNOBRA_ASP.Server.Repositorio;
+using ItemTipoRenglon = INNOBRA_ASP.DB.Data.Entity.ItemTipoRenglon; //Me recomendo usar este using
 
 namespace INNOBRA_ASP.Server.Controllers
 {
@@ -9,26 +13,86 @@ namespace INNOBRA_ASP.Server.Controllers
     [Route("api/ItemTipoRenglon")]
     public class ItemTiposRenglonControllers : ControllerBase
     {
-        private readonly Context context;
-        public ItemTiposRenglonControllers(Context context)
+        private readonly IMapper mapper;
+        private readonly IRepositorio<ItemTipoRenglon> repositorio;
+
+        public ItemTiposRenglonControllers(IItemTipoRenglonRepositorio repositorio, IMapper mapper)
         {
-            this.context = context;
+            this.mapper = mapper;
+            this.repositorio = (IRepositorio<ItemTipoRenglon>?)repositorio;//Le agregue que acepte nulos por que me daba error
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<ItemTipoRenglon>>> get()
+        public async Task<ActionResult<List<ItemTipoRenglon>>> Get()
         {
-            return await context.ItemTipoRenglones.ToListAsync();
+            return await repositorio.Select();
+        }
+
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<ItemTipoRenglon>> Get(int id)
+        {
+            ItemTipoRenglon? sel = await repositorio.SelectById(id);
+            if (sel == null)
+            {
+                return NotFound();
+            }
+            return sel;
+        }
+
+        [HttpGet("existe/{id:int}")]
+        public async Task<ActionResult<bool>> Existe(int id)
+        {
+            var existe = await repositorio.Existe(id);
+            return existe;
         }
 
         [HttpPost]
-        public async Task<ActionResult<int>> Post(ItemTipoRenglon entidad)
+        public async Task<ActionResult<int>> Posts(CrearItemRenglonTipoDTO entidadDTO)
         {
             try
             {
-                context.ItemTipoRenglones.Add(entidad);
-                await context.SaveChangesAsync();
-                return entidad.Id;
+                ItemTipoRenglon entidad = mapper.Map<ItemTipoRenglon>(entidadDTO);
+                return await repositorio.Insert(entidad);
+            }
+            catch (Exception e)
+            {
+                {
+                    if (e.InnerException != null)
+                    {
+                        return BadRequest($"Error: {e.Message}. Inner Exception: {e.InnerException.Message}");
+                    }
+                    return BadRequest(e.Message);
+                }
+            }
+        }
+
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult> Put(int id, [FromBody] ItemTipoRenglon entidad)
+        {
+            if (id != entidad.Id)
+            {
+                return BadRequest("Datos incorrectos");
+            }
+
+            var sel = await repositorio.SelectById(id);
+            if (sel == null)
+            {
+                return NotFound("El item no existe.");
+            }
+
+            mapper.Map(entidad, sel);
+
+            try
+            {
+                var actualizado = await repositorio.Update(id, sel);
+                if (actualizado)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest("No se pudo actualizar los datos.");
+                }
             }
             catch (Exception e)
             {
@@ -36,37 +100,22 @@ namespace INNOBRA_ASP.Server.Controllers
             }
         }
 
-        [HttpPut("{id:int}")] //api/ItemTipoRenglon/2
-        public async Task<ActionResult> Put(int Id, [FromBody] ItemTipoRenglon entidad)
+        [HttpDelete("{id:int}")]
+        public async Task<ActionResult> Delete(int id)
         {
-            if (Id != entidad.Id)
+            var existe = await repositorio.Existe(id);
+            if (!existe)
             {
-                return BadRequest("Datos Incorrectos");
-            }
-            var Verif = await context.ItemTipoRenglones
-                .Where(e => e.Id == Id).FirstOrDefaultAsync();
-
-            if (Verif == null)
-            {
-                return NotFound("No existe el renglon buscado.");
+                return NotFound($"El Item {id} no existe");
             }
 
-            Verif.Item_Tipos_Id = entidad.Item_Tipos_Id;
-            Verif.Item = entidad.Item;
-            Verif.Recurso_Id = entidad.Recurso_Id;
-            Verif.recurso = entidad.recurso;
-
-
-            try
+            if (await repositorio.Delete(id))
             {
-                context.ItemTipoRenglones.Update(Verif);
-                await context.SaveChangesAsync();
                 return Ok();
             }
-            catch (Exception e)
+            else
             {
-
-                return BadRequest(e.Message);
+                return BadRequest();
             }
         }
     }

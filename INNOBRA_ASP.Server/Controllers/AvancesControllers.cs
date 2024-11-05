@@ -2,6 +2,9 @@
 using INNOBRA_ASP.DB.Data.Entity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using INNOBRA_ASP.Shared.DTO;
+using AutoMapper;
+using INNOBRA_ASP.Server.Repositorio;
 
 namespace INNOBRA_ASP.Server.Controllers
 {
@@ -9,64 +12,105 @@ namespace INNOBRA_ASP.Server.Controllers
     [Route("api/Avances")]
     public class AvancesControllers : ControllerBase
     {
-        private readonly Context context;
-        public AvancesControllers(Context context)
+        private readonly IAvanceRepositorio repositorio;
+        private readonly IMapper mapper;
+        public AvancesControllers(IAvanceRepositorio repositorio, IMapper mapper)
         {
-            this.context = context;
+            this.repositorio = repositorio;
+            this.mapper = mapper;
         }
 
         [HttpGet]
         public async Task<ActionResult<List<Avance>>> get()
         {
-            return await context.Avances.ToListAsync();
+            return await repositorio.Select();
+        }
+
+        [HttpGet("GetById/{id:int}")] //api/Avances/2
+        public async Task<ActionResult<Avance>> GetById(int id)
+        {
+            var Verif = await repositorio.SelectById(id);
+            if (Verif == null)
+            {
+                return NotFound();
+            }
+            return Verif;
+        }
+
+        [HttpGet("existe/{id:int}")] //api/Avances/existe/2
+        public async Task<ActionResult<bool>> Existe(int id)
+        {
+            var existe = await repositorio.Existe(id);
+            return existe;
         }
 
         [HttpPost]
-        public async Task<ActionResult<int>> Post(Avance entidad)
+        public async Task<ActionResult<int>> Post(CrearAvanceDTO entidadDTO)
         {
             try
             {
-                context.Avances.Add(entidad);
-                await context.SaveChangesAsync();
-                return entidad.Id;
+                Avance entidad = mapper.Map<Avance>(entidadDTO);
+                return await repositorio.Insert(entidad);
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                {
+                    if (e.InnerException != null)
+                    {
+                        return BadRequest($"Error: {e.Message}. Inner Exception: {e.InnerException.Message}");
+                    }
+                    return BadRequest(e.Message);
+                }
             }
         }
 
-        [HttpPut("{id:int}")] //api/Avances/2
+        [HttpPut("{Id:int}")] //api/Avances/2
         public async Task<ActionResult> Put(int Id, [FromBody] Avance entidad)
         {
             if (Id != entidad.Id)
             {
-                return BadRequest("Datos Incorrectos");
+                return BadRequest("Datos incorrectos");
             }
-            var Verif = await context.Avances
-                .Where(e => e.Id == Id).FirstOrDefaultAsync();
 
-            if (Verif == null)
+            var sel = await repositorio.SelectById(Id);
+            if (sel == null)
             {
-                return NotFound("No existe el avance buscado.");
+                return NotFound("El avance no existe.");
             }
 
-            Verif.Fecha = entidad.Fecha;
-            Verif.MaterialEjecutado = entidad.MaterialEjecutado;
-            Verif.FechaFinalizacionReal = entidad.FechaFinalizacionReal;
+            mapper.Map(entidad, sel);
 
             try
             {
-                context.Avances.Update(Verif);
-                await context.SaveChangesAsync();
-                return Ok();
+                var actualizado = await repositorio.Update(Id, sel);
+                if (actualizado)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest("No se pudo actualizar los datos.");
+                }
             }
             catch (Exception e)
             {
-
                 return BadRequest(e.Message);
             }
+        }
+
+        [HttpDelete("{id:int}")] //api/Avances/2
+        public async Task<ActionResult> Delete(int id)
+        {
+            var resp = await repositorio.Delete(id);
+
+            if (!resp)
+            {
+                return BadRequest("El avance no se pudo borrar");
+
+            }
+            return Ok();
 
         }
     }
 }
+

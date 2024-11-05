@@ -1,0 +1,85 @@
+﻿@page "/api/Recursos/crear"
+@inject IHttpServicio http
+@using INNOBRA_ASP.Shared.DTO
+@using System.Net.Http.Json
+@inject NavigationManager nav
+
+<h3>Gestión de Recursos</h3>
+
+<!-- Formulario para Crear/Editar Recurso -->
+<EditForm Model="@recurso" OnValidSubmit="Grabar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Nombre:</label>
+        <InputText @bind-Value="recurso.Nombre" />
+    </div>
+
+    <div>
+        <label>Cantidad:</label>
+        <InputText @bind-Value="recurso.Cantidad" />
+    </div>
+
+    <div>
+        <label>Unidad de Medida:</label>
+        <InputText @bind-Value="recurso.UnidadMedida" />
+    </div>
+
+    <div>
+        <label>Tipo de Recurso:</label>
+        <InputSelect @bind-Value="recurso.Tipo">
+            @foreach (var tipo in Enum.GetValues(typeof(CrearRecursoDTO.TipoRecursoDTO)))
+            {
+                <option value="@tipo">@tipo</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div>
+        <label>Unidad ID:</label>
+        <InputNumber @bind-Value="recurso.Unidad_Id" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+</EditForm>
+
+<hr />
+
+
+@code {
+    private CrearRecursoDTO recurso = new CrearRecursoDTO();
+    private List<CrearRecursoDTO> listaRecursos = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarRecursos();
+    }
+
+    private async Task CargarRecursos()
+    {
+        // Llama al servicio para obtener la lista de recursos
+        var respuesta = await http.Get<List<CrearRecursoDTO>>("api/Recursos");
+        if (!respuesta.Error)
+        {
+            listaRecursos = respuesta.Respuesta;
+        }
+    }
+
+    private async Task Grabar()
+    {
+        var httpRespuesta = await http.Post<CrearRecursoDTO>("api/Recursos", recurso);
+        if (httpRespuesta.Error)
+        {
+            var body = httpRespuesta.HttpResponseMessage;
+        }
+        nav.NavigateTo("/api/Recursos");
+    }
+
+
+    private void Cancelar()
+    {
+       
+    }
+}

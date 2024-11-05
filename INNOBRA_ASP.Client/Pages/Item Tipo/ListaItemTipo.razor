@@ -1,0 +1,114 @@
+﻿@page "/api/ItemTipos"
+@inject IHttpServicio http
+
+<h3>Lista de Tipos de Ítems</h3>
+<br />
+<a class="btn btn-primary" href="/api/ItemTipos/crear">Nuevo Tipo de Ítem</a>
+<br />
+<table>
+    <tr>
+        <th>Código</th>
+        <th>Nombre</th>
+        <th>Unidad de Medida</th>
+    </tr>
+    @if (Mensaje == "")
+    {
+        @if (listaItemTipos == null)
+        {
+            <p>Buscando....</p>
+        }
+        else if (listaItemTipos.Count == 0)
+        {
+            <p>No existen tipos de ítems</p>
+        }
+        else
+        {
+            @foreach (var item in listaItemTipos)
+            {
+                <tr>
+                    <td>@item.Codigo</td>
+                    <td>@item.Nombre</td>
+                    <td>@item.Unidad_Id</td>
+                    <td>
+                        <a class="btn btn-primary"
+                           href="api/ItemTipos/editar/@item.Id">
+                            Editar
+                        </a>
+                    </td>
+                    <td>
+                        <button class="btn btn-danger"
+                                @onclick="() => Eliminar(item)">
+                            Borrar
+                        </button>
+                    </td>
+                </tr>
+            }
+        }
+    }
+    else
+    {
+        <p> Error: @Mensaje</p>
+    }
+</table>
+
+<Confirmacion @ref="confirmacion"
+              Titulo="CUIDADO"
+              textCancelar="Salir"
+              onCancel="Cancelar"
+              onConfirm="Borrar">
+    <h5>Está por borrar el tipo de ítem</h5>
+    <br />
+    <p>¿Está seguro?</p>
+</Confirmacion>
+
+@code {
+    Confirmacion confirmacion;
+
+    List<ItemTipo> listaItemTipos;
+    ItemTipo itemTipo;
+    string Mensaje = "";
+
+    ItemTipo? itemTipoBorrar = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await Leer();
+    }
+
+    private async Task Leer()
+    {
+        var resp = await http.Get<List<ItemTipo>>("api/ItemTipos");
+        if (!resp.Error)
+        {
+            listaItemTipos = resp.Respuesta;
+        }
+        else
+        {
+            Mensaje = await resp.ObtenerError();
+        }
+    }
+
+    private async Task Eliminar(ItemTipo itemTipo)
+    {
+        itemTipoBorrar = itemTipo;
+        confirmacion.Ver();
+    }
+
+    private void Cancelar()
+    {
+        confirmacion.Ocultar();
+        itemTipoBorrar = null;
+    }
+
+    private async Task Borrar()
+    {
+        var respuesta = await http.Delete($"api/ItemTipos/{itemTipoBorrar.Id}");
+        if (respuesta.Error)
+        {
+            Mensaje = "No se pudo borrar el tipo de ítem";
+        }
+        Cancelar();
+        await Leer();
+    }
+}

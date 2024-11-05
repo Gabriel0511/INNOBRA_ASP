@@ -15,6 +15,8 @@ namespace INNOBRA_ASP.DB.Data.Entity
         [Required(ErrorMessage = "El Material_estimado es obligatorio.")]
         public int Material_estimado { get; set; }
 
+        // Clave Foranea
+
         public int ItemTipos_idItemTipos { get; set; }
 
         public ItemTipo ItemTipo { get; set; }
