@@ -17,6 +17,6 @@ namespace INNOBRA_ASP.Shared.DTO
         public string Nombre { get; set; }
 
         [Required(ErrorMessage = "La unidad de medida es obligatoria.")]
-        public string Unidad_Id { get; set; }
+        public int Unidad_Id { get; set; }
     }
 }
