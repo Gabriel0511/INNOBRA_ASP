@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace INNOBRA_ASP.DB.Data.Entity
 {
@@ -13,6 +14,8 @@ namespace INNOBRA_ASP.DB.Data.Entity
         public string Nombre { get; set; }
 
         public string Descripcion { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
         public decimal Costo { get; set; }
     }
 }
