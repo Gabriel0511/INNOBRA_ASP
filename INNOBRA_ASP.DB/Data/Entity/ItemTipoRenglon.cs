@@ -9,7 +9,7 @@ namespace INNOBRA_ASP.DB.Data.Entity
 {
     public class ItemTipoRenglon : EntityBase
     {
-        public string Item_Tipos_Id { get; set; }
+        public int Item_Tipos_Id { get; set; }
 
         public Item Item { get; set; }
 
