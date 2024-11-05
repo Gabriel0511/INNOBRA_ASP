@@ -16,9 +16,9 @@ namespace INNOBRA_ASP.Server.Controllers
     public class UnidadesControllers : ControllerBase
     {
         private readonly IMapper mapper;
-        private readonly IRepositorio<Unidad> repositorio;
+        private readonly IUnidadRepositorio repositorio;
 
-        public UnidadesControllers(IMapper mapper, IRepositorio<Unidad> repositorio)
+        public UnidadesControllers(IMapper mapper, IUnidadRepositorio repositorio)
         {
             this.mapper = mapper;
             this.repositorio = repositorio;

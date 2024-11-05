@@ -50,7 +50,7 @@
 
 @code {
     private CrearRecursoDTO recurso = new CrearRecursoDTO();
-    private List<CrearRecursoDTO> listaRecursos = new();
+    private List<Avance> listaRecursos = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -60,7 +60,7 @@
     private async Task CargarRecursos()
     {
         // Llama al servicio para obtener la lista de recursos
-        var respuesta = await http.Get<List<CrearRecursoDTO>>("api/Recursos");
+        var respuesta = await http.Get<List<Avance>>("api/Recursos");
         if (!respuesta.Error)
         {
             listaRecursos = respuesta.Respuesta;
@@ -80,6 +80,6 @@
 
     private void Cancelar()
     {
-       
+        nav.NavigateTo("/api/Recursos");
     }
 }

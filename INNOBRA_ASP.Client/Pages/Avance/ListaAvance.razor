@@ -1,43 +1,47 @@
-﻿@page "/api/Unidades"
+﻿@page "/api/Avances"
 @inject IHttpServicio http
 
-<h3>Lista de Unidades</h3>
+<h3>Lista de Avances</h3>
 <br />
-<a class="btn btn-primary" href="/api/Unidades/crear">Nueva Unidad</a>
+<a class="btn btn-primary" href="/api/Recursos/crear">Nuevo Recurso</a>
 <br />
 <table>
     <tr>
-        <th>Nombre</th>
-        <th>Descripción</th>
-        <th>Costo</th>
+        <th>Fecha</th>
+        <th>Material Ejecutado</th>
+        <th>Fecha de Finalizacion Real</th>
+        <th>Item Id</th>
+        <th>Recurso Id</th>
     </tr>
     @if (Mensaje == "")
     {
-        @if (listaUnidades == null)
+        @if (listaAvances == null)
         {
             <p>Buscando....</p>
         }
-        else if (listaUnidades.Count == 0)
+        else if (listaAvances.Count == 0)
         {
-            <p>No existen unidades</p>
+            <p>No existen recursos</p>
         }
         else
         {
-            @foreach (var item in listaUnidades)
+            @foreach (var item in listaAvances)
             {
                 <tr>
-                    <td>@item.Nombre</td>
-                    <td>@item.Descripcion</td>
-                    <td>@item.Costo</td>
+                    <td>@item.Fecha</td>
+                    <td>@item.MaterialEjecutado</td>
+                    <td>@item.FechaFinalizacionReal</td>
+                    <td>@item.Item_Id</td>
+                    <td>@item.Recurso_Id</td>
                     <td>
                         <a class="btn btn-primary"
-                           href="api/Unidades/editar/@item.Id">
+                           href="api/Avances/editar/@item.Id">
                             Editar
                         </a>
                     </td>
                     <td>
                         <button class="btn btn-danger"
-                                @onclick="() => Eliminar(item)">
+                                @onclick="()=>Eliminar(item)">
                             Borrar
                         </button>
                     </td>
@@ -56,19 +60,20 @@
               textCancelar="Salir"
               onCancel="Cancelar"
               onConfirm="Borrar">
-    <h5>Está por borrar la unidad</h5>
+    <h5>Está por borrar el avance</h5>
     <br />
-    <p>¿Está seguro?</p>
+    <p>Está seguro?</p>
 </Confirmacion>
+
 
 @code {
     Confirmacion confirmacion;
 
-    List<Unidad> listaUnidades;
-    Unidad unidad;
+    List<Avance> listaAvances;
+    Avance avance;
     string Mensaje = "";
 
-    Unidad? unidadBorrar = null;
+    Avance? avanceBorrar = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -78,10 +83,10 @@
 
     private async Task Leer()
     {
-        var resp = await http.Get<List<Unidad>>("api/Unidades");
+        var resp = await http.Get<List<Avance>>("api/Avances");
         if (!resp.Error)
         {
-            listaUnidades = resp.Respuesta;
+            listaAvances = resp.Respuesta;
         }
         else
         {
@@ -89,26 +94,27 @@
         }
     }
 
-    private async Task Eliminar(Unidad unidad)
+    private async Task Eliminar(Avance avance)
     {
-        unidadBorrar = unidad;
+        avanceBorrar = avance;
         confirmacion.Ver();
     }
 
     private void Cancelar()
     {
         confirmacion.Ocultar();
-        unidadBorrar = null;
+        avanceBorrar = null;
     }
 
     private async Task Borrar()
     {
-        var respuesta = await http.Delete($"api/Unidades/{unidadBorrar.Id}");
+        var respuesta = await http.Delete($"api/Avances/{avanceBorrar.Id}");
         if (respuesta.Error)
         {
-            Mensaje = "No se pudo borrar la unidad";
+            var body = "No se pudo borrar";
         }
         Cancelar();
         await Leer();
     }
+
 }

@@ -1,0 +1,70 @@
+﻿@page "/api/Unidades/crear"
+@inject IHttpServicio http
+@using INNOBRA_ASP.Shared.DTO
+@using System.Net.Http.Json
+@inject NavigationManager nav
+
+<h3>Gestión de Unidades</h3>
+
+<!-- Formulario para Crear/Editar Unidad -->
+<EditForm Model="@unidad" OnValidSubmit="Grabar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Nombre:</label>
+        <InputText @bind-Value="unidad.Nombre" />
+    </div>
+
+    <div>
+        <label>Descripcion:</label>
+        <InputText @bind-Value="unidad.Descripcion" />
+    </div>
+
+    <div>
+        <label>Costo:</label>
+        <InputNumber @bind-Value="unidad.Costo" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+</EditForm>
+
+<hr />
+
+
+@code {
+    private CrearUnidadDTO unidad = new CrearUnidadDTO();
+    private List<CrearUnidadDTO> listaUnidades = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarUnidades();
+    }
+
+    private async Task CargarUnidades()
+    {
+        // Llama al servicio para obtener la lista de unidades
+        var respuesta = await http.Get<List<CrearUnidadDTO>>("api/Unidades");
+        if (!respuesta.Error)
+        {
+            listaUnidades = respuesta.Respuesta;
+        }
+    }
+
+    private async Task Grabar()
+    {
+        var httpRespuesta = await http.Post<CrearUnidadDTO>("api/Unidades", unidad);
+        if (httpRespuesta.Error)
+        {
+            var body = httpRespuesta.HttpResponseMessage;
+        }
+        nav.NavigateTo("/api/Unidades");
+    }
+
+
+    private void Cancelar()
+    {
+
+    }
+}
