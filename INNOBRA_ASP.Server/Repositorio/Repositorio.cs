@@ -65,7 +65,7 @@ namespace INNOBRA_ASP.Server.Repositorio
 
             try
             {
-                context.Entry(EntidadExistente).CurrentValues.SetValues(entidad);
+                context.Set<E>().Update(entidad);
                 await context.SaveChangesAsync();
                 return true;
             }
