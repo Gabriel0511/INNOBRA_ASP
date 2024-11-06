@@ -17,6 +17,9 @@ namespace INNOBRA_ASP.Server.Util
             CreateMap<CrearAvanceDTO, Avance>();
             CreateMap<CrearRecursoDTO, Recurso>();
 
+            CreateMap<EditarAvanceDTO, Avance>();
+            CreateMap<EditarRecursoDTO, Recurso>();
+
             //GABRIEL
             CreateMap<CrearObraDTO, Obra>();
             CreateMap<CrearPresupuestoDTO, Presupuesto>();

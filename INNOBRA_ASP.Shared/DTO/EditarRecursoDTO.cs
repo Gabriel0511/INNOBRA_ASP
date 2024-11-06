@@ -1,23 +1,22 @@
 ﻿using INNOBRA_ASP.DB.Data.Entity;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace INNOBRA_ASP.Shared.DTO
 {
-    public class CrearRecursoDTO
+    public class EditarRecursoDTO
     {
-        public enum TipoRecursoDTO
+        public enum TipoRecursoDTOEditar
         {
             Humano,
             Maquinaria,
             Material
         }
 
-        public TipoRecursoDTO Tipo { get; set; }
+        public TipoRecursoDTOEditar Tipo { get; set; }
 
         public string Nombre { get; set; }
 
@@ -27,6 +26,5 @@ namespace INNOBRA_ASP.Shared.DTO
 
         //CLAVE FORANEA
         public int UnidadId { get; set; }
-
     }
 }

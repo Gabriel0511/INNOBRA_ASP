@@ -65,36 +65,20 @@ namespace INNOBRA_ASP.Server.Controllers
         }
 
         [HttpPut("{Id:int}")] //api/Avances/2
-        public async Task<ActionResult> Put(int Id, [FromBody] Avance entidad)
+        public async Task<ActionResult> Put(int Id, [FromBody] EditarAvanceDTO entidadDTO)
         {
-            if (Id != entidad.Id)
-            {
-                return BadRequest("Datos incorrectos");
-            }
-
-            var sel = await repositorio.SelectById(Id);
-            if (sel == null)
-            {
-                return NotFound("El avance no existe.");
-            }
-
-            mapper.Map(entidad, sel);
-
             try
             {
-                var actualizado = await repositorio.Update(Id, sel);
-                if (actualizado)
-                {
-                    return Ok();
-                }
-                else
-                {
-                    return BadRequest("No se pudo actualizar los datos.");
-                }
+                Avance entidad = mapper.Map<Avance>(entidadDTO);
+
+                await repositorio.Update(entidad.Id, entidad);
+                return Ok();
+                //return Ok(new { message = "Actualización exitosa" });
             }
+
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                return BadRequest(e.InnerException.Message);
             }
         }
 

@@ -17,7 +17,7 @@
     </div>
 
     <div>
-        <label>Material Ejecutado:</label>
+        <label>Material Ejecutado: (numero)</label>
         <InputText @bind-Value="avance.MaterialEjecutado" />
     </div>
 
@@ -46,6 +46,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        avance.Fecha = DateTime.Today;
         await CargarAvances();
     }
 

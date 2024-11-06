@@ -1,14 +1,13 @@
 ﻿using INNOBRA_ASP.DB.Data.Entity;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace INNOBRA_ASP.Shared.DTO
 {
-    public class CrearAvanceDTO
+    public class EditarAvanceDTO
     {
 
         //PRUEBA PARA PABLO
