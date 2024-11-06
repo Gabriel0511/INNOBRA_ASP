@@ -38,15 +38,16 @@
 
     <div>
         <label>Unidad ID:</label>
-        <InputNumber @bind-Value="recurso.Unidad_Id" />
+        <InputNumber @bind-Value="recurso.UnidadId" />
     </div>
+
+   
 
     <button type="submit" class="btn btn-primary">Guardar</button>
     <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
 </EditForm>
 
 <hr />
-
 
 @code {
     private CrearRecursoDTO recurso = new CrearRecursoDTO();
@@ -67,6 +68,7 @@
         }
     }
 
+
     private async Task Grabar()
     {
         var httpRespuesta = await http.Post<CrearRecursoDTO>("api/Recursos", recurso);
@@ -76,7 +78,6 @@
         }
         nav.NavigateTo("/api/Recursos");
     }
-
 
     private void Cancelar()
     {

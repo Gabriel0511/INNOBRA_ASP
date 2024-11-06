@@ -1,0 +1,89 @@
+﻿@page "/api/Avances/editar/{avanceId:int}"
+@inject IHttpServicio http
+@inject NavigationManager nav
+@using INNOBRA_ASP.Shared.DTO
+
+<h3>Editar Avance</h3>
+
+<EditForm Model="avance" OnValidSubmit="Grabar">
+    <DataAnnotationsValidator />
+    
+    <div class="form-group">
+        <label>Fecha</label>
+        <div>
+            <InputDate class="form-control" @bind-Value="@avance.Fecha" />
+            <ValidationMessage For="@(() => avance.Fecha)" />
+        </div>
+    </div>
+    <div>
+        <label>Material Ejecutado</label>
+        <div>
+            <InputText class="form-control" @bind-Value="@avance.MaterialEjecutado" />
+            <ValidationMessage For="@(() => avance.MaterialEjecutado)" />
+        </div>
+    </div>
+    <div>
+        <label>Fecha de Finalizacion Real</label>
+        <div>
+            <InputDate class="form-control" @bind-Value="@avance.FechaFinalizacionReal" />
+            <ValidationMessage For="@(() => avance.FechaFinalizacionReal)" />
+        </div>
+    </div>
+    <div>
+        <label>Item ID:</label>
+        <InputNumber @bind-Value="avance.Item_Id" />
+    </div>
+    <div>
+        <label>Recurso ID:</label>
+        <InputNumber @bind-Value="avance.Recurso_Id" />
+    </div>
+
+    <br />
+    <button class="btn btn-primary" type="submit">Aceptar</button>
+    <button class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+</EditForm>
+
+@code {
+    [Parameter] public int avanceId { get; set; }
+    private EditarAvanceDTO avance = new EditarAvanceDTO();
+
+    string mensaje = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        avance.FechaFinalizacionReal = DateTime.Today;
+        await base.OnInitializedAsync();
+        await Mostrar();
+    }
+
+    private async Task Mostrar()
+    {
+        var respuesta = await http.Get<EditarAvanceDTO>($"api/Avances/GetById/{avanceId}");
+
+        if (!respuesta.Error)
+        {
+            avance = respuesta.Respuesta;
+        }
+        else
+        {
+            nav.NavigateTo("/api/Avances");
+        }
+    }
+
+
+    private async Task Grabar()
+    {
+
+        var httpRespuesta = await http.Put<EditarAvanceDTO>($"api/Avances/{avanceId}", avance);
+        if (httpRespuesta.Error)
+        {
+            var body = httpRespuesta.HttpResponseMessage;
+        }
+        nav.NavigateTo("/api/Avances");
+    }
+
+    private void Cancelar()
+    {
+        nav.NavigateTo("/api/Avances");
+    }
+}
