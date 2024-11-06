@@ -69,38 +69,25 @@ namespace INNOBRA_ASP.Server.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult> Put(int id, [FromBody] Unidad entidad)
+        public async Task<ActionResult> Put(int id, [FromBody] EditarUnidadDTO entidadDTO)
         {
-            if (id != entidad.Id)
-            {
-                return BadRequest("Datos incorrectos");
-            }
 
-            var sel = await repositorio.SelectById(id);
-            if (sel == null)
-            {
-                return NotFound("La unidad no existe.");
-            }
-
-            mapper.Map(entidad, sel);
 
             try
             {
-                var actualizado = await repositorio.Update(id, sel);
-                if (actualizado)
-                {
-                    return Ok();
-                }
-                else
-                {
-                    return BadRequest("No se pudo actualizar los datos de la unidad.");
-                }
+                Unidad entidad = mapper.Map<Unidad>(entidadDTO);
+                await repositorio.Update(entidad.Id, entidad);
+                return Ok();
             }
+
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                return BadRequest(e.InnerException.Message);
             }
+
+            
         }
+
 
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)
