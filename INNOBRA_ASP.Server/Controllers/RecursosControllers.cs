@@ -54,47 +54,25 @@ namespace INNOBRA_ASP.Server.Controllers
             }
             catch (Exception e)
             {
-                {
-                    if (e.InnerException != null)
-                    {
-                        return BadRequest($"Error: {e.Message}. Inner Exception: {e.InnerException.Message}");
-                    }
-                    return BadRequest(e.Message);
-                }
+                return BadRequest(e.InnerException.Message);
             }
         }
 
         [HttpPut("{Id:int}")] //api/Recursos/2
-        public async Task<ActionResult> Put(int Id, [FromBody] Recurso entidad)
+        public async Task<ActionResult> Put(int Id, [FromBody] EditarRecursoDTO entidadDTO)
         {
-            if (Id != entidad.Id)
-            {
-                return BadRequest("Datos incorrectos");
-            }
-
-            var sel = await repositorio.SelectById(Id);
-            if (sel == null)
-            {
-                return NotFound("El Recurso no existe.");
-            }
-
-            mapper.Map(entidad, sel);
-
             try
             {
-                var actualizado = await repositorio.Update(Id, sel);
-                if (actualizado)
-                {
-                    return Ok();
-                }
-                else
-                {
-                    return BadRequest("No se pudo actualizar los datos.");
-                }
+                Recurso entidad = mapper.Map<Recurso>(entidadDTO);
+
+                await repositorio.Update(entidad.Id, entidad);
+                return Ok();
+                //return Ok(new { message = "Actualización exitosa" });
             }
+
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                return BadRequest(e.InnerException.Message);
             }
         }
 

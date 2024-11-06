@@ -31,7 +31,7 @@ namespace INNOBRA_ASP.DB.Data.Entity
         public string UnidadMedida { get; set; }
 
         //CLAVE FORANEA
-        public int Unidad_Id { get; set; }
+        public int UnidadId { get; set; }
 
         public Unidad Unidad { get; set; }
     }

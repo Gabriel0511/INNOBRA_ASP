@@ -1,0 +1,92 @@
+﻿@page "/api/Recursos/editar/{recursoId:int}"
+@inject IHttpServicio http
+@inject NavigationManager nav
+@using INNOBRA_ASP.Shared.DTO
+
+<h3>Editar Recurso</h3>
+
+<EditForm Model="recurso" OnValidSubmit="Grabar">
+    <DataAnnotationsValidator />
+    <div class="form-group">
+        <label>Tipo de Recurso:</label>
+        <InputSelect @bind-Value="recurso.Tipo">
+            @foreach (var tipo in Enum.GetValues(typeof(CrearRecursoDTO.TipoRecursoDTO)))
+            {
+                <option value="@tipo">@tipo</option>
+            }
+        </InputSelect>
+    </div>
+    <div>
+        <label>Nombre</label>
+        <div>
+            <InputText class="form-control" @bind-Value="@recurso.Nombre" />
+            <ValidationMessage For="@(() => recurso.Nombre)" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Cantidad</label>
+        <div>
+            <InputText class="form-control" @bind-Value="@recurso.Cantidad" />
+            <ValidationMessage For="@(() => recurso.Cantidad)" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Unidad de medida</label>
+        <div>
+            <InputText class="form-control" @bind-Value="@recurso.UnidadMedida" />
+            <ValidationMessage For="@(() => recurso.Nombre)" />
+        </div>
+    </div>
+    <div>
+        <label>Unidad ID:</label>
+        <InputNumber @bind-Value="recurso.UnidadId" />
+    </div>
+    
+    <br />
+    <button class="btn btn-primary" type="submit">Aceptar</button>
+    <button class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+</EditForm>
+
+@code {
+    [Parameter] public int recursoId { get; set; }
+    private EditarRecursoDTO recurso = new EditarRecursoDTO();
+
+    string mensaje = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await Mostrar();
+    }
+
+    private async Task Mostrar()
+    {
+        var respuesta = await http.Get<EditarRecursoDTO>($"api/Recursos/GetById/{recursoId}");
+
+        if (!respuesta.Error)
+        {
+            recurso = respuesta.Respuesta;
+        }
+        else
+        {
+            nav.NavigateTo("/api/Recursos");
+        }
+    }
+
+
+    private async Task Grabar()
+    {
+
+        var httpRespuesta = await http.Put<EditarRecursoDTO>($"api/Recursos/{recursoId}", recurso);
+        if (httpRespuesta.Error)
+        {
+            var body = httpRespuesta.HttpResponseMessage;
+        }
+        nav.NavigateTo("/api/Recursos");
+    }
+
+    private void Cancelar()
+    {
+        nav.NavigateTo("/api/Recursos");
+    }
+}
