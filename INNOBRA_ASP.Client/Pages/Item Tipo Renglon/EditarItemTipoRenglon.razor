@@ -1,0 +1,71 @@
+﻿@page "/api/ItemTipoRenglon/editar/{id:int}"
+@inject IHttpServicio http
+@using INNOBRA_ASP.Shared.DTO
+@using System.Net.Http.Json
+@inject NavigationManager nav
+
+<h3>Editar Item Tipo Renglon</h3>
+
+<!-- Formulario para Editar ItemTipoRenglon -->
+<EditForm Model="@itemRenglonTipo" OnValidSubmit="Actualizar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Item Tipo ID:</label>
+        <InputNumber @bind-Value="itemRenglonTipo.Item_Tipos_Id" />
+    </div>
+
+    <div>
+        <label>Recurso ID:</label>
+        <InputNumber @bind-Value="itemRenglonTipo.Recurso_Id" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+</EditForm>
+
+<hr />
+
+@code {
+    [Parameter] public int id { get; set; } // ID del ItemTipoRenglon a editar
+    private CrearItemRenglonTipoDTO itemRenglonTipo = new CrearItemRenglonTipoDTO();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarItemTipoRenglon();
+    }
+
+    private async Task CargarItemTipoRenglon()
+    {
+        // Carga el ItemTipoRenglon existente usando su ID
+        var respuesta = await http.Get<CrearItemRenglonTipoDTO>($"api/ItemTipoRenglon/{id}");
+        if (!respuesta.Error)
+        {
+            itemRenglonTipo = respuesta.Respuesta;
+        }
+        else
+        {
+            // Manejo del error en caso de fallo en la carga
+            nav.NavigateTo("/api/ItemTipoRenglon");
+        }
+    }
+
+    private async Task Actualizar()
+    {
+        var respuesta = await http.Put($"api/ItemTipoRenglon/{id}", itemRenglonTipo);
+        if (!respuesta.Error)
+        {
+            nav.NavigateTo("/api/ItemTipoRenglon");
+        }
+        else
+        {
+            // Manejo de error en caso de fallo en la actualización
+        }
+    }
+
+    private void Cancelar()
+    {
+        nav.NavigateTo("/api/ItemTipoRenglon");
+    }
+}
