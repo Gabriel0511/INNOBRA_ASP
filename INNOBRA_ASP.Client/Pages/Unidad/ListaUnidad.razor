@@ -1,65 +1,78 @@
 ﻿@page "/api/Unidades"
 @inject IHttpServicio http
 
-<h3>Lista de Unidades</h3>
-<br />
-<a class="btn btn-primary" href="/api/Unidades/crear">Nueva Unidad</a>
-<br />
-<table>
-    <tr>
-        <th>Nombre</th>
-        <th>Descripción</th>
-        <th>Costo</th>
-    </tr>
-    @if (Mensaje == "")
-    {
-        @if (listaUnidades == null)
+<style>
+    .fondo {
+        background-image: url('/images/InnObra.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        height: 100vh;
+        color: white; /* Cambia el color del texto si es necesario */
+    }
+</style>
+
+<div class="fondo">
+    <h3>Lista de Unidades</h3>
+    <br />
+    <a class="btn btn-primary" href="/api/Unidades/crear">Nueva Unidad</a>
+    <br />
+    <table>
+        <tr>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Costo</th>
+        </tr>
+        @if (Mensaje == "")
         {
-            <p>Buscando....</p>
-        }
-        else if (listaUnidades.Count == 0)
-        {
-            <p>No existen unidades</p>
+            @if (listaUnidades == null)
+            {
+                <p>Buscando....</p>
+            }
+            else if (listaUnidades.Count == 0)
+            {
+                <p>No existen unidades</p>
+            }
+            else
+            {
+                @foreach (var item in listaUnidades)
+                {
+                    <tr>
+                        <td>@item.Nombre</td>
+                        <td>@item.Descripcion</td>
+                        <td>@item.Costo</td>
+                        <td>
+                            <a class="btn btn-primary"
+                               href="api/Unidades/editar/@item.Id">
+                                Editar
+                            </a>
+                        </td>
+                        <td>
+                            <button class="btn btn-danger"
+                                    @onclick="() => Eliminar(item)">
+                                Borrar
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
         }
         else
         {
-            @foreach (var item in listaUnidades)
-            {
-                <tr>
-                    <td>@item.Nombre</td>
-                    <td>@item.Descripcion</td>
-                    <td>@item.Costo</td>
-                    <td>
-                        <a class="btn btn-primary"
-                           href="api/Unidades/editar/@item.Id">
-                            Editar
-                        </a>
-                    </td>
-                    <td>
-                        <button class="btn btn-danger"
-                                @onclick="() => Eliminar(item)">
-                            Borrar
-                        </button>
-                    </td>
-                </tr>
-            }
+            <p> Error: @Mensaje</p>
         }
-    }
-    else
-    {
-        <p> Error: @Mensaje</p>
-    }
-</table>
+    </table>
 
-<Confirmacion @ref="confirmacion"
-              Titulo="CUIDADO"
-              textCancelar="Salir"
-              onCancel="Cancelar"
-              onConfirm="Borrar">
-    <h5>Está por borrar la unidad</h5>
-    <br />
-    <p>¿Está seguro?</p>
-</Confirmacion>
+    <Confirmacion @ref="confirmacion"
+                  Titulo="CUIDADO"
+                  textCancelar="Salir"
+                  onCancel="Cancelar"
+                  onConfirm="Borrar">
+        <h5>Está por borrar la unidad</h5>
+        <br />
+        <p>¿Está seguro?</p>
+    </Confirmacion>
+</div>
 
 @code {
     Confirmacion confirmacion;
