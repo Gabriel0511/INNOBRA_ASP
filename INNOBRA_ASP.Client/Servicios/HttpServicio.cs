@@ -51,14 +51,24 @@ namespace INNOBRA_ASP.Client.Servicios
         public async Task<HttpRespuesta<object>> Put<T>(string url, T entidad)
         {
             var enviarJson = JsonSerializer.Serialize(entidad);
-            var enviarContent = new StringContent(enviarJson, Encoding.UTF8, "application/json");
+            var enviarContent = new StringContent(enviarJson,
+            Encoding.UTF8,
+            "application/json");
 
             var response = await http.PutAsync(url, enviarContent);
 
             if (response.IsSuccessStatusCode)
             {
-                //var respuesta = await DesSereailzar<object>(response);
-                return new HttpRespuesta<object>(null, false, response);
+                // Verificar si la respuesta tiene contenido
+                if (response.Content.Headers.ContentLength == 0)
+                {
+                    // Si no hay contenido, devolver una respuesta vacía
+                    return new HttpRespuesta<object>(null, false, response);
+                }
+
+                // Si tiene contenido, deserializar
+                var respuesta = await DesSereailzar<object>(response);
+                return new HttpRespuesta<object>(respuesta, false, response);
             }
             else
             {
@@ -66,7 +76,7 @@ namespace INNOBRA_ASP.Client.Servicios
             }
         }
 
-         public async Task<HttpRespuesta<object>> Delete(string url)
+        public async Task<HttpRespuesta<object>> Delete(string url)
         {
             var respuesta = await http.DeleteAsync(url);
             return new HttpRespuesta<object>(null,
