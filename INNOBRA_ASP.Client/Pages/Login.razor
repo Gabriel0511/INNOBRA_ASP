@@ -1,0 +1,56 @@
+﻿@page "/login"
+@inject NavigationManager NavigationManager
+
+<h3>Iniciar Sesión</h3>
+
+<div class="login-container">
+    <form @onsubmit="HandleLogin">
+        <div class="form-group">
+            <label for="username">Usuario</label>
+            <input type="text" id="username" @bind="username" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+            <label for="password">Contraseña</label>
+            <input type="password" id="password" @bind="password" class="form-control" required />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+    </form>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <p class="text-danger">@errorMessage</p>
+    }
+</div>
+
+<style>
+    .login-container {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: rgba(255, 255, 255, 0.8); /* Fondo semi-transparente */
+        border-radius: 8px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+@code {
+    private string username;
+    private string password;
+    private string errorMessage;
+
+    private async Task HandleLogin()
+    {
+        // Ejemplo de autenticación básica
+        if (username == "Admin" && password == "Admin")
+        {
+            // Redirige a la página principal o a otra página
+            NavigationManager.NavigateTo("/home");
+        }
+        else
+        {
+            errorMessage = "Credenciales incorrectas. Inténtalo de nuevo.";
+        }
+    }
+}
