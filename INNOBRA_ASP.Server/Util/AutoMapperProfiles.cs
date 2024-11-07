@@ -13,6 +13,10 @@ namespace INNOBRA_ASP.Server.Util
             CreateMap<CrearItemTipoDTO, ItemTipo>();
             CreateMap<CrearUnidadDTO, Unidad>();
 
+            CreateMap<EditarUnidadDTO, Unidad>();
+            CreateMap<EditarItemRenglonTipoDTO, ItemTipoRenglon>();
+            CreateMap<EditarItemTipoDTO, ItemTipo>();
+
             //STEFANO
             CreateMap<CrearAvanceDTO, Avance>();
             CreateMap<CrearRecursoDTO, Recurso>();

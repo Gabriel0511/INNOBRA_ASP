@@ -42,7 +42,7 @@
 
 @code {
     [Parameter] public int id { get; set; }
-    private CrearUnidadDTO unidad = new CrearUnidadDTO();
+    private EditarUnidadDTO unidad = new EditarUnidadDTO();
     private string mensaje = "";
 
     protected override async Task OnInitializedAsync()
@@ -52,7 +52,7 @@
 
     private async Task CargarUnidad()
     {
-        var respuesta = await http.Get<CrearUnidadDTO>($"api/Unidades/{id}");
+        var respuesta = await http.Get<EditarUnidadDTO>($"api/Unidades/{id}");
         if (!respuesta.Error)
         {
             unidad = respuesta.Respuesta;
