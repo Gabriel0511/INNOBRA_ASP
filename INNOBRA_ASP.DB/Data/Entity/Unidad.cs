@@ -17,5 +17,8 @@ namespace INNOBRA_ASP.DB.Data.Entity
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal Costo { get; set; }
+
+        public ICollection<Recurso> Recursos { get; set; }
+        public ICollection<ItemTipo> ItemTipos { get; set; }
     }
 }

@@ -11,11 +11,11 @@ namespace INNOBRA_ASP.DB.Data.Entity
     {
         public int Item_Tipos_Id { get; set; }
 
-        public Item Item { get; set; }
+        public ItemTipo ItemTipo { get; set; }
 
         public int Recurso_Id { get; set; }
 
-        public Recurso recurso { get; set; }
+        public Recurso Recurso { get; set; }
 
     }
 }

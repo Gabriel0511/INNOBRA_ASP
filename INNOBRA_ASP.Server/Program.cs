@@ -3,13 +3,15 @@ using INNOBRA_ASP.DB.Data.Entity;
 using INNOBRA_ASP.Server.Repositorio;
 using INNOBRA_ASP.Shared.DTO;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 //Configuracion de los servicios en el constructor de la aplicacion
 var builder = WebApplication.CreateBuilder(args);
 
-
+builder.Services.AddControllers().AddJsonOptions(
+    x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles); ;
+builder.Services.AddControllersWithViews();
 // Add services to the container.
-builder.Services.AddControllers();
 builder.Services.AddRazorPages();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
