@@ -19,5 +19,10 @@ namespace INNOBRA_ASP.DB.Data.Entity
         [Required(ErrorMessage = "La unidad de medida es obligatoria.")]
         public int Unidad_Id { get; set; }
 
+        public Unidad Unidad { get; set; }
+
+        public ICollection<Item> Items { get; set; }
+        public ICollection<ItemTipoRenglon> ItemTipoRenglons { get; set; }
+
     }
 }

@@ -22,7 +22,7 @@ namespace INNOBRA_ASP.DB.Data.Entity
 
         public Item Item { get; set; }
 
-        public int Recursos_idRecursos { get; set; }
+        public int Recursos_Id { get; set; }
 
         public Recurso Recurso { get; set; }
 

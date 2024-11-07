@@ -1,0 +1,79 @@
+﻿@page "/api/Presupuestos"
+@inject IHttpServicio http
+
+<h3>Presupuestos</h3>
+
+@if (listaPresupuestos != null && listaPresupuestos.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Nombre</th>
+                <th scope="col">Fecha Inicio</th>
+                <th scope="col">Fecha Fin</th>
+                <th scope="col">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var presupuesto in listaPresupuestos)
+            {
+                <tr>
+                    <td>@presupuesto.Nombre</td>
+                    <td>@presupuesto.FechaInicioPrevista</td>
+                    <td>@presupuesto.FechaFinPrevista</td>
+                    <td>
+                        <a class="btn btn-warning btn-sm" href="/api/Presupuestos/editar/@presupuesto.Id">Editar</a>
+                        <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(presupuesto.Id)">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-warning" role="alert">
+        No hay presupuestos disponibles.
+    </div>
+}
+
+<a class="btn btn-primary" href="/api/Presupuestos/crear">
+    <i class="bi bi-plus-circle"></i> Crear Presupuesto
+</a>
+
+@code {
+    List<Presupuesto> listaPresupuestos = new List<Presupuesto>();
+    string Mensaje = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await Leer();
+    }
+
+    private async Task Leer()
+    {
+        var resp = await http.Get<List<Presupuesto>>("api/Presupuestos");
+        if (!resp.Error)
+        {
+            listaPresupuestos = resp.Respuesta;
+        }
+        else
+        {
+            Mensaje = await resp.ObtenerError();
+        }
+    }
+
+    private async Task Eliminar(int id)
+    {
+        var resp = await http.Delete($"api/Presupuestos/{id}");
+        if (!resp.Error)
+        {
+            await Leer(); // Recarga la lista después de eliminar
+        }
+        else
+        {
+            Mensaje = await resp.ObtenerError();
+        }
+    }
+}

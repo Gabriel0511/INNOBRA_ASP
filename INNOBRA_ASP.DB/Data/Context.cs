@@ -28,6 +28,85 @@ namespace INNOBRA_ASP.DB.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Presupuesto>()
+                .HasOne(p => p.Obra)
+                .WithMany(o => o.Presupuestos) // Ahora 'Obra' tiene la colección 'Presupuestos'
+                .HasForeignKey(p => p.Obra_Id) // Usa 'Obra_Id' como la clave foránea
+                .OnDelete(DeleteBehavior.Restrict); // O el comportamiento de eliminación que prefieras
+
+            modelBuilder.Entity<Recurso>()
+                .HasOne(p => p.Unidad)
+                .WithMany(o => o.Recursos) 
+                .HasForeignKey(p => p.Unidad_Id)
+                .OnDelete(DeleteBehavior.Restrict); 
+
+            modelBuilder.Entity<ItemTipo>()
+                .HasOne(p => p.Unidad)
+                .WithMany(o => o.ItemTipos) 
+                .HasForeignKey(p => p.Unidad_Id) 
+                .OnDelete(DeleteBehavior.Restrict); 
+
+            modelBuilder.Entity<ItemTipoRenglon>()
+                .HasOne(p => p.Recurso)
+                .WithMany(o => o.ItemTipoRenglons) 
+                .HasForeignKey(p => p.Recurso_Id) 
+                .OnDelete(DeleteBehavior.Restrict); 
+
+            modelBuilder.Entity<ItemTipoRenglon>()
+                .HasOne(p => p.ItemTipo)
+                .WithMany(o => o.ItemTipoRenglons) 
+                .HasForeignKey(p => p.Item_Tipos_Id) 
+                .OnDelete(DeleteBehavior.Restrict); 
+
+            modelBuilder.Entity<ItemTipoRenglon>()
+                .HasOne(p => p.Recurso)
+                .WithMany(o => o.ItemTipoRenglons) 
+                .HasForeignKey(p => p.Recurso_Id) 
+                .OnDelete(DeleteBehavior.Restrict); 
+
+            modelBuilder.Entity<ItemTipo>()
+                .HasOne(p => p.Unidad)
+                .WithMany(o => o.ItemTipos) 
+                .HasForeignKey(p => p.Unidad_Id) 
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ItemRenglon>()
+                .HasOne(p => p.Item)
+                .WithMany(o => o.ItemRenglons) 
+                .HasForeignKey(p => p.Items_idItems) 
+                .OnDelete(DeleteBehavior.Restrict); 
+
+            modelBuilder.Entity<ItemRenglon>()
+                .HasOne(p => p.Recurso)
+                .WithMany(o => o.ItemRenglons) 
+                .HasForeignKey(p => p.Recursos_Id) 
+                .OnDelete(DeleteBehavior.Restrict); 
+
+            modelBuilder.Entity<Item>()
+                .HasOne(p => p.ItemTipo)
+                .WithMany(o => o.Items) 
+                .HasForeignKey(p => p.Item_Tipos_Id) 
+                .OnDelete(DeleteBehavior.Restrict); 
+
+            modelBuilder.Entity<Item>()
+                .HasOne(p => p.Presupuesto)
+                .WithMany(o => o.Items) 
+                .HasForeignKey(p => p.Presupuesto_Id) 
+                .OnDelete(DeleteBehavior.Restrict); 
+
+            modelBuilder.Entity<Avance>()
+                .HasOne(p => p.Recurso)
+                .WithMany(o => o.Avances) 
+                .HasForeignKey(p => p.Recurso_Id) 
+                .OnDelete(DeleteBehavior.Restrict); 
+
+            modelBuilder.Entity<Avance>()
+                .HasOne(p => p.Item)
+                .WithMany(o => o.Avances)
+                .HasForeignKey(p => p.Item_Id) 
+                .OnDelete(DeleteBehavior.Restrict);
+
+
             var cascadeFKs = modelBuilder.Model.GetEntityTypes()
                                           .SelectMany(t => t.GetForeignKeys())
                                           .Where(fk => !fk.IsOwnership
@@ -37,7 +116,7 @@ namespace INNOBRA_ASP.DB.Data
             {
                 fk.DeleteBehavior = DeleteBehavior.Restrict;
             }
-            
+
             //ENUM 
             modelBuilder.Entity<Recurso>()
            .Property(r => r.Tipo)
