@@ -10,6 +10,8 @@ namespace INNOBRA_ASP.Shared.DTO
 {
     public class CrearAvanceDTO
     {
+
+        //PRUEBA PARA PABLO
         public DateTime Fecha { get; set; }
 
         public string MaterialEjecutado { get; set; }
@@ -19,10 +21,10 @@ namespace INNOBRA_ASP.Shared.DTO
         //CLAVES FORANEAS
         public int Item_Id { get; set; }
 
-        public Item Item { get; set; }
+        //public Item Item { get; set; }
 
         public int Recurso_Id { get; set; }
 
-        public Recurso Recurso { get; set; }
+        //public Recurso Recurso { get; set; }
     }
 }

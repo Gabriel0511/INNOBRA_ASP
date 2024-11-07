@@ -21,5 +21,7 @@ namespace INNOBRA_ASP.DB.Data.Entity
         public int Obra_Id { get; set; }
 
         public Obra Obra { get; set; }
+
+        public ICollection<Item> Items { get; set; }
     }
 }

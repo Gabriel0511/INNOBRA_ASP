@@ -16,9 +16,9 @@ namespace INNOBRA_ASP.Server.Controllers
     public class UnidadesControllers : ControllerBase
     {
         private readonly IMapper mapper;
-        private readonly IRepositorio<Unidad> repositorio;
+        private readonly IUnidadRepositorio repositorio;
 
-        public UnidadesControllers(IMapper mapper, IRepositorio<Unidad> repositorio)
+        public UnidadesControllers(IMapper mapper, IUnidadRepositorio repositorio)
         {
             this.mapper = mapper;
             this.repositorio = repositorio;
@@ -58,43 +58,36 @@ namespace INNOBRA_ASP.Server.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                {
+                    if (e.InnerException != null)
+                    {
+                        return BadRequest($"Error: {e.Message}. Inner Exception: {e.InnerException.Message}");
+                    }
+                    return BadRequest(e.Message);
+                }
             }
         }
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult> Put(int id, [FromBody] Unidad entidad)
+        public async Task<ActionResult> Put(int id, [FromBody] EditarUnidadDTO entidadDTO)
         {
-            if (id != entidad.Id)
-            {
-                return BadRequest("Datos incorrectos");
-            }
 
-            var sel = await repositorio.SelectById(id);
-            if (sel == null)
-            {
-                return NotFound("La unidad no existe.");
-            }
-
-            mapper.Map(entidad, sel);
 
             try
             {
-                var actualizado = await repositorio.Update(id, sel);
-                if (actualizado)
-                {
-                    return Ok();
-                }
-                else
-                {
-                    return BadRequest("No se pudo actualizar los datos de la unidad.");
-                }
+                Unidad entidad = mapper.Map<Unidad>(entidadDTO);
+                await repositorio.Update(entidad.Id, entidad);
+                return Ok();
             }
+
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                return BadRequest(e.InnerException.Message);
             }
+
+            
         }
+
 
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)

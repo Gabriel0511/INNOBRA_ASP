@@ -34,5 +34,9 @@ namespace INNOBRA_ASP.DB.Data.Entity
         public int Unidad_Id { get; set; }
 
         public Unidad Unidad { get; set; }
+
+        public ICollection<ItemTipoRenglon> ItemTipoRenglons { get; set; }
+        public ICollection<Avance> Avances { get; set; }
+        public ICollection<ItemRenglon> ItemRenglons { get; set; }
     }
 }

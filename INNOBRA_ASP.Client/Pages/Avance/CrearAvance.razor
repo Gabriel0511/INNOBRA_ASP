@@ -1,0 +1,78 @@
+﻿@page "/api/Avances/crear"
+@inject IHttpServicio http
+@using INNOBRA_ASP.Shared.DTO
+@using System.Net.Http.Json
+@inject NavigationManager nav
+
+<h3>Gestión de Avances</h3>
+
+<!-- Formulario para Crear/Editar Avance -->
+<EditForm Model="@avance" OnValidSubmit="Grabar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Fecha:</label>
+        <InputDate @bind-Value="avance.Fecha" />
+    </div>
+
+    <div>
+        <label>Material Ejecutado: (numero)</label>
+        <InputText @bind-Value="avance.MaterialEjecutado" />
+    </div>
+
+    <!-- FECHA FINALIZACION REAL -->
+
+    <div>
+        <label>Item ID:</label>
+        <InputNumber @bind-Value="avance.Item_Id" />
+    </div>
+
+    <div>
+        <label>Recurso ID:</label>
+        <InputNumber @bind-Value="avance.Recurso_Id" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+</EditForm>
+
+<hr />
+
+
+@code {
+    private CrearAvanceDTO avance = new CrearAvanceDTO();
+    private List<Avance> listaAvances = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        avance.Fecha = DateTime.Today;
+        await CargarAvances();
+    }
+
+    private async Task CargarAvances()
+    {
+        // Llama al servicio para obtener la lista de recursos
+        var respuesta = await http.Get<List<Avance>>("api/Avances");
+        if (!respuesta.Error)
+        {
+            listaAvances = respuesta.Respuesta;
+        }
+    }
+
+    private async Task Grabar()
+    {
+        var httpRespuesta = await http.Post<CrearAvanceDTO>("api/Avances", avance);
+        if (httpRespuesta.Error)
+        {
+            var body = httpRespuesta.HttpResponseMessage;
+        }
+        nav.NavigateTo("/api/Avances");
+    }
+
+
+    private void Cancelar()
+    {
+        nav.NavigateTo("/api/Recursos");
+    }
+}

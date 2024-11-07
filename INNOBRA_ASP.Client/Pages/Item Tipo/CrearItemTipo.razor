@@ -1,0 +1,67 @@
+﻿@page "/api/ItemTipos/crear"
+@inject IHttpServicio http
+@using INNOBRA_ASP.Shared.DTO
+@using System.Net.Http.Json
+@inject NavigationManager nav
+
+<h3>Gestión de ItemTipo</h3>
+
+<!-- Formulario para Crear/Editar Unidad -->
+<EditForm Model="@itemtipo" OnValidSubmit="Grabar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Codigo:</label>
+        <InputText @bind-Value="itemtipo.Codigo" />
+    </div>
+
+    <div>
+        <label>Nombre:</label>
+        <InputText @bind-Value="itemtipo.Nombre" />
+    </div>
+    <div>
+        <label>Unidad :</label>
+        <InputNumber @bind-Value="itemtipo.Unidad_Id" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+</EditForm>
+
+<hr />
+
+@code {
+    private CrearItemTipoDTO itemtipo = new CrearItemTipoDTO();
+    private List<CrearItemTipo> listaItemTipo = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarItemTipo();
+    }
+
+    private async Task CargarItemTipo()
+    {
+        // Llama al servicio para obtener la lista de unidades
+        var respuesta = await http.Get<List<CrearItemTipo>>("api/ItemTipos");
+        if (!respuesta.Error)
+        {
+            listaItemTipo = respuesta.Respuesta;
+        }
+    }
+
+    private async Task Grabar()
+    {
+        var httpRespuesta = await http.Post<CrearItemTipoDTO>("api/ItemTipos", itemtipo);
+        if (httpRespuesta.Error)
+        {
+            var body = httpRespuesta.HttpResponseMessage;
+        }
+        nav.NavigateTo("/api/ItemTipos");
+    }
+
+    private void Cancelar()
+    {
+        nav.NavigateTo("/api/ItemTipos");
+    }
+}

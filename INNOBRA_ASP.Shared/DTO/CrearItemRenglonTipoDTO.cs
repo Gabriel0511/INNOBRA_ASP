@@ -8,7 +8,7 @@ namespace INNOBRA_ASP.Shared.DTO
 {
     public class CrearItemRenglonTipoDTO
     {
-        public string Item_Tipos_Id { get; set; }
+        public int Item_Tipos_Id { get; set; }
 
         public int Recurso_Id { get; set; }
     }

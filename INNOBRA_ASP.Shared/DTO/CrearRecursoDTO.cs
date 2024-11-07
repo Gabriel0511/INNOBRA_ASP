@@ -10,12 +10,14 @@ namespace INNOBRA_ASP.Shared.DTO
 {
     public class CrearRecursoDTO
     {
-        public enum TipoRecurso
+        public enum TipoRecursoDTO
         {
             Humano,
             Maquinaria,
             Material
         }
+
+        public TipoRecursoDTO Tipo { get; set; }
 
         public string Nombre { get; set; }
 
@@ -24,8 +26,7 @@ namespace INNOBRA_ASP.Shared.DTO
         public string UnidadMedida { get; set; }
 
         //CLAVE FORANEA
-        public int Unidad_Id { get; set; }
+        public int UnidadId { get; set; }
 
-        public Unidad Unidad { get; set; }
     }
 }

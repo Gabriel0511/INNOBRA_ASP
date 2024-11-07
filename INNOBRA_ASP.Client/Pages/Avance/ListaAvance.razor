@@ -1,0 +1,120 @@
+﻿@page "/api/Avances"
+@inject IHttpServicio http
+
+<h3>Lista de Avances</h3>
+<br />
+<a class="btn btn-primary" href="/api/Avances/crear">Nuevo Recurso</a>
+<br />
+<table>
+    <tr>
+        <th>Fecha</th>
+        <th>Material Ejecutado</th>
+        <th>Fecha de Finalizacion Real</th>
+        <th>Item Id</th>
+        <th>Recurso Id</th>
+    </tr>
+    @if (Mensaje == "")
+    {
+        @if (listaAvances == null)
+        {
+            <p>Buscando....</p>
+        }
+        else if (listaAvances.Count == 0)
+        {
+            <p>No existen recursos</p>
+        }
+        else
+        {
+            @foreach (var item in listaAvances)
+            {
+                <tr>
+                    <td>@item.Fecha</td>
+                    <td>@item.MaterialEjecutado</td>
+                    <td>@item.FechaFinalizacionReal</td>
+                    <td>@item.Item_Id</td>
+                    <td>@item.Recurso_Id</td>
+                    <td>
+                        <a class="btn btn-primary"
+                           href="api/Avances/editar/@item.Id">
+                            Editar
+                        </a>
+                    </td>
+                    <td>
+                        <button class="btn btn-danger"
+                                @onclick="()=>Eliminar(item)">
+                            Borrar
+                        </button>
+                    </td>
+                </tr>
+            }
+        }
+    }
+    else
+    {
+        <p> Error: @Mensaje</p>
+    }
+</table>
+
+<Confirmacion @ref="confirmacion"
+              Titulo="CUIDADO"
+              textCancelar="Salir"
+              onCancel="Cancelar"
+              onConfirm="Borrar">
+    <h5>Está por borrar el avance</h5>
+    <br />
+    <p>Está seguro?</p>
+</Confirmacion>
+
+
+@code {
+    Confirmacion confirmacion;
+
+    List<Avance> listaAvances;
+    Avance avance;
+    string Mensaje = "";
+
+    Avance? avanceBorrar = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await Leer();
+    }
+
+    private async Task Leer()
+    {
+        var resp = await http.Get<List<Avance>>("api/Avances");
+        if (!resp.Error)
+        {
+            listaAvances = resp.Respuesta;
+        }
+        else
+        {
+            Mensaje = await resp.ObtenerError();
+        }
+    }
+
+    private async Task Eliminar(Avance avance)
+    {
+        avanceBorrar = avance;
+        confirmacion.Ver();
+    }
+
+    private void Cancelar()
+    {
+        confirmacion.Ocultar();
+        avanceBorrar = null;
+    }
+
+    private async Task Borrar()
+    {
+        var respuesta = await http.Delete($"api/Avances/{avanceBorrar.Id}");
+        if (respuesta.Error)
+        {
+            var body = "No se pudo borrar";
+        }
+        Cancelar();
+        await Leer();
+    }
+
+}
