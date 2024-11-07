@@ -1,76 +1,139 @@
 ﻿@page "/api/Recursos"
 @inject IHttpServicio http
+<style>
+    /* Configura la imagen de fondo para ocupar toda la pantalla */
+    .fondo {
+        position: fixed; /* Cambia a fixed para mantener el fondo detrás al hacer scroll */
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('/images/fondo.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        z-index: -2; /* Asegura que el fondo esté detrás de todos los elementos */
+    }
 
-<h3>Lista de Recursos</h3>
-<br />
-<a class="btn btn-primary" href="/api/Recursos/crear">Nuevo Recurso</a>
-<br />
-<table>
-    <tr>
-        <th>Tipo</th>
-        <th>Nombre</th>
-        <th>Cantidad</th>
-        <th>Unidad de Medida</th>
-    </tr>
-    @if (Mensaje == "")
-    {
-        @if (listaRecursos == null)
+    /* Capa semitransparente */
+    .overlay {
+        position: fixed; /* También cambia a fixed para estar alineado con el fondo */
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: -1; /* Debe estar detrás del contenedor principal */
+    }
+
+    /* Contenedor principal */
+    .contenedor {
+        position: relative;
+        z-index: 1; /* Por encima de fondo y overlay */
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 15px;
+        padding: 20px;
+        max-width: 800px;
+        margin: auto;
+        color: black;
+        margin-top: 20px;
+    }
+
+    /* Estilo de la tabla */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: center;
+    }
+
+    th {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .btn-primary, .btn-danger {
+        border: none;
+        border-radius: 5px;
+        padding: 8px 12px;
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+    }
+</style>
+
+<div class="fondo"></div>
+<div class="overlay"></div>
+<div class="contenedor">
+    <h3>Lista de Recursos</h3>
+    <br />
+    <a class="btn btn-primary" href="/api/Recursos/crear">Nuevo Recurso</a>
+    <br /><br />
+    <table>
+        <tr>
+            <th>Tipo</th>
+            <th>Nombre</th>
+            <th>Cantidad</th>
+            <th>Unidad de Medida</th>
+            <th>Acciones</th>
+        </tr>
+        @if (Mensaje == "")
         {
-            <p>Buscando....</p>
-        }
-        else if (listaRecursos.Count == 0)
-        {
-            <p>No existen recursos</p>
+            @if (listaRecursos == null)
+            {
+                <p>Buscando....</p>
+            }
+            else if (listaRecursos.Count == 0)
+            {
+                <p>No existen recursos</p>
+            }
+            else
+            {
+                @foreach (var item in listaRecursos)
+                {
+                    <tr>
+                        <td>@item.Tipo</td>
+                        <td>@item.Nombre</td>
+                        <td>@item.Cantidad</td>
+                        <td>@item.UnidadMedida</td>
+                        <td>
+                            <a class="btn btn-primary" href="api/Recursos/editar/@item.Id">Editar</a>
+                            <button class="btn btn-danger" @onclick="() => Eliminar(item)">Borrar</button>
+                        </td>
+                    </tr>
+                }
+            }
         }
         else
         {
-            @foreach (var item in listaRecursos)
-            {
-                <tr>
-                    <td>@item.Tipo</td>
-                    <td>@item.Nombre</td>
-                    <td>@item.Cantidad</td>
-                    <td>@item.UnidadMedida</td>
-                    <td>
-                        <a class="btn btn-primary"
-                           href="api/Recursos/editar/@item.Id">
-                            Editar
-                        </a>
-                    </td>
-                    <td>
-                        <button class="btn btn-danger"
-                           @onclick = "()=>Eliminar(item)">
-                            Borrar
-                        </button>
-                    </td>
-                </tr>
-            }
+            <p>Error: @Mensaje</p>
         }
-    }
-    else
-    {
-        <p> Error: @Mensaje</p>
-    }
-</table>
+    </table>
+</div>
 
-<Confirmacion @ref="confirmacion"
-              Titulo="CUIDADO"
-              textCancelar="Salir"
-              onCancel="Cancelar"
-              onConfirm="Borrar">
-              <h5>Está por borrar el recurso</h5>
-              <br />
-              <p>Está seguro?</p>
+<Confirmacion @ref="confirmacion" Titulo="CUIDADO" textCancelar="Salir" onCancel="Cancelar" onConfirm="Borrar">
+    <h5>Está por borrar el recurso</h5>
+    <br />
+    <p>Está seguro?</p>
 </Confirmacion>
 
 
 @code {
     Confirmacion confirmacion;
-
     List<Recurso> listaRecursos;
     Recurso recurso;
     string Mensaje = "";
-
     Recurso? recursoBorrar = null;
 
     protected override async Task OnInitializedAsync()
@@ -114,5 +177,4 @@
         Cancelar();
         await Leer();
     }
-
 }
