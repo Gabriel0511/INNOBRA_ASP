@@ -12,15 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace INNOBRA_ASP.DB.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20240826032441_grupo")]
-    partial class grupo
+    [Migration("20241107215601_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.6")
+                .HasAnnotation("ProductVersion", "8.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -39,9 +39,6 @@ namespace INNOBRA_ASP.DB.Migrations
                     b.Property<DateTime>("FechaFinalizacionReal")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("ItemId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Item_Id")
                         .HasColumnType("int");
 
@@ -50,17 +47,14 @@ namespace INNOBRA_ASP.DB.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("RecursoId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Recurso_Id")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ItemId");
+                    b.HasIndex("Item_Id");
 
-                    b.HasIndex("RecursoId");
+                    b.HasIndex("Recurso_Id");
 
                     b.ToTable("Avances");
                 });
@@ -73,19 +67,13 @@ namespace INNOBRA_ASP.DB.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ItemTipoId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ItemTipos_idItemTipos")
+                    b.Property<int>("Item_Tipos_Id")
                         .HasColumnType("int");
 
                     b.Property<int>("Material_estimado")
                         .HasColumnType("int");
 
-                    b.Property<int>("PresupuestoId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Presupuesto_id")
+                    b.Property<int>("Presupuesto_Id")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Tiempo_estimado")
@@ -93,9 +81,9 @@ namespace INNOBRA_ASP.DB.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ItemTipoId");
+                    b.HasIndex("Item_Tipos_Id");
 
-                    b.HasIndex("PresupuestoId");
+                    b.HasIndex("Presupuesto_Id");
 
                     b.ToTable("Items");
                 });
@@ -112,27 +100,21 @@ namespace INNOBRA_ASP.DB.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ItemId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Items_idItems")
+                    b.Property<int>("Item_Id")
                         .HasColumnType("int");
 
                     b.Property<string>("MaterialPrevisto")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RecursoId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Recursos_idRecursos")
+                    b.Property<int>("Recursos_Id")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ItemId");
+                    b.HasIndex("Item_Id");
 
-                    b.HasIndex("RecursoId");
+                    b.HasIndex("Recursos_Id");
 
                     b.ToTable("ItemRenglones");
                 });
@@ -153,11 +135,12 @@ namespace INNOBRA_ASP.DB.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Unidad_Id")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Unidad_Id")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Unidad_Id");
 
                     b.ToTable("ItemTipos");
                 });
@@ -170,24 +153,17 @@ namespace INNOBRA_ASP.DB.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ItemId")
+                    b.Property<int>("Item_Tipos_Id")
                         .HasColumnType("int");
-
-                    b.Property<string>("Item_Tipos_Id")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Recurso_Id")
                         .HasColumnType("int");
 
-                    b.Property<int>("recursoId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("ItemId");
+                    b.HasIndex("Item_Tipos_Id");
 
-                    b.HasIndex("recursoId");
+                    b.HasIndex("Recurso_Id");
 
                     b.ToTable("ItemTipoRenglones");
                 });
@@ -233,15 +209,12 @@ namespace INNOBRA_ASP.DB.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ObraId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Obra_Id")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ObraId");
+                    b.HasIndex("Obra_Id");
 
                     b.ToTable("Presupuestos");
                 });
@@ -267,9 +240,6 @@ namespace INNOBRA_ASP.DB.Migrations
                     b.Property<int>("Tipo")
                         .HasColumnType("int");
 
-                    b.Property<int>("UnidadId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UnidadMedida")
                         .IsRequired()
                         .HasMaxLength(45)
@@ -280,7 +250,7 @@ namespace INNOBRA_ASP.DB.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UnidadId");
+                    b.HasIndex("Unidad_Id");
 
                     b.ToTable("Recursos");
                 });
@@ -293,7 +263,10 @@ namespace INNOBRA_ASP.DB.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Codigo")
+                    b.Property<decimal>("Costo")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Descripcion")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -309,14 +282,14 @@ namespace INNOBRA_ASP.DB.Migrations
             modelBuilder.Entity("INNOBRA_ASP.DB.Data.Entity.Avance", b =>
                 {
                     b.HasOne("INNOBRA_ASP.DB.Data.Entity.Item", "Item")
-                        .WithMany()
-                        .HasForeignKey("ItemId")
+                        .WithMany("Avances")
+                        .HasForeignKey("Item_Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("INNOBRA_ASP.DB.Data.Entity.Recurso", "Recurso")
-                        .WithMany()
-                        .HasForeignKey("RecursoId")
+                        .WithMany("Avances")
+                        .HasForeignKey("Recurso_Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -328,14 +301,14 @@ namespace INNOBRA_ASP.DB.Migrations
             modelBuilder.Entity("INNOBRA_ASP.DB.Data.Entity.Item", b =>
                 {
                     b.HasOne("INNOBRA_ASP.DB.Data.Entity.ItemTipo", "ItemTipo")
-                        .WithMany()
-                        .HasForeignKey("ItemTipoId")
+                        .WithMany("Items")
+                        .HasForeignKey("Item_Tipos_Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("INNOBRA_ASP.DB.Data.Entity.Presupuesto", "Presupuesto")
-                        .WithMany()
-                        .HasForeignKey("PresupuestoId")
+                        .WithMany("Items")
+                        .HasForeignKey("Presupuesto_Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -347,14 +320,14 @@ namespace INNOBRA_ASP.DB.Migrations
             modelBuilder.Entity("INNOBRA_ASP.DB.Data.Entity.ItemRenglon", b =>
                 {
                     b.HasOne("INNOBRA_ASP.DB.Data.Entity.Item", "Item")
-                        .WithMany()
-                        .HasForeignKey("ItemId")
+                        .WithMany("ItemRenglons")
+                        .HasForeignKey("Item_Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("INNOBRA_ASP.DB.Data.Entity.Recurso", "Recurso")
-                        .WithMany()
-                        .HasForeignKey("RecursoId")
+                        .WithMany("ItemRenglons")
+                        .HasForeignKey("Recursos_Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -363,30 +336,41 @@ namespace INNOBRA_ASP.DB.Migrations
                     b.Navigation("Recurso");
                 });
 
+            modelBuilder.Entity("INNOBRA_ASP.DB.Data.Entity.ItemTipo", b =>
+                {
+                    b.HasOne("INNOBRA_ASP.DB.Data.Entity.Unidad", "Unidad")
+                        .WithMany("ItemTipos")
+                        .HasForeignKey("Unidad_Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Unidad");
+                });
+
             modelBuilder.Entity("INNOBRA_ASP.DB.Data.Entity.ItemTipoRenglon", b =>
                 {
-                    b.HasOne("INNOBRA_ASP.DB.Data.Entity.Item", "Item")
-                        .WithMany()
-                        .HasForeignKey("ItemId")
+                    b.HasOne("INNOBRA_ASP.DB.Data.Entity.ItemTipo", "ItemTipo")
+                        .WithMany("ItemTipoRenglons")
+                        .HasForeignKey("Item_Tipos_Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("INNOBRA_ASP.DB.Data.Entity.Recurso", "recurso")
-                        .WithMany()
-                        .HasForeignKey("recursoId")
+                    b.HasOne("INNOBRA_ASP.DB.Data.Entity.Recurso", "Recurso")
+                        .WithMany("ItemTipoRenglons")
+                        .HasForeignKey("Recurso_Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Item");
+                    b.Navigation("ItemTipo");
 
-                    b.Navigation("recurso");
+                    b.Navigation("Recurso");
                 });
 
             modelBuilder.Entity("INNOBRA_ASP.DB.Data.Entity.Presupuesto", b =>
                 {
                     b.HasOne("INNOBRA_ASP.DB.Data.Entity.Obra", "Obra")
-                        .WithMany()
-                        .HasForeignKey("ObraId")
+                        .WithMany("Presupuestos")
+                        .HasForeignKey("Obra_Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -396,12 +380,52 @@ namespace INNOBRA_ASP.DB.Migrations
             modelBuilder.Entity("INNOBRA_ASP.DB.Data.Entity.Recurso", b =>
                 {
                     b.HasOne("INNOBRA_ASP.DB.Data.Entity.Unidad", "Unidad")
-                        .WithMany()
-                        .HasForeignKey("UnidadId")
+                        .WithMany("Recursos")
+                        .HasForeignKey("Unidad_Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Unidad");
+                });
+
+            modelBuilder.Entity("INNOBRA_ASP.DB.Data.Entity.Item", b =>
+                {
+                    b.Navigation("Avances");
+
+                    b.Navigation("ItemRenglons");
+                });
+
+            modelBuilder.Entity("INNOBRA_ASP.DB.Data.Entity.ItemTipo", b =>
+                {
+                    b.Navigation("ItemTipoRenglons");
+
+                    b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("INNOBRA_ASP.DB.Data.Entity.Obra", b =>
+                {
+                    b.Navigation("Presupuestos");
+                });
+
+            modelBuilder.Entity("INNOBRA_ASP.DB.Data.Entity.Presupuesto", b =>
+                {
+                    b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("INNOBRA_ASP.DB.Data.Entity.Recurso", b =>
+                {
+                    b.Navigation("Avances");
+
+                    b.Navigation("ItemRenglons");
+
+                    b.Navigation("ItemTipoRenglons");
+                });
+
+            modelBuilder.Entity("INNOBRA_ASP.DB.Data.Entity.Unidad", b =>
+                {
+                    b.Navigation("ItemTipos");
+
+                    b.Navigation("Recursos");
                 });
 #pragma warning restore 612, 618
         }

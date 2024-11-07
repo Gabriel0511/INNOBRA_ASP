@@ -16,12 +16,8 @@ namespace INNOBRA_ASP.Shared.DTO
 
         //Clave Foranea
 
-        public int Items_idItems { get; set; }
+        public int Item_Id { get; set; }
 
-        public Item Item { get; set; }
-
-        public int Recursos_idRecursos { get; set; }
-
-        public Recurso Recurso { get; set; }
+        public int Recursos_Id { get; set; }
     }
 }

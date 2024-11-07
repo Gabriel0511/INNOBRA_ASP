@@ -34,6 +34,9 @@ namespace INNOBRA_ASP.Server.Util
             //LUCIA
             CreateMap<CrearItemDTO, Item>();
             CreateMap<CrearItemRenglonDTO, ItemRenglon>();
+
+            //CreateMap<EditarItemDTO, Item>();
+            //CreateMap<EditarItemRenglonDTO, ItemRenglon>();
         }
     }
 }

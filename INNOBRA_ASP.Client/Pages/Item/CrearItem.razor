@@ -1,0 +1,148 @@
+﻿@page "/Api/Items/crear"
+@inject IHttpServicio http
+@using INNOBRA_ASP.Shared.DTO
+@using System.Net.Http.Json
+@inject NavigationManager nav
+
+<h3>Crear Item</h3>
+
+@if (!string.IsNullOrEmpty(mensajeError))
+{
+    <div class="alert alert-danger" role="alert">
+        @mensajeError
+    </div>
+}
+
+<EditForm Model="@item" OnValidSubmit="Grabar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Tiempo Estimado:</label>
+        <InputDate @bind-Value="item.Tiempo_estimado" />
+        <ValidationMessage For="@(() => item.Tiempo_estimado)" />
+    </div >
+
+    <div class="mb-3">
+        <label>Material Estimado:</label>
+        <InputNumber @bind-Value="item.Material_estimado" />
+        <ValidationMessage For="@(() => item.Material_estimado)" />
+    </div >
+
+    <div class="mb-3">
+        <label>Item Tipo</label>
+        <div>
+            <select class="form-control" @bind="item.Item_Tipos_Id">
+                <option value="">Seleccione un item tipo</option>
+                @foreach (var itemTipo in itemTipos)
+                {
+                    <option value="@itemTipo.Id">@itemTipo.Nombre</option>
+                }
+            </select>
+            <ValidationMessage For="@(() => item.Item_Tipos_Id)" />
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label>Presupuesto</label>
+        <div>
+            <select class="form-control" @bind="item.Presupuesto_Id">
+                <option value="">Seleccione un presupuesto</option>
+                @foreach (var presupuesto in presupuestos)
+                {
+                    <option value="@presupuesto.Id">@presupuesto.Nombre</option>
+                }
+            </select>
+            <ValidationMessage For="@(() => item.Presupuesto_Id)" />
+        </div>
+    </div>
+
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+</EditForm>
+
+
+@code {
+    private Item item = new Item();
+    private List<Item> listaItems = new();
+    private List<ItemTipo> itemTipos = new List<ItemTipo>();
+    private List<Presupuesto> presupuestos = new List<Presupuesto>();
+
+    private string mensajeError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarItems();
+        await CargarItemsTipos();
+        await CargarPresupuesto();
+        item.Tiempo_estimado = DateTime.Today;
+    }
+
+    private async Task CargarItems()
+    {
+        var respuesta = await http.Get<List<Item>>("Api/Items");
+        if (!respuesta.Error)
+        {
+            listaItems = respuesta.Respuesta;
+        }
+        else
+        {
+            mensajeError = "Error al cargar los items.";
+        }
+    }
+
+    private async Task CargarItemsTipos()
+    {
+        // Llama al servicio para obtener la lista de obras
+        var respuesta = await http.Get<List<ItemTipo>>("api/ItemTipos");
+        if (!respuesta.Error)
+        {
+            itemTipos = respuesta.Respuesta;  // Poblamos la lista de obras, no la de presupuestos
+        }
+        else
+        {
+            mensajeError = "Error al cargar los items tipo.";
+        }
+    }
+
+    private async Task CargarPresupuesto()
+    {
+        // Llama al servicio para obtener la lista de obras
+        var respuesta = await http.Get<List<Presupuesto>>("api/Presupuestos");
+        if (!respuesta.Error)
+        {
+            presupuestos = respuesta.Respuesta;  // Poblamos la lista de obras, no la de presupuestos
+        }
+        else
+        {
+            mensajeError = "Error al cargar los presupuestos.";
+        }
+    }
+
+    private async Task Grabar()
+    {
+        if (item.Item_Tipos_Id == 0 || item.Presupuesto_Id == 0)
+        {
+            mensajeError = "Los campos Item Tipo y Presupuesto son obligatorios.";
+            return;
+        }
+
+        var httpRespuesta = await http.Post<Item>("Api/Items", item);
+
+        if (httpRespuesta.Error)
+        {
+            mensajeError = $"Error al guardar el item: {httpRespuesta.HttpResponseMessage.ReasonPhrase}";
+        }
+        else
+        {
+            nav.NavigateTo("/Api/Items");
+        }
+    }
+
+
+    private void Cancelar()
+    {
+        nav.NavigateTo("/Api/Items");
+    }
+}

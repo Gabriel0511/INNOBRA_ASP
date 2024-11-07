@@ -18,7 +18,7 @@ namespace INNOBRA_ASP.DB.Data.Entity
 
         //Clave Foranea
 
-        public int Items_idItems { get; set; }
+        public int Item_Id { get; set; }
 
         public Item Item { get; set; }
 

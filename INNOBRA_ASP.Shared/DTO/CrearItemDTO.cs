@@ -15,12 +15,8 @@ namespace INNOBRA_ASP.Shared.DTO
 
         // clave foranea
 
-        public int ItemTipos_idItemTipos { get; set; }
+        public int Item_Tipos_Id{ get; set; }
 
-        public ItemTipo ItemTipo { get; set; }
-
-        public int Presupuesto_id { get; set; }
-
-        public Presupuesto Presupuesto { get; set; }
+        public int Presupuesto_Id { get; set; }
     }
 }
