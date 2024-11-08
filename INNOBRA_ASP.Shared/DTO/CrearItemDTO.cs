@@ -11,6 +11,8 @@ namespace INNOBRA_ASP.Shared.DTO
     public class CrearItemDTO
     {
         public DateTime Tiempo_estimado { get; set; }
+
+        [Required(ErrorMessage = "El material estimado es obligatorio.")]
         public int Material_estimado { get; set; }
 
         // clave foranea

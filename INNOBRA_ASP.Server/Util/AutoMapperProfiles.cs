@@ -35,8 +35,8 @@ namespace INNOBRA_ASP.Server.Util
             CreateMap<CrearItemDTO, Item>();
             CreateMap<CrearItemRenglonDTO, ItemRenglon>();
 
-            //CreateMap<EditarItemDTO, Item>();
-            //CreateMap<EditarItemRenglonDTO, ItemRenglon>();
+            CreateMap<EditarItemDTO, Item>();
+            CreateMap<EditarItemRenglonDTO, ItemRenglon>();
         }
     }
 }

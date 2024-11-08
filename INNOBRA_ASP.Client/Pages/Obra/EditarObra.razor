@@ -1,5 +1,87 @@
-﻿<h3>EditarObra</h3>
+﻿@page "/Api/Obras/editar/{id:int}"
+@inject IHttpServicio http
+@using INNOBRA_ASP.Shared.DTO
+@using System.Net.Http.Json
+@inject NavigationManager nav
+
+<h3>Editar Obra</h3>
+
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <div class="alert alert-success">
+        @mensaje
+    </div>
+}
+
+<EditForm Model="@obra" OnValidSubmit="Actualizar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Nombre:</label>
+        <InputText @bind-Value="obra.Nombre" />
+        <ValidationMessage For="@(() => obra.Nombre)" />
+    </div>
+
+    <div>
+        <label>Fecha Inicio</label>
+        <InputDate @bind-Value="obra.FechaInicio" />
+        <ValidationMessage For="@(() => obra.FechaInicio)" />
+    </div>
+
+    <div>
+        <label>Fecha fin</label>
+        <InputDate @bind-Value="obra.FechaFin" />
+        <ValidationMessage For="@(() => obra.FechaFin)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+</EditForm>
+
+<hr />
 
 @code {
+    [Parameter] public int id { get; set; }
+    private EditarObraDTO obra = new EditarObraDTO();
+    private string mensaje = "";
 
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarObra();
+    }
+
+    private async Task CargarObra()
+    {
+        var respuesta = await http.Get<EditarObraDTO>($"Api/Obras/{id}");
+        if (!respuesta.Error)
+        {
+            obra = respuesta.Respuesta;
+        }
+        else
+        {
+            nav.NavigateTo("/api/Obras");
+        }
+    }
+
+    private async Task Actualizar()
+    {
+        var respuesta = await http.Put($"Api/Obras/{id}", obra);
+
+        if (!respuesta.Error)
+        {
+            mensaje = "Se cargó con éxito la obra.";
+            nav.NavigateTo("/api/Obras");
+        }
+        else
+        {
+            var errorContent = await respuesta.HttpResponseMessage.Content.ReadAsStringAsync();
+            mensaje = $"Error: {errorContent}"; // Muestra el error
+        }
+    }
+
+    private void Cancelar()
+    {
+        nav.NavigateTo("/api/Obras");
+    }
 }

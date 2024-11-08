@@ -68,33 +68,45 @@ namespace INNOBRA_ASP.Server.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult> Put(int id, [FromBody] Item entidad)
+        public async Task<ActionResult> Put(int id, [FromBody] EditarItemDTO entidadDTO)
         {
-
-            if (id != entidad.Id)
-            {
-                return BadRequest("Datos incorrectos.");
-            }
-
-            var verif = await repositorio.SelectById(id);
-
-            if (verif == null)
-            {
-                return NotFound("No existe el item buscado.");
-            }
-
-            mapper.Map(verif, entidad);
 
             try
             {
-                await repositorio.Update(id, verif);
+                Item entidad = mapper.Map<Item>(entidadDTO);
+                await repositorio.Update(entidad.Id, entidad);
                 return Ok();
             }
-            catch (Exception)
-            {
 
-                throw;
+            catch (Exception e)
+            {
+                return BadRequest(e.InnerException.Message);
             }
+
+            //if (id != entidad.Id)
+            //{
+            //    return BadRequest("Datos incorrectos.");
+            //}
+
+            //var verif = await repositorio.SelectById(id);
+
+            //if (verif == null)
+            //{
+            //    return NotFound("No existe el item buscado.");
+            //}
+
+            //mapper.Map(verif, entidad);
+
+            //try
+            //{
+            //    await repositorio.Update(id, verif);
+            //    return Ok();
+            //}
+            //catch (Exception)
+            //{
+
+            //    throw;
+            //}
 
         }
 
