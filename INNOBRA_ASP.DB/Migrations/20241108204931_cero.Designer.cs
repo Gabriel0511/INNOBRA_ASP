@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace INNOBRA_ASP.DB.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20241107215601_initial")]
-    partial class initial
+    [Migration("20241108204931_cero")]
+    partial class cero
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -76,8 +76,12 @@ namespace INNOBRA_ASP.DB.Migrations
                     b.Property<int>("Presupuesto_Id")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("Tiempo_estimado")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("Tiempo_estimado")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Unidad_Tiempo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

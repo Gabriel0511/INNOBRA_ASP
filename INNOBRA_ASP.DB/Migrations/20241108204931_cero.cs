@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace INNOBRA_ASP.DB.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class cero : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -113,7 +113,8 @@ namespace INNOBRA_ASP.DB.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Tiempo_estimado = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Tiempo_estimado = table.Column<int>(type: "int", nullable: false),
+                    Unidad_Tiempo = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Material_estimado = table.Column<int>(type: "int", nullable: false),
                     Item_Tipos_Id = table.Column<int>(type: "int", nullable: false),
                     Presupuesto_Id = table.Column<int>(type: "int", nullable: false)

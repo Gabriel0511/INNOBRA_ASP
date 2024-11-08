@@ -73,8 +73,12 @@ namespace INNOBRA_ASP.DB.Migrations
                     b.Property<int>("Presupuesto_Id")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("Tiempo_estimado")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("Tiempo_estimado")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Unidad_Tiempo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

@@ -4,6 +4,9 @@
 @using System.Net.Http.Json
 @inject NavigationManager nav
 
+<div class="fondo">
+    <div class="contenido">
+
 <h3>Editar Item</h3>
 
 @if (!string.IsNullOrEmpty(mensaje))
@@ -19,8 +22,22 @@
 
     <div>
         <label>Tiempo Estimado:</label>
-        <InputDate @bind-Value="item.Tiempo_estimado" />
+        <InputNumber @bind-Value="item.Tiempo_estimado" />
         <ValidationMessage For="@(() => item.Tiempo_estimado)" />
+    </div>
+
+    <div>
+        <label>Unidad de tiempo:</label>
+        <div>
+            <select class="form-control" @bind="item.Unidad_Tiempo">
+                <option value="">Seleccione la unidad de tiempo</option>
+                        @foreach (var undTiempo in undTiempo)
+                        {
+                            <option value="@undTiempo">@undTiempo</option>
+                        }
+            </select>
+            <ValidationMessage For="@(() => item.Unidad_Tiempo)" />
+        </div>
     </div>
 
     <div>
@@ -33,10 +50,14 @@
     <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
 </EditForm>
 
+    </div>
+</div>
 
 @code {
     [Parameter] public int id { get; set; }
     private EditarItemDTO item = new EditarItemDTO();
+    private List<string> undTiempo = new List<string> { "Horas", "Dias", "Meses", "Años" };
+
     private string mensaje = "";
 
     protected override async Task OnInitializedAsync()

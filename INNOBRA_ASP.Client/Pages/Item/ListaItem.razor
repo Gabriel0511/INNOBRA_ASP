@@ -1,6 +1,9 @@
 ﻿@page "/Api/Items"
 @inject IHttpServicio http
 
+<div class="fondo">
+    <div class="contenido">
+
 <h3>Items</h3>
 
 @if (listaItems != null && listaItems.Any())
@@ -9,6 +12,7 @@
         <thead>
             <tr>
                 <th scope="col">Tiempo Estimado</th>
+                <th scope="col">Unidad de Tiempo</th>
                 <th scope="col">Material Estimado</th>
                 <th scope="col">Item Tipo</th>
                 <th scope="col">Presupuesto</th>
@@ -20,6 +24,7 @@
             {
                 <tr>
                     <td>@item.Tiempo_estimado</td>
+                    <td>@item.Unidad_Tiempo</td>
                     <td>@item.Material_estimado</td>
                     <td>@item.ItemTipo</td>
                     <td>@item.Presupuesto</td>
@@ -42,6 +47,9 @@ else
 <a class="btn btn-primary" href="/api/Items/crear">
     <i class="bi bi-plus-circle"></i> Crear Item
 </a>
+
+    </div>
+</div>
 
 @code {
     List<Item> listaItems = new List<Item>();
