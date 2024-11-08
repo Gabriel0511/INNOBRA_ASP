@@ -1,0 +1,80 @@
+﻿@page "/api/ItemsRenglones/editar/{id:int}"
+@inject IHttpServicio http
+@using INNOBRA_ASP.Shared.DTO
+@using System.Net.Http.Json
+@inject NavigationManager nav
+
+<h3>Editar Item Renglon</h3>
+
+@if (!string.IsNullOrEmpty(mensaje))
+{
+        <div class="alert alert-success">
+        @mensaje
+        </div>
+}
+
+<EditForm Model="@itemRenglon" OnValidSubmit="Actualizar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Material Previsto:</label>
+        <InputText @bind-Value="itemRenglon.MaterialPrevisto" />
+        <ValidationMessage For="@(() => itemRenglon.MaterialPrevisto)" />
+    </div>
+
+    <div>
+        <label>Cantidad:</label>
+        <InputText @bind-Value="itemRenglon.Cantidad" />
+        <ValidationMessage For="@(() => itemRenglon.Cantidad)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+</EditForm>
+
+
+@code {
+    [Parameter] public int id { get; set; }
+    private EditarItemRenglonDTO itemRenglon = new EditarItemRenglonDTO();
+    private string mensaje = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarItemRenglon();
+    }
+
+    private async Task CargarItemRenglon()
+    {
+        var respuesta = await http.Get<EditarItemRenglonDTO>($"api/ItemsRenglones/GetById/{id}");
+        if (!respuesta.Error)
+        {
+            itemRenglon = respuesta.Respuesta;
+        }
+        else
+        {
+            nav.NavigateTo("/api/ItemsRenglones");
+        }
+    }
+
+    private async Task Actualizar()
+    {
+        var respuesta = await http.Put($"api/ItemsRenglones/{id}", itemRenglon);
+
+        if (!respuesta.Error)
+        {
+            mensaje = "Se cargó con éxito el item renglon.";
+            nav.NavigateTo("/Api/ItemsRenglones");
+        }
+        else
+        {
+            var errorContent = await respuesta.HttpResponseMessage.Content.ReadAsStringAsync();
+            mensaje = $"Error: {errorContent}"; // Muestra el error
+        }
+    }
+
+    private void Cancelar()
+    {
+        nav.NavigateTo("/api/ItemsRenglones");
+    }
+}

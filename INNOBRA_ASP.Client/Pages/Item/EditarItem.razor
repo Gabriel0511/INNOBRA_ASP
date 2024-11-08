@@ -46,7 +46,7 @@
 
     private async Task CargarItem()
     {
-        var respuesta = await http.Get<EditarItemDTO>($"Api/Items/{id}");
+        var respuesta = await http.Get<EditarItemDTO>($"Api/Items/GetById/{id}");
         if (!respuesta.Error)
         {
             item = respuesta.Respuesta;

@@ -71,44 +71,36 @@ namespace INNOBRA_ASP.Server.Controllers
         public async Task<ActionResult> Put(int id, [FromBody] EditarItemDTO entidadDTO)
         {
 
-            try
-            {
-                Item entidad = mapper.Map<Item>(entidadDTO);
-                await repositorio.Update(entidad.Id, entidad);
-                return Ok();
-            }
+			if (id != entidadDTO.Id)
+			{
+				return BadRequest("Datos incorrectos.");
+			}
 
-            catch (Exception e)
-            {
-                return BadRequest(e.InnerException.Message);
-            }
+			var item = await repositorio.SelectById(id);
 
-            //if (id != entidad.Id)
-            //{
-            //    return BadRequest("Datos incorrectos.");
-            //}
+			if (item == null)
+			{
+				return NotFound("No existe la obra buscada.");
+			}
 
-            //var verif = await repositorio.SelectById(id);
+			// Actualizar los campos del presupuesto
+			item.Tiempo_estimado = entidadDTO.Tiempo_estimado;
+			item.Material_estimado = entidadDTO.Material_estimado;
 
-            //if (verif == null)
-            //{
-            //    return NotFound("No existe el item buscado.");
-            //}
+			// Aquí no modificamos la relación con 'Obra' ni 'Items', solo los campos mencionados.
 
-            //mapper.Map(verif, entidad);
+			try
+			{
+				// Guardar los cambios
+				await repositorio.Update(id, item);
+				return Ok();
+			}
+			catch (Exception ex)
+			{
+				return BadRequest($"Error al actualizar el item: {ex.Message}");
+			}
 
-            //try
-            //{
-            //    await repositorio.Update(id, verif);
-            //    return Ok();
-            //}
-            //catch (Exception)
-            //{
-
-            //    throw;
-            //}
-
-        }
+		}
 
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)

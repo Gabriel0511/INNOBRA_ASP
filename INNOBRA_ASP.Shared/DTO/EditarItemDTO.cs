@@ -16,11 +16,5 @@ namespace INNOBRA_ASP.Shared.DTO
 
 		[Required(ErrorMessage = "El material estimado es obligatorio.")]
 		public int Material_estimado { get; set; }
-
-		// Clave Foranea
-
-		public int Item_Tipos_Id { get; set; }
-
-		public int Presupuesto_Id { get; set; }
 	}
 }
