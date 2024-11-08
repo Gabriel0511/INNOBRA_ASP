@@ -1,0 +1,9 @@
+﻿@inject NavigationManager NavigationManager
+
+@code {
+    protected override void OnInitialized()
+    {
+        // Redirige automáticamente a la página de inicio de sesión
+        NavigationManager.NavigateTo("/login");
+    }
+}

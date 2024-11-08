@@ -17,12 +17,15 @@ namespace INNOBRA_ASP.DB.Data.Entity
 
         // Clave Foranea
 
-        public int ItemTipos_idItemTipos { get; set; }
+        public int Item_Tipos_Id { get; set; }
 
         public ItemTipo ItemTipo { get; set; }
 
-        public int Presupuesto_id {  get; set; }
+        public int Presupuesto_Id { get; set; }
 
         public Presupuesto Presupuesto { get; set; }
+
+        public ICollection<ItemRenglon> ItemRenglons { get; set; }
+        public ICollection<Avance> Avances { get; set; }
     }
 }

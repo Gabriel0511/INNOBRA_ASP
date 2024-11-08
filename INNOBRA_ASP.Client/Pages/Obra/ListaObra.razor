@@ -1,0 +1,79 @@
+﻿@page "/api/Obras"
+@inject IHttpServicio http
+
+<h3>Obras</h3>
+
+@if (listaObras != null && listaObras.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Nombre</th>
+                <th scope="col">Fecha Inicio</th>
+                <th scope="col">Fecha Fin</th>
+                <th scope="col">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var obra in listaObras)
+            {
+                <tr>
+                    <td>@obra.Nombre</td>
+                    <td>@obra.FechaInicio</td>
+                    <td>@obra.FechaFin</td>
+                    <td>
+                        <a class="btn btn-warning btn-sm" href="/api/Obras/editar/@obra.Id">Editar</a>
+                        <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(obra.Id)">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-warning" role="alert">
+        No hay obras disponibles.
+    </div>
+}
+
+<a class="btn btn-primary" href="/api/Obras/crear">
+    <i class="bi bi-plus-circle"></i> Crear Obra
+</a>
+
+@code {
+    List<Obra> listaObras = new List<Obra>();
+    string Mensaje = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await Leer();
+    }
+
+    private async Task Leer()
+    {
+        var resp = await http.Get<List<Obra>>("api/Obras");
+        if (!resp.Error)
+        {
+            listaObras = resp.Respuesta;
+        }
+        else
+        {
+            Mensaje = await resp.ObtenerError();
+        }
+    }
+
+    private async Task Eliminar(int id)
+    {
+        var resp = await http.Delete($"api/Obras/{id}");
+        if (!resp.Error)
+        {
+            await Leer(); // Recarga la lista después de eliminar
+        }
+        else
+        {
+            Mensaje = await resp.ObtenerError();
+        }
+    }
+}

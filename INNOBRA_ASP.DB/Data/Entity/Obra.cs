@@ -17,6 +17,7 @@ namespace INNOBRA_ASP.DB.Data.Entity
 
         [Required(ErrorMessage = "La fecha de fin es obligatoria.")]
         public DateTime FechaFin { get; set; }
+
+        public ICollection<Presupuesto> Presupuestos { get; set; }
     }
 }
-

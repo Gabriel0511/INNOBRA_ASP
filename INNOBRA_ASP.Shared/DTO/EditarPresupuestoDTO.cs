@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INNOBRA_ASP.DB.Data.Entity
+namespace INNOBRA_ASP.Shared.DTO
 {
-    public class Presupuesto : EntityBase
+    public class EditarPresupuestoDTO
     {
         [Required(ErrorMessage = "El nombre es obligatorio.")]
         public string Nombre { get; set; }
@@ -19,9 +19,5 @@ namespace INNOBRA_ASP.DB.Data.Entity
         public DateTime FechaFinPrevista { get; set; }
 
         public int Obra_Id { get; set; }
-
-        public Obra Obra { get; set; }
-
-        public ICollection<Item> Items { get; set; }
     }
 }
