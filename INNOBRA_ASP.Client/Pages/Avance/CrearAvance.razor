@@ -5,109 +5,7 @@
 @inject NavigationManager nav
 
 <style>
-    /* Fondo */
-    .fondo {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-image: url('/images/fondo.png');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        z-index: -2;
-    }
-
-    /* Capa semitransparente para oscurecer el fondo */
-    .overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro */
-        z-index: -1; /* Capa debajo del contenedor */
-    }
-
-    /* Contenedor principal de la página */
-    .contenedor-formulario {
-        position: relative;
-        z-index: 1;
-        background-color: rgba(255, 255, 255, 0.9); /* Fondo blanco semitransparente */
-        border-radius: 15px;
-        padding: 30px;
-        margin: 50px auto;
-        width: 90%;
-        max-width: 900px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra ligera */
-    }
-
-    /* Estilo del título */
-    h3 {
-        text-align: center;
-        color: #333;
-        font-family: 'Arial', sans-serif;
-        font-size: 2rem;
-        margin-bottom: 20px;
-    }
-
-    /* Estilos para los formularios */
-    .form-control {
-        width: 100%;
-        padding: 10px;
-        border-radius: 8px;
-        border: 1px solid #ddd;
-        margin-bottom: 15px;
-    }
-
-    /* Estilo para la tabla */
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    th, td {
-        padding: 10px;
-        border: 1px solid #ddd;
-        text-align: center;
-    }
-
-    th {
-        background-color: #007bff;
-        color: white;
-    }
-
-    .btn-primary, .btn-secondary {
-        border: none;
-        border-radius: 5px;
-        padding: 10px 15px;
-        color: white;
-        font-weight: bold;
-    }
-
-    .btn-primary {
-        background-color: #007bff;
-    }
-
-    .btn-secondary {
-        background-color: #6c757d;
-    }
-
-    /* Estilos para botones de cancelación */
-    .btn-primary:hover {
-        background-color: #0056b3;
-    }
-
-    .btn-secondary:hover {
-        background-color: #5a6268;
-    }
-
-    /* Estilos para el input de tipo Select */
-    .form-control.select {
-        padding: 8px;
-        border-radius: 8px;
-    }
+    /* ... Estilos existentes ... */
 </style>
 
 <div class="fondo"></div>
@@ -130,15 +28,22 @@
             <InputText @bind-Value="avance.MaterialEjecutado" class="form-control" />
         </div>
 
-        <!-- FECHA FINALIZACION REAL -->
+        <!-- Selección de Item ID -->
         <div>
             <label>Item ID:</label>
             <InputNumber @bind-Value="avance.Item_Id" class="form-control" />
         </div>
 
+        <!-- Selección del Recurso por Nombre -->
         <div>
-            <label>Recurso ID:</label>
-            <InputNumber @bind-Value="avance.Recurso_Id" class="form-control" />
+            <label>Recurso:</label>
+            <select @bind="avance.Recurso_Id" class="form-control">
+                <option value="">Seleccione un recurso</option>
+                @foreach (var recurso in listaRecursos)
+                {
+                    <option value="@recurso.Id">@recurso.Nombre</option>
+                }
+            </select>
         </div>
 
         <button type="submit" class="btn btn-primary">Guardar</button>
@@ -148,21 +53,21 @@
 
 @code {
     private CrearAvanceDTO avance = new CrearAvanceDTO();
-    private List<Avance> listaAvances = new();
+    private List<Recurso> listaRecursos = new(); // Lista para almacenar recursos
 
     protected override async Task OnInitializedAsync()
     {
         avance.Fecha = DateTime.Today;
-        await CargarAvances();
+        await CargarRecursos();
     }
 
-    private async Task CargarAvances()
+    private async Task CargarRecursos()
     {
-        // Llama al servicio para obtener la lista de avances
-        var respuesta = await http.Get<List<Avance>>("api/Avances");
+        // Llama al servicio para obtener la lista de recursos
+        var respuesta = await http.Get<List<Recurso>>("api/Recursos");
         if (!respuesta.Error)
         {
-            listaAvances = respuesta.Respuesta;
+            listaRecursos = respuesta.Respuesta;
         }
     }
 

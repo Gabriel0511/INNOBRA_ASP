@@ -2,9 +2,8 @@
 @inject IHttpServicio http
 
 <style>
-    /* Configura la imagen de fondo para ocupar toda la pantalla */
     .fondo {
-        position: fixed; /* Cambia a fixed para mantener el fondo detrás al hacer scroll */
+        position: fixed;
         top: 0;
         left: 0;
         width: 100%;
@@ -13,24 +12,22 @@
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
-        z-index: -2; /* Asegura que el fondo esté detrás de todos los elementos */
+        z-index: -2;
     }
 
-    /* Capa semitransparente */
     .overlay {
-        position: fixed; /* También cambia a fixed para estar alineado con el fondo */
+        position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
         background-color: rgba(0, 0, 0, 0.5);
-        z-index: -1; /* Debe estar detrás del contenedor principal */
+        z-index: -1;
     }
 
-    /* Contenedor principal */
     .contenedor {
         position: relative;
-        z-index: 1; /* Por encima de fondo y overlay */
+        z-index: 1;
         background-color: rgba(255, 255, 255, 0.8);
         border-radius: 15px;
         padding: 20px;
@@ -40,7 +37,6 @@
         margin-top: 20px;
     }
 
-    /* Estilo de la tabla */
     table {
         width: 100%;
         border-collapse: collapse;
@@ -87,7 +83,7 @@
             <th>Material Ejecutado</th>
             <th>Fecha de Finalización Real</th>
             <th>Item Id</th>
-            <th>Recurso Id</th>
+            <th>Recurso</th>
             <th>Acciones</th>
         </tr>
         @if (Mensaje == "")
@@ -109,7 +105,7 @@
                         <td>@item.MaterialEjecutado</td>
                         <td>@item.FechaFinalizacionReal</td>
                         <td>@item.Item_Id</td>
-                        <td>@item.Recurso_Id</td>
+                        <td>@MostrarNombreRecurso(item.Recurso_Id)</td>
                         <td>
                             <a class="btn btn-primary" href="api/Avances/editar/@item.Id">Editar</a>
                         </td>
@@ -137,7 +133,7 @@
     Confirmacion confirmacion;
 
     List<Avance> listaAvances;
-    Avance avance;
+    List<Recurso> listaRecursos;
     string Mensaje = "";
     Avance? avanceBorrar = null;
 
@@ -145,6 +141,7 @@
     {
         await base.OnInitializedAsync();
         await Leer();
+        await CargarRecursos();
     }
 
     private async Task Leer()
@@ -158,6 +155,21 @@
         {
             Mensaje = await resp.ObtenerError();
         }
+    }
+
+    private async Task CargarRecursos()
+    {
+        var respuesta = await http.Get<List<Recurso>>("api/Recursos");
+        if (!respuesta.Error)
+        {
+            listaRecursos = respuesta.Respuesta;
+        }
+    }
+
+    private string MostrarNombreRecurso(int recursoId)
+    {
+        var recurso = listaRecursos?.FirstOrDefault(r => r.Id == recursoId);
+        return recurso?.Nombre ?? "Sin asignar";
     }
 
     private async Task Eliminar(Avance avance)
@@ -177,7 +189,7 @@
         var respuesta = await http.Delete($"api/Avances/{avanceBorrar.Id}");
         if (respuesta.Error)
         {
-            var body = "No se pudo borrar";
+            Mensaje = "No se pudo borrar";
         }
         Cancelar();
         await Leer();
