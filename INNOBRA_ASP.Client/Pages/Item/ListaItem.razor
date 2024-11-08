@@ -26,7 +26,7 @@
                     <td>@item.Tiempo_estimado</td>
                     <td>@item.Unidad_Tiempo</td>
                     <td>@item.Material_estimado</td>
-                    <td>@item.ItemTipo</td>
+                    <td>@MostrarNombreItemTipo(item.ItemTipo)</td>
                     <td>@item.Presupuesto</td>
                     <td>
                         <a class="btn btn-warning btn-sm" href="Api/Items/editar/@item.Id">Editar</a>
@@ -53,6 +53,8 @@ else
 
 @code {
     List<Item> listaItems = new List<Item>();
+    List<ItemTipo> listaItemsTipos = new List<ItemTipo>();
+
     string Mensaje = "";
 
     protected override async Task OnInitializedAsync()
@@ -73,6 +75,22 @@ else
             Mensaje = await resp.ObtenerError();
         }
     }
+
+    private async Task CargarItemTipo()
+    {
+        var respuesta = await http.Get<List<ItemTipo>>("api/ItemTipos");
+        if (!respuesta.Error)
+        {
+            listaItemsTipos = respuesta.Respuesta;
+        }
+    }
+
+    private string MostrarNombreItemTipo(int itemTipoId)
+    {
+        var itemTipo = listaItemsTipos?.FirstOrDefault(r => r.Id == itemTipoId);
+        return itemTipo?.Nombre ?? "Sin asignar";
+    }
+
 
     private async Task Eliminar(int id)
     {
