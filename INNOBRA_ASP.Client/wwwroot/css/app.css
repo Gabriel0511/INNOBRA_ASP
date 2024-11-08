@@ -6,6 +6,11 @@ h1:focus {
     outline: none;
 }
 
+.icono-alineado {
+    position: relative;
+    top: 0px; /* Ajusta este valor si es necesario */
+}
+
 a, .btn-link {
     color: #0071c1;
 }
