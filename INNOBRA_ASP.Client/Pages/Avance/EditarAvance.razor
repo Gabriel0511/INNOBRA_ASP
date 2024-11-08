@@ -3,7 +3,6 @@
 @inject NavigationManager nav
 @using INNOBRA_ASP.Shared.DTO
 
-
 <style>
     /* Fondo que cubre toda la pantalla */
     .fondo {
@@ -16,9 +15,8 @@
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
-        z-index: -1;
+        z-index: -1; /* Coloca el fondo detrás del formulario */
     }
-
     /* Capa semitransparente */
     .overlay {
         position: absolute;
@@ -29,12 +27,11 @@
         background-color: rgba(0, 0, 0, 0.5);
         z-index: 1;
     }
-
     /* Contenedor del formulario */
     .contenedor-formulario {
         position: relative;
         z-index: 2;
-        background-color: rgba(255, 255, 255, 0.8);
+        background-color: rgba(255, 255, 255, 0.8); /* Fondo blanco semitransparente */
         border-radius: 15px;
         padding: 30px;
         max-width: 600px;
@@ -42,6 +39,28 @@
         margin-top: 50px;
         color: black;
     }
+
+        .contenedor-formulario h3 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .contenedor-formulario label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .contenedor-formulario div {
+            margin-bottom: 15px;
+        }
+
+        .contenedor-formulario .form-control {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
 
     .btn-primary, .btn-secondary {
         margin-right: 10px;
@@ -72,8 +91,8 @@
         }
 </style>
 
-<div class="fondo"></div>
-<div class="overlay"></div>
+<div class="fondo"></div> <!-- Fondo que cubre toda la pantalla -->
+<div class="overlay"></div> <!-- Capa semitransparente -->
 <div class="contenedor-formulario">
     <h3>Editar Avance</h3>
 
@@ -110,14 +129,8 @@
         </div>
 
         <div class="form-group">
-            <label>Recurso:</label>
-            <select class="form-control" @bind="avance.Recurso_Id">
-                <option value="">Seleccione un recurso</option>
-                @foreach (var recurso in listaRecursos)
-                {
-                    <option value="@recurso.Id">@recurso.Nombre</option>
-                }
-            </select>
+            <label>Recurso ID:</label>
+            <InputNumber class="form-control" @bind-Value="avance.Recurso_Id" />
         </div>
 
         <br />
@@ -128,62 +141,15 @@
     </EditForm>
 </div>
 
-<h3>Editar Avance</h3>
-
-<EditForm Model="avance" OnValidSubmit="Grabar">
-    <DataAnnotationsValidator />
-    
-    <div class="form-group">
-        <label>Fecha</label>
-        <div>
-            <InputDate class="form-control" @bind-Value="@avance.Fecha" />
-            <ValidationMessage For="@(() => avance.Fecha)" />
-        </div>
-    </div>
-    <div>
-        <label>Material Ejecutado</label>
-        <div>
-            <InputText class="form-control" @bind-Value="@avance.MaterialEjecutado" />
-            <ValidationMessage For="@(() => avance.MaterialEjecutado)" />
-        </div>
-    </div>
-    <div>
-        <label>Fecha de Finalizacion Real</label>
-        <div>
-            <InputDate class="form-control" @bind-Value="@avance.FechaFinalizacionReal" />
-            <ValidationMessage For="@(() => avance.FechaFinalizacionReal)" />
-        </div>
-    </div>
-    <div>
-        <label>Item ID:</label>
-        <InputNumber @bind-Value="avance.Item_Id" />
-    </div>
-    <div>
-        <label>Recurso ID:</label>
-        <InputNumber @bind-Value="avance.Recurso_Id" />
-    </div>
-
-    <br />
-    <button class="btn btn-primary" type="submit">Aceptar</button>
-    <button class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-</EditForm>
-
-
 @code {
     [Parameter] public int avanceId { get; set; }
     private EditarAvanceDTO avance = new EditarAvanceDTO();
-    private List<Recurso> listaRecursos = new();
-
-    string mensaje = "";
-
 
     protected override async Task OnInitializedAsync()
     {
         avance.FechaFinalizacionReal = DateTime.Today;
         await base.OnInitializedAsync();
         await Mostrar();
-
-        await CargarRecursos();
     }
 
     private async Task Mostrar()
@@ -196,15 +162,6 @@
         else
         {
             nav.NavigateTo("/api/Avances");
-        }
-    }
-
-    private async Task CargarRecursos()
-    {
-        var respuesta = await http.Get<List<Recurso>>("api/Recursos");
-        if (!respuesta.Error)
-        {
-            listaRecursos = respuesta.Respuesta;
         }
     }
 
@@ -223,4 +180,3 @@
         nav.NavigateTo("/api/Avances");
     }
 }
-

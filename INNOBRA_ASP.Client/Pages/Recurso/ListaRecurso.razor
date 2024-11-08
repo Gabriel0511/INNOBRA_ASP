@@ -1,9 +1,9 @@
 ﻿@page "/api/Recursos"
 @inject IHttpServicio http
-
 <style>
+    /* Configura la imagen de fondo para ocupar toda la pantalla */
     .fondo {
-        position: fixed;
+        position: fixed; /* Cambia a fixed para mantener el fondo detrás al hacer scroll */
         top: 0;
         left: 0;
         width: 100%;
@@ -12,22 +12,22 @@
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
-        z-index: -2;
+        z-index: -2; /* Asegura que el fondo esté detrás de todos los elementos */
     }
-
+    /* Capa semitransparente */
     .overlay {
-        position: fixed;
+        position: fixed; /* También cambia a fixed para estar alineado con el fondo */
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
         background-color: rgba(0, 0, 0, 0.5);
-        z-index: -1;
+        z-index: -1; /* Debe estar detrás del contenedor principal */
     }
-
+    /* Contenedor principal */
     .contenedor {
         position: relative;
-        z-index: 1;
+        z-index: 1; /* Por encima de fondo y overlay */
         background-color: rgba(255, 255, 255, 0.8);
         border-radius: 15px;
         padding: 20px;
@@ -36,7 +36,7 @@
         color: black;
         margin-top: 20px;
     }
-
+    /* Estilo de la tabla */
     table {
         width: 100%;
         border-collapse: collapse;
@@ -83,7 +83,6 @@
             <th>Nombre</th>
             <th>Cantidad</th>
             <th>Unidad de Medida</th>
-            <th>Unidad</th> <!-- Nueva columna para Unidad -->
             <th>Acciones</th>
         </tr>
         @if (Mensaje == "")
@@ -105,7 +104,6 @@
                         <td>@item.Nombre</td>
                         <td>@item.Cantidad</td>
                         <td>@item.UnidadMedida</td>
-                        <td>@item.Unidad?.Nombre</td> <!-- Muestra el nombre de la Unidad obtenida -->
                         <td>
                             <a class="btn btn-primary" href="api/Recursos/editar/@item.Id">Editar</a>
                             <button class="btn btn-danger" @onclick="() => Eliminar(item)">Borrar</button>
@@ -132,75 +130,6 @@
     List<Recurso> listaRecursos;
     Recurso recurso;
     string Mensaje = "";
-<h3>Lista de Recursos</h3>
-<br />
-<a class="btn btn-primary" href="/api/Recursos/crear">Nuevo Recurso</a>
-<br />
-<table>
-    <tr>
-        <th>Tipo</th>
-        <th>Nombre</th>
-        <th>Cantidad</th>
-        <th>Unidad de Medida</th>
-    </tr>
-    @if (Mensaje == "")
-    {
-        @if (listaRecursos == null)
-        {
-            <p>Buscando....</p>
-        }
-        else if (listaRecursos.Count == 0)
-        {
-            <p>No existen recursos</p>
-        }
-        else
-        {
-            @foreach (var item in listaRecursos)
-            {
-                <tr>
-                    <td>@item.Tipo</td>
-                    <td>@item.Nombre</td>
-                    <td>@item.Cantidad</td>
-                    <td>@item.UnidadMedida</td>
-                    <td>
-                        <a class="btn btn-primary"
-                           href="api/Recursos/editar/@item.Id">
-                            Editar
-                        </a>
-                    </td>
-                    <td>
-                        <button class="btn btn-danger"
-                           @onclick = "()=>Eliminar(item)">
-                            Borrar
-                        </button>
-                    </td>
-                </tr>
-            }
-        }
-    }
-    else
-    {
-        <p> Error: @Mensaje</p>
-    }
-</table>
-
-<Confirmacion @ref="confirmacion"
-              Titulo="CUIDADO"
-              textCancelar="Salir"
-              onCancel="Cancelar"
-              onConfirm="Borrar">
-              <h5>Está por borrar el recurso</h5>
-              <br />
-              <p>Está seguro?</p>
-</Confirmacion>
-
-
-@code {
-    Confirmacion confirmacion;
-
-    List<Recurso> listaRecursos;
-    Recurso recurso;
-    string Mensaje = "";
     Recurso? recursoBorrar = null;
 
     protected override async Task OnInitializedAsync()
@@ -211,27 +140,10 @@
 
     private async Task Leer()
     {
-        // Obtener los recursos
-
         var resp = await http.Get<List<Recurso>>("api/Recursos");
         if (!resp.Error)
         {
             listaRecursos = resp.Respuesta;
-
-            // Hacer las llamadas para cargar las Unidades correspondientes
-            foreach (var recurso in listaRecursos)
-            {
-                // Obtener la unidad correspondiente con el Id
-                var unidadResp = await http.Get<Unidad>($"api/Unidades/{recurso.Unidad_Id}");
-                if (!unidadResp.Error)
-                {
-                    recurso.Unidad = unidadResp.Respuesta; // Asigna la unidad a la propiedad
-                }
-                else
-                {
-                    Mensaje = "Error al cargar las unidades";
-                }
-            }
         }
         else
         {

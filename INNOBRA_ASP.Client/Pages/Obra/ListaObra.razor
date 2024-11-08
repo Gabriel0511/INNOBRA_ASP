@@ -1,88 +1,136 @@
 ﻿@page "/api/Obras"
 @inject IHttpServicio http
-
-
-<h3>Obras</h3>
-
-@if (listaObras != null && listaObras.Any())
-
 @inject IJSRuntime js
 
-<div class="fondo">
-    <div class="contenido">
-<h3>Obras</h3>
+<style>
+    /* Configura la imagen de fondo para ocupar toda la pantalla */
+    .fondo {
+        position: fixed; /* Cambia a fixed para mantener el fondo detrás al hacer scroll */
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('/images/fondo.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        z-index: -2; /* Asegura que el fondo esté detrás de todos los elementos */
+    }
+    /* Capa semitransparente */
+    .overlay {
+        position: fixed; /* También cambia a fixed para estar alineado con el fondo */
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: -1; /* Debe estar detrás del contenedor principal */
+    }
+    /* Contenedor principal */
+    .contenedor {
+        position: relative;
+        z-index: 1; /* Por encima de fondo y overlay */
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 15px;
+        padding: 20px;
+        max-width: 800px;
+        margin: auto;
+        color: black;
+        margin-top: 20px;
+    }
+    /* Estilo de la tabla */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
 
-@if (!string.IsNullOrEmpty(Mensaje))
-{
-    <div class="alert alert-danger" role="alert">
-        @Mensaje
-    </div>
-}
+    th, td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: center;
+    }
 
-@if (cargando)
-{
-    <div class="spinner-border" role="status">
-        <span class="visually-hidden">Cargando...</span>
-    </div>
-}
-else if (listaObras != null && listaObras.Any())
-{
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th scope="col">Nombre</th>
-                <th scope="col">Fecha Inicio</th>
-                <th scope="col">Fecha Fin</th>
-                <th scope="col">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var obra in listaObras)
-            {
-                <tr>
-                    <td>@obra.Nombre</td>
+    th {
+        background-color: #007bff;
+        color: white;
+    }
 
-                    <td>@obra.FechaInicio</td>
-                    <td>@obra.FechaFin</td>
-                    <td>
-                        <a class="btn btn-warning btn-sm" href="/api/Obras/editar/@obra.Id">Editar</a>
-                        <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(obra.Id)">Eliminar</button>
+    .btn-primary, .btn-danger {
+        border: none;
+        border-radius: 5px;
+        padding: 8px 12px;
+        color: white;
+        text-decoration: none;
+    }
 
-                    <td>@obra.FechaInicio.ToString("dd-MM-yyyy")</td>
-                    <td>@obra.FechaFin.ToString("dd-MM-yyyy")</td>
-                    <td>
-                        <a class="btn btn-warning btn-sm" href="/api/Obras/editar/@obra.Id"><i class="bi bi-pencil"></i></a>
-                        <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(obra.Id)"><i class="bi bi-trash3"></i></button>
+    .btn-primary {
+        background-color: #007bff;
+    }
 
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <div class="alert alert-warning" role="alert">
-        No hay obras disponibles.
-    </div>
-}
+    .btn-danger {
+        background-color: #dc3545;
+    }
+</style>
 
-<a class="btn btn-primary" href="/api/Obras/crear">
+<div class="fondo"></div>
+    <div class="contenido"></div>
+        <h3>Obras</h3>
 
-    <i class="bi bi-plus-circle"></i> Crear Obra
-</a>
+        @if (!string.IsNullOrEmpty(Mensaje))
+        {
+            <div class="alert alert-danger" role="alert">
+                @Mensaje
+            </div>
+        }
+
+        @if (cargando)
+        {
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+        }
+        else if (listaObras != null && listaObras.Any())
+        {
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Fecha Inicio</th>
+                        <th scope="col">Fecha Fin</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var obra in listaObras)
+                    {
+                        <tr>
+                            <td>@obra.Nombre</td>
+                            <td>@obra.FechaInicio.ToString("dd-MM-yyyy")</td>
+                            <td>@obra.FechaFin.ToString("dd-MM-yyyy")</td>
+                            <td>
+                                <a class="btn btn-warning btn-sm" href="/api/Obras/editar/@obra.Id"><i class="bi bi-pencil"></i></a>
+                                <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(obra.Id)"><i class="bi bi-trash3"></i></button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="alert alert-warning" role="alert">
+                No hay obras disponibles.
+            </div>
+        }
+
+        <a class="btn btn-primary" href="/api/Obras/crear">
             <i class="bi bi-building-fill-add"></i> Crear Obra
-</a>
-    </div>
-</div>
-
+        </a>
 
 @code {
     List<Obra> listaObras = new List<Obra>();
     string Mensaje = "";
-
     bool cargando = true;
-
 
     protected override async Task OnInitializedAsync()
     {
@@ -92,16 +140,6 @@ else
 
     private async Task Leer()
     {
-
-        var resp = await http.Get<List<Obra>>("api/Obras");
-        if (!resp.Error)
-        {
-            listaObras = resp.Respuesta;
-        }
-        else
-        {
-            Mensaje = await resp.ObtenerError();
-
         try
         {
             cargando = true;
@@ -124,22 +162,11 @@ else
         finally
         {
             cargando = false;
-
         }
     }
 
     private async Task Eliminar(int id)
     {
-
-        var resp = await http.Delete($"api/Obras/{id}");
-        if (!resp.Error)
-        {
-            await Leer(); // Recarga la lista después de eliminar
-        }
-        else
-        {
-            Mensaje = await resp.ObtenerError();
-
         bool confirmado = await js.InvokeAsync<bool>("confirm", "¿Estás seguro de que deseas eliminar esta obra?");
         if (confirmado)
         {
@@ -159,7 +186,6 @@ else
             {
                 Mensaje = $"Ocurrió un error al eliminar la obra: {ex.Message}";
             }
-
         }
     }
 }
