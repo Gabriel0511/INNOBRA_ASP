@@ -31,8 +31,12 @@ namespace INNOBRA_ASP.DB.Data.Entity
         public string UnidadMedida { get; set; }
 
         //CLAVE FORANEA
-        public int UnidadId { get; set; }
+        public int Unidad_Id { get; set; }
 
         public Unidad Unidad { get; set; }
+
+        public ICollection<ItemTipoRenglon> ItemTipoRenglons { get; set; }
+        public ICollection<Avance> Avances { get; set; }
+        public ICollection<ItemRenglon> ItemRenglons { get; set; }
     }
 }

@@ -1,0 +1,72 @@
+﻿@page "/api/Obras/crear"
+@inject IHttpServicio http
+@using INNOBRA_ASP.Shared.DTO
+@using System.Net.Http.Json
+@inject NavigationManager nav
+
+<h3>Crear Obra</h3>
+
+<EditForm Model="@obra" OnValidSubmit="Grabar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Nombre:</label>
+        <InputText @bind-Value="obra.Nombre" />
+        <ValidationMessage For="@(() => obra.Nombre)" />
+    </div>
+
+    <div class="mb-3">
+        <label>Fecha de Inicio:</label>
+        <InputDate @bind-Value="obra.FechaInicio" />
+        <ValidationMessage For="@(() => obra.FechaInicio)" />
+    </div>
+
+    <div class="mb-3">
+        <label>Fecha de Fin:</label>
+        <InputDate @bind-Value="obra.FechaFin" />
+        <ValidationMessage For="@(() => obra.FechaFin)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+</EditForm>
+
+<hr />
+
+@code {
+    private Obra obra = new Obra();
+    private List<Obra> listaObra = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        obra.FechaInicio = DateTime.Today;
+        obra.FechaFin = DateTime.Today;
+        await CargarObra();
+    }
+
+    private async Task CargarObra()
+    {
+        // Llama al servicio para obtener la lista de obras
+        var respuesta = await http.Get<List<Obra>>("api/Obras");
+        if (!respuesta.Error)
+        {
+            listaObra = respuesta.Respuesta;
+        }
+    }
+
+    private async Task Grabar()
+    {
+        var httpRespuesta = await http.Post<Obra>("api/Obras", obra);
+        if (httpRespuesta.Error)
+        {
+            var body = httpRespuesta.HttpResponseMessage;
+        }
+        nav.NavigateTo("/api/Obras");
+    }
+
+    private void Cancelar()
+    {
+        nav.NavigateTo("/api/Obras");
+    }
+}

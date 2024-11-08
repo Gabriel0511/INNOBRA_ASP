@@ -17,7 +17,7 @@ namespace INNOBRA_ASP.Client.Servicios
             var response = await http.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
-                var respuesta = await DesSereailzar<T>(response);
+                var respuesta = await DesSerializar<T>(response);
                 return new HttpRespuesta<T>(respuesta, false, response);
             }
             else
@@ -37,7 +37,7 @@ namespace INNOBRA_ASP.Client.Servicios
             var response = await http.PostAsync(url, enviarContent);
             if (response.IsSuccessStatusCode)
             {
-                var respuesta = await DesSereailzar<object>(response);
+                var respuesta = await DesSerializar<object>(response);
                 return new HttpRespuesta<object>(respuesta, false, response);
             }
             else
@@ -67,7 +67,7 @@ namespace INNOBRA_ASP.Client.Servicios
                 }
 
                 // Si tiene contenido, deserializar
-                var respuesta = await DesSereailzar<object>(response);
+                var respuesta = await DesSerializar<object>(response);
                 return new HttpRespuesta<object>(respuesta, false, response);
             }
             else
@@ -85,11 +85,10 @@ namespace INNOBRA_ASP.Client.Servicios
         }
 
 
-        private async Task<T> DesSereailzar<T>(HttpResponseMessage response)
+        private async Task<T> DesSerializar<T>(HttpResponseMessage response)
         {
             var respuestaStr = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<T>(respuestaStr,
-                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            return JsonSerializer.Deserialize<T>(respuestaStr, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
         }
     }
 }
