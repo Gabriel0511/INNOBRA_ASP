@@ -53,7 +53,7 @@
 
     private async Task CargarObra()
     {
-        var respuesta = await http.Get<EditarObraDTO>($"Api/Obras/{id}");
+        var respuesta = await http.Get<EditarObraDTO>($"Api/Obras/GetById/{id}");
         if (!respuesta.Error)
         {
             obra = respuesta.Respuesta;

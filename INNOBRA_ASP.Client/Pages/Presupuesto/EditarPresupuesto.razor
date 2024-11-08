@@ -1,5 +1,92 @@
-﻿<h3>EditarPresupuesto</h3>
+﻿@page "/Api/Presupuestos/editar/{id:int}"
+@inject IHttpServicio http
+@using INNOBRA_ASP.Shared.DTO
+@using System.Net.Http.Json
+@inject NavigationManager nav
+
+<h3>Editar Presupuesto</h3>
+
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <div class="alert alert-success">
+        @mensaje
+    </div>
+}
+
+<EditForm Model="@presupuesto" OnValidSubmit="Actualizar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Nombre:</label>
+        <InputText @bind-Value="presupuesto.Nombre" />
+        <ValidationMessage For="@(() => presupuesto.Nombre)" />
+    </div>
+
+    <div>
+        <label>Fecha Inicio</label>
+        <InputDate @bind-Value="presupuesto.FechaInicioPrevista" />
+        <ValidationMessage For="@(() => presupuesto.FechaInicioPrevista)" />
+    </div>
+
+    <div>
+        <label>Fecha fin</label>
+        <InputDate @bind-Value="presupuesto.FechaFinPrevista" />
+        <ValidationMessage For="@(() => presupuesto.FechaFinPrevista)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+</EditForm>
+
+<hr />
 
 @code {
+    [Parameter] public int id { get; set; }
+    private EditarPresupuestoDTO presupuesto = new EditarPresupuestoDTO();
+    private string mensaje = "";
 
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarPresupuesto();
+    }
+
+    private async Task CargarPresupuesto()
+    {
+        var respuesta = await http.Get<EditarPresupuestoDTO>($"Api/Presupuestos/GetById/{id}");
+
+        if (!respuesta.Error)
+        {
+            presupuesto = respuesta.Respuesta;
+        }
+        else
+        {
+            // Muestra el contenido en caso de error para analizarlo
+            var errorContent = await respuesta.HttpResponseMessage.Content.ReadAsStringAsync();
+            Console.WriteLine($"Error Content: {errorContent}");
+            mensaje = "Error al cargar el presupuesto.";
+            nav.NavigateTo("/api/Presupuestos");
+        }
+    }
+
+    private async Task Actualizar()
+    {
+        var respuesta = await http.Put($"Api/Presupuestos/{id}", presupuesto);
+
+        if (!respuesta.Error)
+        {
+            mensaje = "Se cargó con éxito el presupuesto.";
+            nav.NavigateTo("/api/Presupuestos");
+        }
+        else
+        {
+            var errorContent = await respuesta.HttpResponseMessage.Content.ReadAsStringAsync();
+            mensaje = $"Error: {errorContent}"; // Muestra el error
+        }
+    }
+
+    private void Cancelar()
+    {
+        nav.NavigateTo("/api/Obras");
+    }
 }
