@@ -2,8 +2,9 @@
 @inject IHttpServicio http
 @inject IJSRuntime js
 
-<div class="fondo">
-    <div class="contenido">
+<div class="fondo"></div>
+<div class="overlay"></div>
+<div class="contenedor-formulario">
         <h3>Presupuestos</h3>
 
         @if (!string.IsNullOrEmpty(Mensaje))
@@ -57,7 +58,6 @@
             <i class="bi bi-plus-circle"></i> Crear Presupuesto
         </a>
     </div>
-</div>
 
 @code {
     List<Presupuesto> listaPresupuestos = new List<Presupuesto>();

@@ -73,7 +73,8 @@
 </style>
 
 <div class="fondo"></div>
-    <div class="contenido"></div>
+<div class="overlay"></div>
+    <div class="contenedor">
         <h3>Obras</h3>
 
         @if (!string.IsNullOrEmpty(Mensaje))
@@ -91,7 +92,7 @@
         }
         else if (listaObras != null && listaObras.Any())
         {
-            <table class="table table-striped">
+            <table>
                 <thead>
                     <tr>
                         <th scope="col">Nombre</th>
@@ -122,10 +123,10 @@
                 No hay obras disponibles.
             </div>
         }
-
-        <a class="btn btn-primary" href="/api/Obras/crear">
-            <i class="bi bi-building-fill-add"></i> Crear Obra
-        </a>
+    <a class="btn btn-primary" href="/api/Obras/crear">
+        <i class="bi bi-building-fill-add"></i> Crear Obra
+    </a>
+        </div>
 
 @code {
     List<Obra> listaObras = new List<Obra>();
