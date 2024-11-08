@@ -13,6 +13,8 @@
             <tr>
                 <th scope="col">Material Previsto</th>
                 <th scope="col">Cantidad</th>
+                <th scope="col">Item</th>
+                <th scope="col">Recurso</th>
             </tr>
         </thead>
         <tbody>
@@ -21,6 +23,8 @@
                 <tr>
                     <td>@itemRenglon.MaterialPrevisto</td>
                     <td>@itemRenglon.Cantidad</td>
+                    <td>@itemRenglon.Item</td>
+                    <td>@itemRenglon.Recurso</td>
                     <td>
                         <a class="btn btn-warning btn-sm" href="/api/ItemRenglones/editar/@itemRenglon.Id">Editar</a>
                         <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(itemRenglon.Id)">Eliminar</button>
@@ -66,6 +70,21 @@ else
             Mensaje = await resp.ObtenerError();
         }
     }
+
+    // private async Task CargarItemTipo()
+    // {
+    //     var respuesta = await http.Get<List<ItemTipo>>("api/ItemTipos");
+    //     if (!respuesta.Error)
+    //     {
+    //         listaItemsTipos = respuesta.Respuesta;
+    //     }
+    // }
+
+    // private string MostrarNombreItemTipo(int itemTipoId)
+    // {
+    //     var itemTipo = listaItemsTipos?.FirstOrDefault(r => r.Id == itemTipoId);
+    //     return itemTipo?.Nombre ?? "Sin asignar";
+    // }
 
     private async Task Eliminar(int id)
     {

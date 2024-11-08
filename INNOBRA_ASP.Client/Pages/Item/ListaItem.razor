@@ -27,7 +27,7 @@
                     <td>@item.Unidad_Tiempo</td>
                     <td>@item.Material_estimado</td>
                     <td>@MostrarNombreItemTipo(item.Item_Tipos_Id)</td>
-                    <td>@item.Presupuesto</td>
+                    <td>@MostrarPresupuesto(item.Presupuesto_Id)</td>
                     <td>
                         <a class="btn btn-warning btn-sm" href="Api/Items/editar/@item.Id">Editar</a>
                         <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(item.Id)">Eliminar</button>
@@ -54,6 +54,7 @@ else
 @code {
     List<Item> listaItems = new List<Item>();
     List<ItemTipo> listaItemsTipos = new List<ItemTipo>();
+    List<Presupuesto> listaPresupuestos = new List<Presupuesto>();
 
     string Mensaje = "";
 
@@ -62,7 +63,7 @@ else
         await base.OnInitializedAsync();
         await Leer();
         await CargarItemTipo();
-        await MostrarNombreItemTipo();
+        await CargarPresupuesto();
     }
 
     private async Task Leer()
@@ -91,6 +92,21 @@ else
     {
         var itemTipo = listaItemsTipos?.FirstOrDefault(r => r.Id == itemTipoId);
         return itemTipo?.Nombre ?? "Sin asignar";
+    }
+
+    private async Task CargarPresupuesto()
+    {
+        var respuesta = await http.Get<List<Presupuesto>>("Api/Presupuestos");
+        if (!respuesta.Error)
+        {
+            listaPresupuestos = respuesta.Respuesta;
+        }
+    }
+
+    private string MostrarPresupuesto(int presupuestoid)
+    {
+        var presupuesto = listaPresupuestos?.FirstOrDefault(r => r.Id == presupuestoid);
+        return presupuesto?.Nombre ?? "Sin asignar";
     }
 
 
