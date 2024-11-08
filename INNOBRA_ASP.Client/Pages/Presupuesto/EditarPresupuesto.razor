@@ -4,6 +4,9 @@
 @using System.Net.Http.Json
 @inject NavigationManager nav
 
+<div class="fondo">
+    <div class="contenido">
+
 <h3>Editar Presupuesto</h3>
 
 @if (!string.IsNullOrEmpty(mensaje))
@@ -38,8 +41,8 @@
     <button type="submit" class="btn btn-primary">Guardar Cambios</button>
     <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
 </EditForm>
-
-<hr />
+    </div>
+</div>
 
 @code {
     [Parameter] public int id { get; set; }

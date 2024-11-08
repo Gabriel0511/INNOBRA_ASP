@@ -4,6 +4,8 @@
 @using System.Net.Http.Json
 @inject NavigationManager nav
 
+<div class="fondo">
+    <div class="contenido">
 <h3>Crear Obra</h3>
 
 <EditForm Model="@obra" OnValidSubmit="Grabar">
@@ -43,8 +45,8 @@
     <button type="submit" class="btn btn-primary">Guardar</button>
     <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
 </EditForm>
-
-<hr />
+    </div>
+</div>
 
 @code {
     private Obra obra = new Obra();

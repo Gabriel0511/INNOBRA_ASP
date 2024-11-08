@@ -2,6 +2,8 @@
 @inject IHttpServicio http
 @inject IJSRuntime js
 
+<div class="fondo">
+    <div class="contenido">
 <h3>Obras</h3>
 
 @if (!string.IsNullOrEmpty(Mensaje))
@@ -54,6 +56,8 @@ else
 <a class="btn btn-primary" href="/api/Obras/crear">
     <i class="bi bi-plus-circle"></i> Crear Obra
 </a>
+    </div>
+</div>
 
 @code {
     List<Obra> listaObras = new List<Obra>();

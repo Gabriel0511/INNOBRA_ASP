@@ -4,6 +4,9 @@
 @using System.Net.Http.Json
 @inject NavigationManager nav
 
+<div class="fondo">
+    <div class="contenido">
+
 <h3>Editar Obra</h3>
 
 @if (!string.IsNullOrEmpty(mensaje))
@@ -17,19 +20,19 @@
     <DataAnnotationsValidator />
     <ValidationSummary />
 
-    <div>
+            <div class ="mb-3">
         <label>Nombre:</label>
         <InputText @bind-Value="obra.Nombre" />
         <ValidationMessage For="@(() => obra.Nombre)" />
     </div>
 
-    <div>
+            <div class="mb-3">
         <label>Fecha Inicio</label>
         <InputDate @bind-Value="obra.FechaInicio" />
         <ValidationMessage For="@(() => obra.FechaInicio)" />
     </div>
 
-    <div>
+            <div class="mb-3">
         <label>Fecha fin</label>
         <InputDate @bind-Value="obra.FechaFin" />
         <ValidationMessage For="@(() => obra.FechaFin)" />
@@ -38,8 +41,8 @@
     <button type="submit" class="btn btn-primary">Guardar Cambios</button>
     <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
 </EditForm>
-
-<hr />
+    </div>
+</div>
 
 @code {
     [Parameter] public int id { get; set; }
