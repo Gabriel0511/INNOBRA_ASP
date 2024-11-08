@@ -98,22 +98,22 @@ namespace INNOBRA_ASP.Server.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest($"Error al actualizar el presupuesto: {ex.Message}");
+                return BadRequest($"Error al actualizar la obra: {ex.Message}");
             }
         }
 
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var resp = await repositorio.Delete(id);
+            // Llamar al método de eliminación en cascada en el repositorio
+            var resp = await repositorio.EliminarObraConPresupuestosYItems(id);
 
             if (!resp)
             {
-                return BadRequest("La obra no se pudo borrar");
-
+                return BadRequest("La obra no se pudo borrar.");
             }
             return Ok();
-
         }
+
     }
 }

@@ -64,8 +64,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        presupuesto.FechaInicioPrevista = DateTime.Today;
-        presupuesto.FechaFinPrevista = DateTime.Today;
+        presupuesto.FechaInicioPrevista = DateTime.Now.Date;
+        presupuesto.FechaFinPrevista = DateTime.Now.Date;
         await CargarObras();
         await CargarPresupuestos();
     }

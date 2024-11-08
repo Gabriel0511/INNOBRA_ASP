@@ -17,19 +17,19 @@
     <DataAnnotationsValidator />
     <ValidationSummary />
 
-    <div>
+    <div class="mb-3">
         <label>Nombre:</label>
         <InputText @bind-Value="presupuesto.Nombre" />
         <ValidationMessage For="@(() => presupuesto.Nombre)" />
     </div>
 
-    <div>
+    <div class="mb-3">
         <label>Fecha Inicio</label>
         <InputDate @bind-Value="presupuesto.FechaInicioPrevista" />
         <ValidationMessage For="@(() => presupuesto.FechaInicioPrevista)" />
     </div>
 
-    <div>
+    <div class="mb-3">
         <label>Fecha fin</label>
         <InputDate @bind-Value="presupuesto.FechaFinPrevista" />
         <ValidationMessage For="@(() => presupuesto.FechaFinPrevista)" />
