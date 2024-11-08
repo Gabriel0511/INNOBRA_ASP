@@ -4,6 +4,9 @@
 @using System.Net.Http.Json
 @inject NavigationManager nav
 
+
+<div class="fondo">
+    <div class="contenido">
 <h3>Crear Obra</h3>
 
 <EditForm Model="@obra" OnValidSubmit="Grabar">
@@ -28,20 +31,74 @@
         <ValidationMessage For="@(() => obra.FechaFin)" />
     </div>
 
+
     <button type="submit" class="btn btn-primary">Guardar</button>
     <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
 </EditForm>
 
 <hr />
 
+@*     <div class="mb-3">
+        <label>Fecha de Inicio:</label>
+        <InputText @bind-Value="FechaInicioTexto" placeholder="yyyy-MM-ddTHH:mm" />
+        <ValidationMessage For="@(() => obra.FechaInicio)" />
+    </div>
+
+    <div class="mb-3">
+        <label>Fecha de Fin:</label>
+        <InputText @bind-Value="FechaFinTexto" placeholder="yyyy-MM-ddTHH:mm" />
+        <ValidationMessage For="@(() => obra.FechaFin)" />
+    </div> *@
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+</EditForm>
+    </div>
+</div>
+
+
 @code {
     private Obra obra = new Obra();
     private List<Obra> listaObra = new();
+
 
     protected override async Task OnInitializedAsync()
     {
         obra.FechaInicio = DateTime.Today;
         obra.FechaFin = DateTime.Today;
+
+    // // Propiedad para enlazar con InputText en lugar de obra.FechaInicio directamente
+    // private string FechaInicioTexto
+    // {
+    //     get => obra.FechaInicio.ToString("yyyy-MM-ddTHH:mm");
+    //     set
+    //     {
+    //         if (DateTime.TryParse(value, out var fecha))
+    //         {
+    //             obra.FechaInicio = fecha;
+    //         }
+    //     }
+    // }
+
+    // private string FechaFinTexto
+    // {
+    //     get => obra.FechaFin.ToString("yyyy-MM-ddTHH:mm");
+    //     set
+    //     {
+    //         if (DateTime.TryParse(value, out var fecha))
+    //         {
+    //             obra.FechaFin = fecha;
+    //         }
+    //     }
+    // }
+
+    protected override async Task OnInitializedAsync()
+    {
+        obra.FechaInicio = DateTime.Now.Date;
+        // obra.FechaInicio = DateTime.Now;
+        obra.FechaFin = DateTime.Now.Date;
+        // obra.FechaFin = DateTime.Now;
+
         await CargarObra();
     }
 

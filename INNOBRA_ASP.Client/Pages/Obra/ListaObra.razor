@@ -1,9 +1,31 @@
 ﻿@page "/api/Obras"
 @inject IHttpServicio http
 
+
 <h3>Obras</h3>
 
 @if (listaObras != null && listaObras.Any())
+
+@inject IJSRuntime js
+
+<div class="fondo">
+    <div class="contenido">
+<h3>Obras</h3>
+
+@if (!string.IsNullOrEmpty(Mensaje))
+{
+    <div class="alert alert-danger" role="alert">
+        @Mensaje
+    </div>
+}
+
+@if (cargando)
+{
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Cargando...</span>
+    </div>
+}
+else if (listaObras != null && listaObras.Any())
 {
     <table class="table table-striped">
         <thead>
@@ -19,11 +41,19 @@
             {
                 <tr>
                     <td>@obra.Nombre</td>
+
                     <td>@obra.FechaInicio</td>
                     <td>@obra.FechaFin</td>
                     <td>
                         <a class="btn btn-warning btn-sm" href="/api/Obras/editar/@obra.Id">Editar</a>
                         <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(obra.Id)">Eliminar</button>
+
+                    <td>@obra.FechaInicio.ToString("dd-MM-yyyy")</td>
+                    <td>@obra.FechaFin.ToString("dd-MM-yyyy")</td>
+                    <td>
+                        <a class="btn btn-warning btn-sm" href="/api/Obras/editar/@obra.Id"><i class="bi bi-pencil"></i></a>
+                        <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(obra.Id)"><i class="bi bi-trash3"></i></button>
+
                     </td>
                 </tr>
             }
@@ -38,12 +68,21 @@ else
 }
 
 <a class="btn btn-primary" href="/api/Obras/crear">
+
     <i class="bi bi-plus-circle"></i> Crear Obra
 </a>
+            <i class="bi bi-building-fill-add"></i> Crear Obra
+</a>
+    </div>
+</div>
+
 
 @code {
     List<Obra> listaObras = new List<Obra>();
     string Mensaje = "";
+
+    bool cargando = true;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -53,6 +92,7 @@ else
 
     private async Task Leer()
     {
+
         var resp = await http.Get<List<Obra>>("api/Obras");
         if (!resp.Error)
         {
@@ -61,11 +101,36 @@ else
         else
         {
             Mensaje = await resp.ObtenerError();
+
+        try
+        {
+            cargando = true;
+            Mensaje = ""; // Limpiar el mensaje de error
+
+            var resp = await http.Get<List<Obra>>("api/Obras");
+            if (!resp.Error)
+            {
+                listaObras = resp.Respuesta;
+            }
+            else
+            {
+                Mensaje = await resp.ObtenerError();
+            }
+        }
+        catch (Exception ex)
+        {
+            Mensaje = $"Ocurrió un error al cargar las obras: {ex.Message}";
+        }
+        finally
+        {
+            cargando = false;
+
         }
     }
 
     private async Task Eliminar(int id)
     {
+
         var resp = await http.Delete($"api/Obras/{id}");
         if (!resp.Error)
         {
@@ -74,6 +139,27 @@ else
         else
         {
             Mensaje = await resp.ObtenerError();
+
+        bool confirmado = await js.InvokeAsync<bool>("confirm", "¿Estás seguro de que deseas eliminar esta obra?");
+        if (confirmado)
+        {
+            try
+            {
+                var resp = await http.Delete($"api/Obras/{id}");
+                if (!resp.Error)
+                {
+                    await Leer(); // Recarga la lista después de eliminar
+                }
+                else
+                {
+                    Mensaje = await resp.ObtenerError();
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensaje = $"Ocurrió un error al eliminar la obra: {ex.Message}";
+            }
+
         }
     }
 }

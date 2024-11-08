@@ -3,6 +3,7 @@
 @inject NavigationManager nav
 @using INNOBRA_ASP.Shared.DTO
 
+
 <style>
     /* Fondo que cubre toda la pantalla */
     .fondo {
@@ -127,16 +128,61 @@
     </EditForm>
 </div>
 
+<h3>Editar Avance</h3>
+
+<EditForm Model="avance" OnValidSubmit="Grabar">
+    <DataAnnotationsValidator />
+    
+    <div class="form-group">
+        <label>Fecha</label>
+        <div>
+            <InputDate class="form-control" @bind-Value="@avance.Fecha" />
+            <ValidationMessage For="@(() => avance.Fecha)" />
+        </div>
+    </div>
+    <div>
+        <label>Material Ejecutado</label>
+        <div>
+            <InputText class="form-control" @bind-Value="@avance.MaterialEjecutado" />
+            <ValidationMessage For="@(() => avance.MaterialEjecutado)" />
+        </div>
+    </div>
+    <div>
+        <label>Fecha de Finalizacion Real</label>
+        <div>
+            <InputDate class="form-control" @bind-Value="@avance.FechaFinalizacionReal" />
+            <ValidationMessage For="@(() => avance.FechaFinalizacionReal)" />
+        </div>
+    </div>
+    <div>
+        <label>Item ID:</label>
+        <InputNumber @bind-Value="avance.Item_Id" />
+    </div>
+    <div>
+        <label>Recurso ID:</label>
+        <InputNumber @bind-Value="avance.Recurso_Id" />
+    </div>
+
+    <br />
+    <button class="btn btn-primary" type="submit">Aceptar</button>
+    <button class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+</EditForm>
+
+
 @code {
     [Parameter] public int avanceId { get; set; }
     private EditarAvanceDTO avance = new EditarAvanceDTO();
     private List<Recurso> listaRecursos = new();
+
+    string mensaje = "";
+
 
     protected override async Task OnInitializedAsync()
     {
         avance.FechaFinalizacionReal = DateTime.Today;
         await base.OnInitializedAsync();
         await Mostrar();
+
         await CargarRecursos();
     }
 
@@ -177,3 +223,4 @@
         nav.NavigateTo("/api/Avances");
     }
 }
+

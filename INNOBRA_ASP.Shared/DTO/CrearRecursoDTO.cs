@@ -26,7 +26,7 @@ namespace INNOBRA_ASP.Shared.DTO
         public string UnidadMedida { get; set; }
 
         //CLAVE FORANEA
-        public int Unidad_Id { get; set; }
+        public int UnidadId { get; set; }
 
     }
 }

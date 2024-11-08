@@ -88,5 +88,36 @@ namespace INNOBRA_ASP.Server.Repositorio
             await context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<bool> EliminarObraConPresupuestosYItems(int id)
+        {
+            var obra = await context.Obras
+                .Include(o => o.Presupuestos)
+                    .ThenInclude(p => p.Items) // Incluir los Items de cada Presupuesto
+                .FirstOrDefaultAsync(o => o.Id == id);
+
+            if (obra == null)
+            {
+                return false; // Si la obra no existe, retornar falso
+            }
+
+            // Eliminar Items asociados a cada Presupuesto
+            foreach (var presupuesto in obra.Presupuestos)
+            {
+                context.Items.RemoveRange(presupuesto.Items);
+            }
+
+            // Eliminar Presupuestos asociados
+            context.Presupuestos.RemoveRange(obra.Presupuestos);
+
+            // Eliminar la Obra
+            context.Obras.Remove(obra);
+
+            // Guardar cambios en la base de datos
+            await context.SaveChangesAsync();
+
+            return true; // Retornar true si se eliminó correctamente
+        }
+
     }
 }

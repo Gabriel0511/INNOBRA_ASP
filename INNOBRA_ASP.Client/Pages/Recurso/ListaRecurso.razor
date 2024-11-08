@@ -132,6 +132,75 @@
     List<Recurso> listaRecursos;
     Recurso recurso;
     string Mensaje = "";
+<h3>Lista de Recursos</h3>
+<br />
+<a class="btn btn-primary" href="/api/Recursos/crear">Nuevo Recurso</a>
+<br />
+<table>
+    <tr>
+        <th>Tipo</th>
+        <th>Nombre</th>
+        <th>Cantidad</th>
+        <th>Unidad de Medida</th>
+    </tr>
+    @if (Mensaje == "")
+    {
+        @if (listaRecursos == null)
+        {
+            <p>Buscando....</p>
+        }
+        else if (listaRecursos.Count == 0)
+        {
+            <p>No existen recursos</p>
+        }
+        else
+        {
+            @foreach (var item in listaRecursos)
+            {
+                <tr>
+                    <td>@item.Tipo</td>
+                    <td>@item.Nombre</td>
+                    <td>@item.Cantidad</td>
+                    <td>@item.UnidadMedida</td>
+                    <td>
+                        <a class="btn btn-primary"
+                           href="api/Recursos/editar/@item.Id">
+                            Editar
+                        </a>
+                    </td>
+                    <td>
+                        <button class="btn btn-danger"
+                           @onclick = "()=>Eliminar(item)">
+                            Borrar
+                        </button>
+                    </td>
+                </tr>
+            }
+        }
+    }
+    else
+    {
+        <p> Error: @Mensaje</p>
+    }
+</table>
+
+<Confirmacion @ref="confirmacion"
+              Titulo="CUIDADO"
+              textCancelar="Salir"
+              onCancel="Cancelar"
+              onConfirm="Borrar">
+              <h5>Está por borrar el recurso</h5>
+              <br />
+              <p>Está seguro?</p>
+</Confirmacion>
+
+
+@code {
+    Confirmacion confirmacion;
+
+    List<Recurso> listaRecursos;
+    Recurso recurso;
+    string Mensaje = "";
     Recurso? recursoBorrar = null;
 
     protected override async Task OnInitializedAsync()
@@ -143,6 +212,7 @@
     private async Task Leer()
     {
         // Obtener los recursos
+
         var resp = await http.Get<List<Recurso>>("api/Recursos");
         if (!resp.Error)
         {

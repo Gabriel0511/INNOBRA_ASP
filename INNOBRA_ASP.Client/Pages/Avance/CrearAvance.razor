@@ -4,10 +4,6 @@
 @using System.Net.Http.Json
 @inject NavigationManager nav
 
-<style>
-    /* ... Estilos existentes ... */
-</style>
-
 <div class="fondo"></div>
 <div class="overlay"></div>
 <div class="contenedor-formulario">
@@ -54,10 +50,52 @@
 @code {
     private CrearAvanceDTO avance = new CrearAvanceDTO();
     private List<Recurso> listaRecursos = new(); // Lista para almacenar recursos
+=======
+<h3>Gestión de Avances</h3>
+
+<!-- Formulario para Crear/Editar Avance -->
+<EditForm Model="@avance" OnValidSubmit="Grabar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Fecha:</label>
+        <InputDate @bind-Value="avance.Fecha" />
+    </div>
+
+    <div>
+        <label>Material Ejecutado: (numero)</label>
+        <InputText @bind-Value="avance.MaterialEjecutado" />
+    </div>
+
+    <!-- FECHA FINALIZACION REAL -->
+
+    <div>
+        <label>Item ID:</label>
+        <InputNumber @bind-Value="avance.Item_Id" />
+    </div>
+
+    <div>
+        <label>Recurso ID:</label>
+        <InputNumber @bind-Value="avance.Recurso_Id" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+</EditForm>
+
+<hr />
+
+
+@code {
+    private CrearAvanceDTO avance = new CrearAvanceDTO();
+    private List<Avance> listaAvances = new();
+
 
     protected override async Task OnInitializedAsync()
     {
         avance.Fecha = DateTime.Today;
+
         await CargarRecursos();
     }
 
@@ -68,6 +106,18 @@
         if (!respuesta.Error)
         {
             listaRecursos = respuesta.Respuesta;
+
+        await CargarAvances();
+    }
+
+    private async Task CargarAvances()
+    {
+        // Llama al servicio para obtener la lista de recursos
+        var respuesta = await http.Get<List<Avance>>("api/Avances");
+        if (!respuesta.Error)
+        {
+            listaAvances = respuesta.Respuesta;
+
         }
     }
 
@@ -81,8 +131,14 @@
         nav.NavigateTo("/api/Avances");
     }
 
+
     private void Cancelar()
     {
         nav.NavigateTo("/api/Avances");
+
+    private void Cancelar()
+    {
+        nav.NavigateTo("/api/Recursos");
+
     }
 }

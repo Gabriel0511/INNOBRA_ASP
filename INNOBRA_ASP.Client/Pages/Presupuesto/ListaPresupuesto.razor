@@ -1,9 +1,25 @@
 ﻿@page "/api/Presupuestos"
 @inject IHttpServicio http
+@inject IJSRuntime js
 
+<div class="fondo">
+    <div class="contenido">
 <h3>Presupuestos</h3>
 
-@if (listaPresupuestos != null && listaPresupuestos.Any())
+@if (!string.IsNullOrEmpty(Mensaje))
+{
+    <div class="alert alert-danger" role="alert">
+        @Mensaje
+    </div>
+}
+
+@if (cargando)
+{
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Cargando...</span>
+    </div>
+}
+else if (listaPresupuestos != null && listaPresupuestos.Any())
 {
     <table class="table table-striped">
         <thead>
@@ -19,11 +35,11 @@
             {
                 <tr>
                     <td>@presupuesto.Nombre</td>
-                    <td>@presupuesto.FechaInicioPrevista</td>
-                    <td>@presupuesto.FechaFinPrevista</td>
+                    <td>@presupuesto.FechaInicioPrevista.ToString("dd-MM-yyyy")</td>
+                    <td>@presupuesto.FechaFinPrevista.ToString("dd-MM-yyyy")</td>
                     <td>
-                        <a class="btn btn-warning btn-sm" href="/api/Presupuestos/editar/@presupuesto.Id">Editar</a>
-                        <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(presupuesto.Id)">Eliminar</button>
+                        <a class="btn btn-warning btn-sm" href="/api/Presupuestos/editar/@presupuesto.Id"><i class="bi bi-pencil"></i></a>
+                        <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(presupuesto.Id)"><i class="bi bi-trash3"></i></button>
                     </td>
                 </tr>
             }
@@ -40,10 +56,14 @@ else
 <a class="btn btn-primary" href="/api/Presupuestos/crear">
     <i class="bi bi-plus-circle"></i> Crear Presupuesto
 </a>
+    </div>
+</div>
 
 @code {
     List<Presupuesto> listaPresupuestos = new List<Presupuesto>();
     string Mensaje = "";
+    bool cargando = true;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -53,6 +73,7 @@ else
 
     private async Task Leer()
     {
+
         var resp = await http.Get<List<Presupuesto>>("api/Presupuestos");
         if (!resp.Error)
         {
@@ -61,11 +82,34 @@ else
         else
         {
             Mensaje = await resp.ObtenerError();
+        try
+        {
+            cargando = true;
+            Mensaje = ""; // Limpiar el mensaje de error
+
+            var resp = await http.Get<List<Presupuesto>>("api/Presupuestos");
+            if (!resp.Error)
+            {
+                listaPresupuestos = resp.Respuesta;
+            }
+            else
+            {
+                Mensaje = await resp.ObtenerError();
+            }
+        }
+        catch (Exception ex)
+        {
+            Mensaje = $"Ocurrió un error al cargar los presupuestos: {ex.Message}";
+        }
+        finally
+        {
+            cargando = false;
         }
     }
 
     private async Task Eliminar(int id)
     {
+
         var resp = await http.Delete($"api/Presupuestos/{id}");
         if (!resp.Error)
         {
@@ -74,6 +118,25 @@ else
         else
         {
             Mensaje = await resp.ObtenerError();
+        bool confirmado = await js.InvokeAsync<bool>("confirm", "¿Estás seguro de que deseas eliminar este presupuesto?");
+        if (confirmado)
+        {
+            try
+            {
+                var resp = await http.Delete($"api/Presupuestos/{id}");
+                if (!resp.Error)
+                {
+                    await Leer(); // Recarga la lista después de eliminar
+                }
+                else
+                {
+                    Mensaje = await resp.ObtenerError();
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensaje = $"Ocurrió un error al eliminar el presupuesto: {ex.Message}";
+            }
         }
     }
 }
