@@ -1,6 +1,9 @@
 ﻿@page "/api/ItemRenglones"
 @inject IHttpServicio http
 
+<div class="fondo">
+    <div class="contenido">
+
 <h3>Items Renglones</h3>
 
 @if (listaItemsRenglones != null && listaItemsRenglones.Any())
@@ -37,6 +40,9 @@ else
 <a class="btn btn-primary" href="/api/ItemRenglones/Crear">
     <i class="bi bi-plus-circle"></i> Crear Item Renglon
 </a>
+
+    </div>
+</div>
 
 @code {
     List<ItemRenglon> listaItemsRenglones = new List<ItemRenglon>();
