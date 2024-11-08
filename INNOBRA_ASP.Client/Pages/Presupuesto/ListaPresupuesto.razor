@@ -33,8 +33,8 @@ else if (listaPresupuestos != null && listaPresupuestos.Any())
             {
                 <tr>
                     <td>@presupuesto.Nombre</td>
-                    <td>@presupuesto.FechaInicioPrevista.ToString("yyyy-MM-dd")</td>
-                    <td>@presupuesto.FechaFinPrevista.ToString("yyyy-MM-dd")</td>
+                    <td>@presupuesto.FechaInicioPrevista.ToString("dd-MM-yyyy")</td>
+                    <td>@presupuesto.FechaFinPrevista.ToString("dd-MM-yyyy")</td>
                     <td>
                         <a class="btn btn-warning btn-sm" href="/api/Presupuestos/editar/@presupuesto.Id"><i class="bi bi-pencil"></i></a>
                         <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(presupuesto.Id)"><i class="bi bi-trash3"></i></button>

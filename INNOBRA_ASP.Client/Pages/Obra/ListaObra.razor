@@ -33,8 +33,8 @@ else if (listaObras != null && listaObras.Any())
             {
                 <tr>
                     <td>@obra.Nombre</td>
-                    <td>@obra.FechaInicio.ToString("yyyy-MM-dd")</td>
-                    <td>@obra.FechaFin.ToString("yyyy-MM-dd")</td>
+                    <td>@obra.FechaInicio.ToString("dd-MM-yyyy")</td>
+                    <td>@obra.FechaFin.ToString("dd-MM-yyyy")</td>
                     <td>
                         <a class="btn btn-warning btn-sm" href="/api/Obras/editar/@obra.Id"><i class="bi bi-pencil"></i></a>
                         <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(obra.Id)"><i class="bi bi-trash3"></i></button>
