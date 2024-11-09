@@ -15,7 +15,7 @@ namespace INNOBRA_ASP.DB.Data.Entity
         [Required(ErrorMessage = "La fecha de fin es obligatoria.")]
         public DateTime FechaFin { get; set; }
 
-        public byte[] Imagen { get; set; }  // Atributo para almacenar la imagen
+        public byte[]? Imagen { get; set; }  // Atributo para almacenar la imagen
 
         public ICollection<Presupuesto> Presupuestos { get; set; }
     }
