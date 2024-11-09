@@ -1,0 +1,147 @@
+﻿@page "/Api/ItemRenglones/crear"
+@inject IHttpServicio http
+@using INNOBRA_ASP.Shared.DTO
+@using System.Net.Http.Json
+@inject NavigationManager nav
+
+<h3>Crear Item Renglon</h3>
+
+<EditForm Model="@itemRenglon" OnValidSubmit="Grabar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Material Previsto:</label>
+        <InputText @bind-Value="itemRenglon.MaterialPrevisto" />
+        <ValidationMessage For="@(() => itemRenglon.MaterialPrevisto)" />
+    </div >
+
+    <div class="mb-3">
+        <label>Cantidad:</label>
+        <InputText @bind-Value="itemRenglon.Cantidad" />
+        <ValidationMessage For="@(() => itemRenglon.Cantidad)" />
+    </div >
+
+    <div class="mb-3">
+        <label>Item</label>
+        <div>
+            <select class="form-control" @bind="itemRenglon.Item_Id">
+                <option value="">Seleccione un item</option>
+                @foreach (var item in items)
+                {
+                    <option value="@item.Id">@item.Id</option>
+                }
+            </select>
+            <ValidationMessage For="@(() => itemRenglon.Item_Id)" />
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label>Recurso</label>
+        <div>
+            <select class="form-control" @bind="itemRenglon.Recursos_Id">
+                <option value="">Seleccione un recurso</option>
+                @foreach (var recurso in recursos)
+                {
+                    <option value="@recurso.Id">@recurso.Nombre</option>
+                }
+            </select>
+            <ValidationMessage For="@(() => itemRenglon.Recursos_Id)" />
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+</EditForm>
+
+
+@code {
+    private ItemRenglon itemRenglon = new ItemRenglon();
+    private List<ItemRenglon> listaItemsRenglones = new();
+    private List<Item> items = new List<Item>();
+    private List<Recurso> recursos = new List<Recurso>();
+
+    private string mensajeError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarItemsRenglones();
+        await CargarItem();
+        await CargarRecurso();
+    }
+
+    private async Task CargarItemsRenglones()
+    {
+        var respuesta = await http.Get<List<ItemRenglon>>("Api/ItemRenglones");
+        if (!respuesta.Error)
+        {
+            listaItemsRenglones = respuesta.Respuesta;
+        }
+        else
+        {
+            mensajeError = "Error al cargar los items.";
+        }
+    }
+
+    private async Task CargarItem()
+    {
+        // Llama al servicio para obtener la lista de obras
+        var respuesta = await http.Get<List<Item>>("Api/Items");
+        if (!respuesta.Error)
+        {
+            items = respuesta.Respuesta;  // Poblamos la lista de obras, no la de presupuestos
+        }
+        else
+        {
+            mensajeError = "Error al cargar los items.";
+        }
+    }
+
+    private async Task CargarRecurso()
+    {
+        // Llama al servicio para obtener la lista de obras
+        var respuesta = await http.Get<List<Recurso>>("api/Recursos");
+        if (!respuesta.Error)
+        {
+            recursos = respuesta.Respuesta;  // Poblamos la lista de obras, no la de presupuestos
+        }
+        else
+        {
+            mensajeError = "Error al cargar los recursos.";
+        }
+    }
+
+
+    private async Task Grabar()
+    {
+        
+        if (itemRenglon.Item_Id == 0 || itemRenglon.Recursos_Id == 0)
+        {
+            mensajeError = "Los campos Item y Recurso son obligatorios.";
+            return;
+        }
+
+        var httpRespuesta = await http.Post<ItemRenglon>("Api/ItemRenglones", itemRenglon);
+
+        if (httpRespuesta.Error)
+        {
+            mensajeError = $"Error al guardar el item: {httpRespuesta.HttpResponseMessage.ReasonPhrase}";
+        }
+        else
+        {
+            nav.NavigateTo("/Api/ItemRenglones");
+        }
+        
+        // var httpRespuesta = await http.Post<ItemRenglon>("Api/ItemsRenglones", itemRenglon);
+        // if (httpRespuesta.Error)
+        // {
+        //     var body = httpRespuesta.HttpResponseMessage;
+        // }
+        // nav.NavigateTo("/Api/ItemsRenglones");
+    }
+
+    private void Cancelar()
+    {
+        nav.NavigateTo("/Api/ItemRenglones");
+    }
+}

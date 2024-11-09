@@ -73,7 +73,7 @@ namespace INNOBRA_ASP.DB.Data
             modelBuilder.Entity<ItemRenglon>()
                 .HasOne(p => p.Item)
                 .WithMany(o => o.ItemRenglons) 
-                .HasForeignKey(p => p.Items_idItems) 
+                .HasForeignKey(p => p.Item_Id) 
                 .OnDelete(DeleteBehavior.Restrict); 
 
             modelBuilder.Entity<ItemRenglon>()

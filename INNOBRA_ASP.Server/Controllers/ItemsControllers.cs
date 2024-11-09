@@ -68,35 +68,39 @@ namespace INNOBRA_ASP.Server.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult> Put(int id, [FromBody] Item entidad)
+        public async Task<ActionResult> Put(int id, [FromBody] EditarItemDTO entidadDTO)
         {
 
-            if (id != entidad.Id)
-            {
-                return BadRequest("Datos incorrectos.");
-            }
+			if (id != entidadDTO.Id)
+			{
+				return BadRequest("Datos incorrectos.");
+			}
 
-            var verif = await repositorio.SelectById(id);
+			var item = await repositorio.SelectById(id);
 
-            if (verif == null)
-            {
-                return NotFound("No existe el item buscado.");
-            }
+			if (item == null)
+			{
+				return NotFound("No existe la obra buscada.");
+			}
 
-            mapper.Map(verif, entidad);
+			// Actualizar los campos del presupuesto
+			item.Tiempo_estimado = entidadDTO.Tiempo_estimado;
+			item.Material_estimado = entidadDTO.Material_estimado;
 
-            try
-            {
-                await repositorio.Update(id, verif);
-                return Ok();
-            }
-            catch (Exception)
-            {
+			// Aquí no modificamos la relación con 'Obra' ni 'Items', solo los campos mencionados.
 
-                throw;
-            }
+			try
+			{
+				// Guardar los cambios
+				await repositorio.Update(id, item);
+				return Ok();
+			}
+			catch (Exception ex)
+			{
+				return BadRequest($"Error al actualizar el item: {ex.Message}");
+			}
 
-        }
+		}
 
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)

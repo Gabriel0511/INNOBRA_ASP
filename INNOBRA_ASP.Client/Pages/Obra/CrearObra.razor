@@ -4,44 +4,49 @@
 @using System.Net.Http.Json
 @inject NavigationManager nav
 
-<h3>Crear Obra</h3>
+<div class="fondo"></div>
+<div class="overlay"></div>
+<div class="contenedor-formulario">
+        <h3>Crear Obra</h3>
 
-<EditForm Model="@obra" OnValidSubmit="Grabar">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+        <EditForm Model="@obra" OnValidSubmit="Grabar">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
 
-    <div class="mb-3">
-        <label>Nombre:</label>
-        <InputText @bind-Value="obra.Nombre" />
-        <ValidationMessage For="@(() => obra.Nombre)" />
-    </div>
+            <div class="mb-3">
+                <label>Nombre:</label>
+                <InputText @bind-Value="obra.Nombre" />
+                <ValidationMessage For="@(() => obra.Nombre)" />
+            </div>
 
-    <div class="mb-3">
-        <label>Fecha de Inicio:</label>
-        <InputDate @bind-Value="obra.FechaInicio" />
-        <ValidationMessage For="@(() => obra.FechaInicio)" />
-    </div>
+            <div class="mb-3">
+                <label>Fecha de Inicio:</label>
+                <InputDate @bind-Value="obra.FechaInicio" />
+                <ValidationMessage For="@(() => obra.FechaInicio)" />
+            </div>
 
-    <div class="mb-3">
-        <label>Fecha de Fin:</label>
-        <InputDate @bind-Value="obra.FechaFin" />
-        <ValidationMessage For="@(() => obra.FechaFin)" />
-    </div>
+            <div class="mb-3">
+                <label>Fecha de Fin:</label>
+                <InputDate @bind-Value="obra.FechaFin" />
+                <ValidationMessage For="@(() => obra.FechaFin)" />
+            </div>
 
-    <button type="submit" class="btn btn-primary">Guardar</button>
-    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-</EditForm>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+        </EditForm>
 
-<hr />
+</div>
 
 @code {
     private Obra obra = new Obra();
-    private List<Obra> listaObra = new();
+    private List<Obra> listaObra = new List<Obra>();
 
+    // Esta es la única definición de OnInitializedAsync
     protected override async Task OnInitializedAsync()
     {
-        obra.FechaInicio = DateTime.Today;
-        obra.FechaFin = DateTime.Today;
+        obra.FechaInicio = DateTime.Now.Date;  // Solo fecha, sin hora
+        obra.FechaFin = DateTime.Now.Date;     // Solo fecha, sin hora
+
         await CargarObra();
     }
 
@@ -60,7 +65,7 @@
         var httpRespuesta = await http.Post<Obra>("api/Obras", obra);
         if (httpRespuesta.Error)
         {
-            var body = httpRespuesta.HttpResponseMessage;
+            var body = httpRespuesta.HttpResponseMessage; // Aquí podrías manejar el error de la forma que prefieras
         }
         nav.NavigateTo("/api/Obras");
     }

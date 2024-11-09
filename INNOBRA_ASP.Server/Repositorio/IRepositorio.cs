@@ -13,5 +13,6 @@ namespace INNOBRA_ASP.Server.Repositorio
         Task<List<E>> Select();
         Task<E> SelectById(int id);
         Task<bool> Update(int id, E entidad);
+        Task<bool> EliminarObraConPresupuestosYItems(int id);
     }
 }

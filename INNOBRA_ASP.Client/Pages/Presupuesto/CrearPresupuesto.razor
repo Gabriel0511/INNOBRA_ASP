@@ -4,6 +4,10 @@
 @using System.Net.Http.Json
 @inject NavigationManager nav
 
+
+<div class="fondo"></div>
+<div class="overlay"></div>
+<div class="contenedor-formulario">
 <h3>Crear Presupuesto</h3>
 
 @if (!string.IsNullOrEmpty(mensajeError))
@@ -52,8 +56,8 @@
     <button type="submit" class="btn btn-primary">Guardar</button>
     <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
 </EditForm>
+    </div>
 
-<hr />
 
 @code {
     private Presupuesto presupuesto = new Presupuesto();
@@ -64,8 +68,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        presupuesto.FechaInicioPrevista = DateTime.Today;
-        presupuesto.FechaFinPrevista = DateTime.Today;
+
+        presupuesto.FechaInicioPrevista = DateTime.Now.Date;
+        presupuesto.FechaFinPrevista = DateTime.Now.Date;
         await CargarObras();
         await CargarPresupuestos();
     }

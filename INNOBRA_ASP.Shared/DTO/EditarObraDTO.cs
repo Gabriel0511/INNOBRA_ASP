@@ -9,6 +9,8 @@ namespace INNOBRA_ASP.Shared.DTO
 {
     public class EditarObraDTO
     {
+        public int Id { get; set; }
+
         public string Nombre { get; set; }
 
         [Required(ErrorMessage = "La fecha de inicio es obligatoria.")]
