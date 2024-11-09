@@ -1,13 +1,11 @@
-﻿@page "/Login"
+﻿@page "/"
 @inject NavigationManager NavigationManager
 @inject IJSRuntime js
-
-<h3>Iniciar Sesión</h3>
 
 <div class="container">
     <img src="images/innobra-logo.PNG" alt="logo Innobra" class="logo" />
     <div class="formulario">
-        <form @onsubmit="HandleLogin">
+        <form>
             <div class="username">
                 <input type="email" @bind="username" placeholder=" " required />
                 <label for="">Email</label>
@@ -16,7 +14,7 @@
                 <input type="password" @bind="password" placeholder=" " required />
                 <label for="">Contraseña</label>
             </div>
-            <input type="submit" value="Iniciar Sesión" />
+            <button type="button" @onclick="HandleLogin" class="login-btn">Iniciar Sesión</button>
         </form>
 
         @if (!string.IsNullOrEmpty(errorMessage))
@@ -25,24 +23,6 @@
         }
     </div>
 </div>
-
-<script>
-    function openModal() {
-        document.getElementById("modal").style.display = "block";
-    }
-
-    function closeModal() {
-        document.getElementById("modal").style.display = "none";
-    }
-
-    // Cerrar el modal si se hace clic fuera de él
-    window.onclick = function (event) {
-        const modal = document.getElementById("modal");
-        if (event.target === modal) {
-            closeModal();
-        }
-    }
-</script>
 
 <style>
     body {
@@ -54,6 +34,89 @@
         justify-content: center;
         align-items: center;
     }
+
+    .container {
+        text-align: center;
+        width: 400px;
+    }
+
+    .logo {
+        width: 100%;
+        height: auto;
+        border-radius: 10px 10px 0 0;
+    }
+
+    .formulario {
+        background: #0a265c;
+        border-radius: 0 0 10px 10px;
+        padding: 15px 0;
+    }
+
+        .formulario form {
+            padding: 0 40px;
+            box-sizing: border-box;
+        }
+
+    form .username {
+        position: relative;
+        border-bottom: 2px solid #adadad;
+        margin: 30px 0;
+    }
+
+    .username input {
+        width: 100%;
+        padding: 0 5px;
+        height: 40px;
+        font-size: 16px;
+        border: none;
+        background: none;
+        outline: none;
+        box-sizing: border-box;
+        color: white;
+    }
+
+    .username label {
+        position: absolute;
+        top: 50%;
+        left: 5px;
+        color: #adadad;
+        font-size: 16px;
+        pointer-events: none;
+        transition: 0.3s ease all;
+    }
+
+    .username input:focus ~ label,
+    .username input:not(:placeholder-shown) ~ label {
+        top: -10px;
+        left: 5px;
+        font-size: 12px;
+    }
+
+    /* Estilo para el botón de login */
+    .login-btn {
+        width: 100%;
+        height: 50px;
+        border: none;
+        background-color: #28a745; /* Verde */
+        border-radius: 25px;
+        font-size: 18px;
+        color: white;
+        cursor: pointer;
+        outline: none;
+        margin-top: 20px;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        /* Efecto hover */
+        .login-btn:hover {
+            background-color: #218838; /* Verde más oscuro */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+    /* Mensaje de error */
+    .text-danger {
+        color: red;
+    }
 </style>
 
 @code {
@@ -63,11 +126,14 @@
 
     private async Task HandleLogin()
     {
-        // Ejemplo de autenticación básica
+        // Verifica las credenciales ingresadas
         if (username == "Admin" && password == "Admin")
         {
-            // Redirige a la página principal o a otra página
-            NavigationManager.NavigateTo("/home");
+            // Guarda el estado de autenticación en localStorage
+            await js.InvokeVoidAsync("localStorage.setItem", "isAuthenticated", "true");
+
+            // Redirige a la página principal o Home
+            NavigationManager.NavigateTo("/Home");
         }
         else
         {
