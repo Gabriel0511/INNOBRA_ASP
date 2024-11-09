@@ -233,8 +233,8 @@
 
     private async Task EliminarPresupuesto(int presupuestoId)
     {
-        bool confirmado = await js.InvokeAsync<bool>("confirm", "¿Estás seguro de que deseas eliminar este presupuesto?");
-        if (confirmado)
+        var resultado = await js.InvokeAsync<bool>("confirmSwal");
+        if (resultado)
         {
             try
             {

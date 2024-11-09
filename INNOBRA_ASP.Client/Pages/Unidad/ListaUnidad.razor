@@ -1,4 +1,4 @@
-﻿@page "/Api/Unidades"
+﻿@page "/api/Unidades"
 @inject IHttpServicio http
 @inject IJSRuntime js
 
@@ -88,19 +88,34 @@
         {
             Mensaje = await resp.ObtenerError();
         }
+        cargando = false; // Cambiar cargando a false al finalizar la carga
     }
+
 
     
     private async Task Eliminar(int id)
     {
-        var resp = await http.Delete($"Api/Unidades/{id}");
-        if (!resp.Error)
+        var resultado = await js.InvokeAsync<bool>("confirmSwal");
+
+        if (resultado)
         {
-            await Leer(); // Recarga la lista después de eliminar
+            try
+            {
+                var resp = await http.Delete($"api/Unidades/{id}");
+                if (!resp.Error)
+                {
+                    await Leer(); // Recarga la lista después de eliminar
+                }
+                else
+                {
+                    Mensaje = await resp.ObtenerError();
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensaje = $"Ocurrió un error al eliminar la unidad: {ex.Message}";
+            }
         }
-        else
-        {
-            Mensaje = await resp.ObtenerError();
-        }
+
     }
 }
