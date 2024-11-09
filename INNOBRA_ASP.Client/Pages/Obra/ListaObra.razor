@@ -68,35 +68,43 @@
                         <tr>
                             <td colspan="5">
                                 <div class="expandable @(showPresupuestos ? "" : "collapsed")">
-                                    <table class="table-presupuestos">
-                                        <thead>
-                                            <tr>
-                                                <th scope="col">Presupuesto</th>
-                                                <th scope="col">Fecha Inicio Prevista</th>
-                                                <th scope="col">Fecha Fin Prevista</th>
-                                                <th scope="col">Acciones</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var presupuesto in presupuestos.Where(p => p.Obra_Id == obra.Id))
-                                            {
+                                    @if (presupuestos.Where(p => p.Obra_Id == obra.Id).Any())
+                                    {
+                                        <table class="table-presupuestos">
+                                            <thead>
                                                 <tr>
-                                                    <td>@presupuesto.Nombre</td>
-                                                    <td>@presupuesto.FechaInicioPrevista.ToString("dd-MM-yyyy")</td>
-                                                    <td>@presupuesto.FechaFinPrevista.ToString("dd-MM-yyyy")</td>
-                                                    <td>
-                                                        <a class="btn btn-warning btn-sm" href="/api/Presupuestos/editar/@presupuesto.Id"><i class="bi bi-pencil"></i></a>
-                                                        <button class="btn btn-danger btn-sm" @onclick="() => EliminarPresupuesto(presupuesto.Id)"><i class="bi bi-trash3"></i></button>
-                                                    </td>
+                                                    <th scope="col">Presupuesto</th>
+                                                    <th scope="col">Fecha Inicio Prevista</th>
+                                                    <th scope="col">Fecha Fin Prevista</th>
+                                                    <th scope="col">Acciones</th>
                                                 </tr>
-                                            }
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var presupuesto in presupuestos.Where(p => p.Obra_Id == obra.Id))
+                                                {
+                                                    <tr>
+                                                        <td>@presupuesto.Nombre</td>
+                                                        <td>@presupuesto.FechaInicioPrevista.ToString("dd-MM-yyyy")</td>
+                                                        <td>@presupuesto.FechaFinPrevista.ToString("dd-MM-yyyy")</td>
+                                                        <td>
+                                                            <a class="btn btn-warning btn-sm" href="/api/Presupuestos/editar/@presupuesto.Id"><i class="bi bi-pencil"></i></a>
+                                                            <button class="btn btn-danger btn-sm" @onclick="() => EliminarPresupuesto(presupuesto.Id)"><i class="bi bi-trash3"></i></button>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    }
+                                    else
+                                    {
+                                        <div class="alert alert-info" role="alert">
+                                            Esta obra no tiene presupuestos disponibles.
+                                        </div>
+                                    }
                                 </div>
                             </td>
                         </tr>
                     }
-
                 }
             </tbody>
         </table>
@@ -108,8 +116,8 @@
         </div>
     }
     <br />
-    <a class="btn btn-primary" href="/api/Obras/crear">
-        <i class="bi bi-building-fill-add"></i> Crear Obra
+    <a class="btn btn-success btn-sm" href="/api/Obras/crear">
+        <i class="bi bi-plus-circle"></i> Agregar Obra
     </a>
 </div>
 
