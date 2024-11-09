@@ -4,7 +4,6 @@
 @using INNOBRA_ASP.Shared.DTO
 
 <style>
-    /* Fondo que cubre toda la pantalla */
     .fondo {
         position: fixed;
         top: 0;
@@ -15,60 +14,62 @@
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
-        z-index: -1;
+        z-index: -2;
     }
 
-    /* Capa semitransparente */
     .overlay {
-        position: absolute;
+        position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
         background-color: rgba(0, 0, 0, 0.5);
-        z-index: 1;
+        z-index: -1;
     }
 
-    /* Contenedor del formulario */
-    .contenedor-formulario {
+    .contenedor {
         position: relative;
-        z-index: 2;
+        z-index: 1;
         background-color: rgba(255, 255, 255, 0.8);
         border-radius: 15px;
-        padding: 30px;
-        max-width: 600px;
-        margin: 0 auto;
-        margin-top: 50px;
+        padding: 20px;
+        max-width: 800px;
+        margin: auto;
         color: black;
+        margin-top: 20px;
     }
 
-    .btn-primary, .btn-secondary {
-        margin-right: 10px;
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: center;
+    }
+
+    th {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .btn-primary, .btn-danger {
+        border: none;
         border-radius: 5px;
-        padding: 10px 15px;
+        padding: 8px 12px;
+        color: white;
+        text-decoration: none;
     }
 
     .btn-primary {
         background-color: #007bff;
-        border-color: #007bff;
-        color: white;
     }
 
-        .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #004085;
-        }
-
-    .btn-secondary {
-        background-color: #6c757d;
-        border-color: #6c757d;
-        color: white;
+    .btn-danger {
+        background-color: #dc3545;
     }
-
-        .btn-secondary:hover {
-            background-color: #5a6268;
-            border-color: #4e555b;
-        }
 </style>
 
 <div class="fondo"></div>
