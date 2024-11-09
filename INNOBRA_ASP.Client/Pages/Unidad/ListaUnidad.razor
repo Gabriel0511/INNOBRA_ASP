@@ -1,5 +1,6 @@
 ﻿@page "/Api/Unidades"
 @inject IHttpServicio http
+@inject IJSRuntime js
 
 <div class="fondo"></div>
     <div class="overlay"></div>
@@ -8,7 +9,20 @@
 
     <h3>Unidades</h3>
 
-    @if (listaUnidades != null && listaUnidades.Any())
+    @if (!string.IsNullOrEmpty(Mensaje))
+    {
+            <div class="alert alert-danger" role="alert">
+            @Mensaje
+            </div>
+    }
+
+    @if (cargando)
+    {
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+    }
+    else if (listaUnidades != null && listaUnidades.Any())
     {
             <table>
                 <thead>
@@ -28,8 +42,8 @@
                                 <td>@unidad.Costo</td>
 
                                 <td>
-                                                    <a class="btn btn-warning btn-sm" href="/api/Unidades/editar/@unidad.Id">Editar</a>
-                                    <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(unidad.Id)">Eliminar</button>
+                                    <a class="btn btn-warning btn-sm" href="/api/Unidades/editar/@unidad.Id"><i class="bi bi-pencil"></i></a>
+                                    <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(unidad.Id)"><i class="bi bi-trash3"></i></button>
                                 </td>
 
                             </tr>
@@ -46,18 +60,16 @@
 
     <br/>
 
-    <a class="btn btn-primary" href="/api/Unidades/crear">
-        <i class="bi bi-plus-circle"></i> Crear Item
+    <a class="btn btn-success btn-sm" href="/api/Unidades/crear">
+        <i class="bi bi-plus-circle"></i> Agregar Unidad
     </a>
 
 </div>
 
 @code {
     List<Unidad> listaUnidades = new List<Unidad>();
-    List<ItemTipo> listaItemsTipos = new List<ItemTipo>();
-    List<Presupuesto> listaPresupuestos = new List<Presupuesto>();
-
     string Mensaje = "";
+    bool cargando = true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -67,7 +79,7 @@
 
     private async Task Leer()
     {
-        var resp = await http.Get<List<Unidad>>("Api/Items");
+        var resp = await http.Get<List<Unidad>>("Api/Unidades");
         if (!resp.Error)
         {
             listaUnidades = resp.Respuesta;
@@ -81,7 +93,7 @@
     
     private async Task Eliminar(int id)
     {
-        var resp = await http.Delete($"Api/Items/{id}");
+        var resp = await http.Delete($"Api/Unidades/{id}");
         if (!resp.Error)
         {
             await Leer(); // Recarga la lista después de eliminar
