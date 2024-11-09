@@ -36,7 +36,14 @@
                 @foreach (var obra in listaObras)
                 {
                     <tr>
-                        <td>@obra.Nombre</td>
+                        <td>
+                            <div class="d-flex justify-content-between">
+                                <span>   @obra.Nombre</span>
+                                <button class="btn btn-info btn-sm" @onclick="() => TogglePresupuestos(obra)">
+                                    <i class="bi bi-chevron-down"></i>
+                                </button>
+                            </div>
+                        </td>
                         <td>@obra.FechaInicio.ToString("dd-MM-yyyy")</td>
                         <td>@obra.FechaFin.ToString("dd-MM-yyyy")</td>
                         <td>
@@ -55,6 +62,25 @@
                             <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(obra.Id)"><i class="bi bi-trash3"></i></button>
                         </td>
                     </tr>
+
+                    <!-- Mostrar presupuestos cuando la obra está seleccionada -->
+                    @if (obraSeleccionada?.Id == obra.Id && showPresupuestos)
+                    {
+                        @foreach (var presupuesto in presupuestos.Where(p => p.Obra_Id == obra.Id))
+                        {
+                            <tr>
+                                <td colspan="5">
+                                    <div class="d-flex justify-content-between">
+                                        <span>@presupuesto.Nombre</span>
+                                        <div>
+                                            <a class="btn btn-warning btn-sm" href="/api/Presupuestos/editar/@presupuesto.Id"><i class="bi bi-pencil"></i></a>
+                                            <button class="btn btn-danger btn-sm" @onclick="() => EliminarPresupuesto(presupuesto.Id)"><i class="bi bi-trash3"></i></button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
                 }
             </tbody>
         </table>
@@ -73,6 +99,9 @@
 
 @code {
     List<Obra> listaObras = new List<Obra>();
+    List<Presupuesto> presupuestos = new List<Presupuesto>();
+    Obra obraSeleccionada;
+    bool showPresupuestos = false;
     string Mensaje = "";
     bool cargando = true;
 
@@ -80,6 +109,7 @@
     {
         await base.OnInitializedAsync();
         await Leer();
+        await LeerPresupuestos();
     }
 
     private async Task Leer()
@@ -109,6 +139,41 @@
         }
     }
 
+    private async Task LeerPresupuestos()
+    {
+        try
+        {
+            var resp = await http.Get<List<Presupuesto>>("api/Presupuestos");
+            if (!resp.Error)
+            {
+                presupuestos = resp.Respuesta;
+            }
+            else
+            {
+                Mensaje = await resp.ObtenerError();
+            }
+        }
+        catch (Exception ex)
+        {
+            Mensaje = $"Ocurrió un error al cargar los presupuestos: {ex.Message}";
+        }
+    }
+
+    private void TogglePresupuestos(Obra obra)
+    {
+        if (obraSeleccionada == obra)
+        {
+            // Si la obra seleccionada es la misma, la ocultamos
+            showPresupuestos = !showPresupuestos;
+        }
+        else
+        {
+            // Si no es la misma obra, mostramos los presupuestos
+            obraSeleccionada = obra;
+            showPresupuestos = true;
+        }
+    }
+
     private async Task Eliminar(int id)
     {
         bool confirmado = await js.InvokeAsync<bool>("confirm", "¿Estás seguro de que deseas eliminar esta obra?");
@@ -129,6 +194,30 @@
             catch (Exception ex)
             {
                 Mensaje = $"Ocurrió un error al eliminar la obra: {ex.Message}";
+            }
+        }
+    }
+
+    private async Task EliminarPresupuesto(int presupuestoId)
+    {
+        bool confirmado = await js.InvokeAsync<bool>("confirm", "¿Estás seguro de que deseas eliminar este presupuesto?");
+        if (confirmado)
+        {
+            try
+            {
+                var resp = await http.Delete($"api/Presupuestos/{presupuestoId}");
+                if (!resp.Error)
+                {
+                    await LeerPresupuestos(); // Recargar los presupuestos después de eliminar
+                }
+                else
+                {
+                    Mensaje = await resp.ObtenerError();
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensaje = $"Ocurrió un error al eliminar el presupuesto: {ex.Message}";
             }
         }
     }
