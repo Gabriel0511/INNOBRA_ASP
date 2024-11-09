@@ -8,76 +8,89 @@
 <div class="fondo"></div>
 <div class="overlay"></div>
 <div class="contenedor-formulario">
-<h3>Crear Presupuesto</h3>
+    <h3>Crear Presupuesto</h3>
 
-@if (!string.IsNullOrEmpty(mensajeError))
-{
-    <div class="alert alert-danger" role="alert">
-        @mensajeError
-    </div>
-}
-
-<EditForm Model="@presupuesto" OnValidSubmit="Grabar">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-
-    <div class="mb-3">
-        <label>Nombre:</label>
-        <InputText class="form-control" @bind-Value="presupuesto.Nombre" />
-        <ValidationMessage For="@(() => presupuesto.Nombre)" />
-    </div>
-
-    <div class="mb-3">
-        <label>Fecha de Inicio Prevista:</label>
-        <InputDate class="form-control" @bind-Value="presupuesto.FechaInicioPrevista" />
-        <ValidationMessage For="@(() => presupuesto.FechaInicioPrevista)" />
-    </div>
-
-    <div class="mb-3">
-        <label>Fecha de Fin Prevista:</label>
-        <InputDate class="form-control" @bind-Value="presupuesto.FechaFinPrevista" />
-        <ValidationMessage For="@(() => presupuesto.FechaFinPrevista)" />
-    </div>
-
-    <div class="mb-3">
-        <label>Obra</label>
-        <div>
-            <select class="form-control" @bind="presupuesto.Obra_Id">
-                <option value="">Seleccione una obra</option>
-                @foreach (var obra in obras)
-                {
-                    <option value="@obra.Id">@obra.Nombre</option>
-                }
-            </select>
-            <ValidationMessage For="@(() => presupuesto.Obra_Id)" />
+    @if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <div class="alert alert-danger" role="alert">
+            @mensajeError
         </div>
-    </div>
+    }
 
-    <button type="submit" class="btn btn-primary">Guardar</button>
-    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-</EditForm>
-    </div>
+    <EditForm Model="@presupuesto" OnValidSubmit="Grabar">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label>Nombre:</label>
+            <InputText class="form-control" @bind-Value="presupuesto.Nombre" />
+            <ValidationMessage For="@(() => presupuesto.Nombre)" />
+        </div>
+
+        <div class="mb-3">
+            <label>Fecha de Inicio Prevista:</label>
+            <InputDate class="form-control" @bind-Value="presupuesto.FechaInicioPrevista" />
+            <ValidationMessage For="@(() => presupuesto.FechaInicioPrevista)" />
+        </div>
+
+        <div class="mb-3">
+            <label>Fecha de Fin Prevista:</label>
+            <InputDate class="form-control" @bind-Value="presupuesto.FechaFinPrevista" />
+            <ValidationMessage For="@(() => presupuesto.FechaFinPrevista)" />
+        </div>
+
+        <div class="mb-3">
+            <label>Obra</label>
+            <div>
+                <input type="text" class="form-control" value="@obraSeleccionada?.Nombre" readonly />
+                <ValidationMessage For="@(() => presupuesto.Obra_Id)" />
+            </div>
+        </div>
+
+
+
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+    </EditForm>
+</div>
 
 
 @code {
+    [Parameter] public int id { get; set; }
     private Presupuesto presupuesto = new Presupuesto();
     private List<Presupuesto> listaPresupuestos = new();
     private List<Obra> obras = new List<Obra>();
+    private Obra obraSeleccionada;
 
     private string mensajeError;
 
     protected override async Task OnInitializedAsync()
     {
-
         presupuesto.FechaInicioPrevista = DateTime.Now.Date;
         presupuesto.FechaFinPrevista = DateTime.Now.Date;
+
+        // Cargar las obras
         await CargarObras();
+
+        // Asignar la obra seleccionada a la propiedad presupuesto.Obra_Id
+        obraSeleccionada = obras.FirstOrDefault(obra => obra.Id == id);
+
+        if (obraSeleccionada != null)
+        {
+            presupuesto.Obra_Id = obraSeleccionada.Id; // Asigna el ID de la obra seleccionada al presupuesto
+        }
+        else
+        {
+            mensajeError = "Obra no encontrada.";
+        }
+
+        // Cargar los presupuestos si es necesario
         await CargarPresupuestos();
     }
 
+
     private async Task CargarPresupuestos()
     {
-        // Llama al servicio para obtener la lista de presupuestos
         var respuesta = await http.Get<List<Presupuesto>>("api/Presupuestos");
         if (!respuesta.Error)
         {
@@ -91,11 +104,10 @@
 
     private async Task CargarObras()
     {
-        // Llama al servicio para obtener la lista de obras
         var respuesta = await http.Get<List<Obra>>("api/Obras");
         if (!respuesta.Error)
         {
-            obras = respuesta.Respuesta;  // Poblamos la lista de obras, no la de presupuestos
+            obras = respuesta.Respuesta; // Poblamos la lista de obras
         }
         else
         {
@@ -105,10 +117,9 @@
 
     private async Task Grabar()
     {
-        // Verificar que el Obra_Id es válido
-        if (presupuesto.Obra_Id == 0)  // Suponiendo que 0 no es un ID válido en tu base de datos
+        if (presupuesto.Obra_Id == 0)
         {
-            mensajeError = "Debe seleccionar una categoría (obra).";
+            mensajeError = "Debe seleccionar una obra.";
             return;
         }
 
@@ -122,7 +133,6 @@
             nav.NavigateTo("/api/Presupuestos");
         }
     }
-
 
     private void Cancelar()
     {
