@@ -4,8 +4,8 @@
 <PageTitle>Home</PageTitle>
 
 <style>
-    html, body {
-        height: 100%; /* Asegura que el body ocupe todo el alto */
+/*     html, body {
+        height: 100%; 
         margin: 0;
     }
 
@@ -29,7 +29,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro semitransparente */
+        background-color: rgba(0, 0, 0, 0.5); 
     }
 
     .content {
@@ -37,7 +37,7 @@
         z-index: 1;
         padding: 20px;
     }
-
+    */
     .buttons {
         display: flex;
         flex-direction: column;
@@ -57,7 +57,7 @@
 
         .btn:hover {
             background-color: #1565c0;
-        }
+        } 
 
     .login-form {
         display: flex;
@@ -71,12 +71,13 @@
         font-size: 16px;
         border-radius: 5px;
         border: 1px solid #ddd;
-    }
+    } 
 </style>
 
-<div class="home-background">
-    <div class="overlay"></div> <!-- Fondo oscuro -->
-    <div class="content">
+<div class="fondo"></div>
+    <div class="overlay"></div>
+
+<div class="contenedor-formulario">
         <h1>InnObra</h1>
         <p>Construyendo tu futuro.</p>
 
@@ -101,7 +102,6 @@
             </div>
         }
     </div>
-</div>
 
 @code {
     private string username = string.Empty;

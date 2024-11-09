@@ -208,3 +208,18 @@ th {
     padding: 8px;
     border-radius: 8px;
 }
+
+.footer-link {
+    position: fixed;
+    bottom: 10px; /* Distancia desde el fondo */
+    left: 7%;
+    transform: translateX(-50%);
+    font-size: 16px; /* Tamaño */
+    text-decoration: none; /* Quitar subrayado */
+    color: #258cfb; /* Color del texto */
+    opacity: 0.7; /* Transparencia, opcional */
+}
+
+    .footer-link:hover {
+        opacity: 1; /* Efecto hover */
+    }

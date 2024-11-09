@@ -1,54 +1,55 @@
 ﻿@page "/Api/Items"
 @inject IHttpServicio http
 
-<div class="fondo">
-    <div class="contenido">
+<div class="fondo"></div>
+    <div class="overlay"></div>
 
-<h3>Items</h3>
+<div class="contenedor-formulario">
 
-@if (listaItems != null && listaItems.Any())
-{
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th scope="col">Tiempo Estimado</th>
-                <th scope="col">Unidad de Tiempo</th>
-                <th scope="col">Material Estimado</th>
-                <th scope="col">Item Tipo</th>
-                <th scope="col">Presupuesto</th>
-                <th scope="col">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in listaItems)
-            {
+    <h3>Items</h3>
+
+    @if (listaItems != null && listaItems.Any())
+    {
+        <table>
+            <thead>
                 <tr>
-                    <td>@item.Tiempo_estimado</td>
-                    <td>@item.Unidad_Tiempo</td>
-                    <td>@item.Material_estimado</td>
-                    <td>@MostrarNombreItemTipo(item.Item_Tipos_Id)</td>
-                    <td>@MostrarPresupuesto(item.Presupuesto_Id)</td>
-                    <td>
-                        <a class="btn btn-warning btn-sm" href="Api/Items/editar/@item.Id">Editar</a>
-                        <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(item.Id)">Eliminar</button>
-                    </td>
+                    <th scope="col">Tiempo Estimado</th>
+                    <th scope="col">Unidad de Tiempo</th>
+                    <th scope="col">Material Estimado</th>
+                    <th scope="col">Item Tipo</th>
+                    <th scope="col">Presupuesto</th>
+                    <th scope="col">Acciones</th>
                 </tr>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <div class="alert alert-warning" role="alert">
-        No hay items registrados.
-    </div>
-}
+            </thead>
+            <tbody>
+                @foreach (var item in listaItems)
+                {
+                    <tr>
+                        <td>@item.Tiempo_estimado</td>
+                        <td>@item.Unidad_Tiempo</td>
+                        <td>@item.Material_estimado</td>
+                        <td>@MostrarNombreItemTipo(item.Item_Tipos_Id)</td>
+                        <td>@MostrarPresupuesto(item.Presupuesto_Id)</td>
+                        <td>
+                            <a class="btn btn-warning btn-sm" href="Api/Items/editar/@item.Id">Editar</a>
+                            <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(item.Id)">Eliminar</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-warning" role="alert">
+            No hay items registrados.
+        </div>
+    }
 
-<a class="btn btn-primary" href="/api/Items/crear">
-    <i class="bi bi-plus-circle"></i> Crear Item
-</a>
-
-    </div>
+    <a class="btn btn-primary" href="/api/Items/crear">
+        <i class="bi bi-plus-circle"></i> Crear Item
+    </a>
+    
 </div>
 
 @code {
