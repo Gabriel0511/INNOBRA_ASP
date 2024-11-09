@@ -13,6 +13,8 @@
             <tr>
                 <th scope="col">Material Previsto</th>
                 <th scope="col">Cantidad</th>
+                <th scope="col">Item</th>
+                <th scope="col">Recurso</th>
             </tr>
         </thead>
         <tbody>
@@ -21,6 +23,8 @@
                 <tr>
                     <td>@itemRenglon.MaterialPrevisto</td>
                     <td>@itemRenglon.Cantidad</td>
+                    <td>@itemRenglon.Item_Id</td>
+                    <td>@MostrarNombreRecurso(itemRenglon.Recursos_Id)</td>
                     <td>
                         <a class="btn btn-warning btn-sm" href="/api/ItemRenglones/editar/@itemRenglon.Id">Editar</a>
                         <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(itemRenglon.Id)">Eliminar</button>
@@ -46,12 +50,14 @@ else
 
 @code {
     List<ItemRenglon> listaItemsRenglones = new List<ItemRenglon>();
+    List<Recurso> listaRecursos = new List<Recurso>();
     string Mensaje = "";
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
         await Leer();
+        await CargarRecurso();
     }
 
     private async Task Leer()
@@ -65,6 +71,21 @@ else
         {
             Mensaje = await resp.ObtenerError();
         }
+    }
+
+    private async Task CargarRecurso()
+    {
+        var respuesta = await http.Get<List<Recurso>>("api/Recursos");
+        if (!respuesta.Error)
+        {
+            listaRecursos = respuesta.Respuesta;
+        }
+    }
+
+    private string MostrarNombreRecurso(int RecursoId)
+    {
+        var recurso = listaRecursos?.FirstOrDefault(r => r.Id == RecursoId);
+        return recurso?.Nombre ?? "Sin asignar";
     }
 
     private async Task Eliminar(int id)
