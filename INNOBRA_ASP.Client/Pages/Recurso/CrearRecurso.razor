@@ -4,6 +4,104 @@
 @using System.Net.Http.Json
 @inject NavigationManager nav
 
+<style>
+    /* Fondo */
+    .fondo {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('/images/fondo.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        z-index: -2;
+    }
+    /* Capa semitransparente para oscurecer el fondo */
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro */
+        z-index: -1; /* Capa debajo del contenedor */
+    }
+    /* Contenedor principal de la página */
+    .contenedor-formulario {
+        position: relative;
+        z-index: 1;
+        background-color: rgba(255, 255, 255, 0.9); /* Fondo blanco semitransparente */
+        border-radius: 15px;
+        padding: 30px;
+        margin: 50px auto;
+        width: 90%;
+        max-width: 900px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+    }
+    /* Estilo del título */
+    h3 {
+        text-align: center;
+        color: #333;
+        font-family: 'Arial', sans-serif;
+        font-size: 2rem;
+        margin-bottom: 20px;
+    }
+    /* Estilos para los formularios */
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        margin-bottom: 15px;
+    }
+    /* Estilo para la tabla */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: center;
+    }
+
+    th {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .btn-primary, .btn-secondary {
+        border: none;
+        border-radius: 5px;
+        padding: 10px 15px;
+        color: white;
+        font-weight: bold;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+    }
+    /* Estilos para botones de cancelación */
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+    /* Estilos para el input de tipo Select */
+    .form-control.select {
+        padding: 8px;
+        border-radius: 8px;
+    }
+</style>
 <div class="fondo"></div>
 <div class="overlay"></div>
 <div class="contenedor-formulario">
@@ -40,8 +138,14 @@
         </div>
 
         <div>
-            <label>Unidad ID:</label>
-            <InputNumber @bind-Value="recurso.Unidad_Id" class="form-control" />
+            <label>Unidad:</label>
+            <InputSelect @bind-Value="recurso.Unidad_Id" class="form-control">
+                <option value="">Seleccione una unidad</option>
+                @foreach (var unidad in listaUnidades)
+                {
+                    <option value="@unidad.Id">@unidad.Nombre</option>
+                }
+            </InputSelect>
         </div>
 
         <button type="submit" class="btn btn-primary">Guardar</button>
@@ -52,10 +156,12 @@
 @code {
     private CrearRecursoDTO recurso = new CrearRecursoDTO();
     private List<Avance> listaRecursos = new();
+    private List<Unidad> listaUnidades = new();
 
     protected override async Task OnInitializedAsync()
     {
         await CargarRecursos();
+        await CargarUnidades();
     }
 
     private async Task CargarRecursos()
@@ -64,6 +170,15 @@
         if (!respuesta.Error)
         {
             listaRecursos = respuesta.Respuesta;
+        }
+    }
+
+    private async Task CargarUnidades()
+    {
+        var respuesta = await http.Get<List<Unidad>>("api/Unidades");
+        if (!respuesta.Error)
+        {
+            listaUnidades = respuesta.Respuesta;
         }
     }
 

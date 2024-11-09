@@ -3,8 +3,76 @@
 @inject NavigationManager nav
 @using INNOBRA_ASP.Shared.DTO
 
-<div class="fondo"></div> <!-- Fondo que cubre toda la pantalla -->
-<div class="overlay"></div> <!-- Capa semitransparente -->
+<style>
+    /* Fondo que cubre toda la pantalla */
+    .fondo {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('/images/fondo.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        z-index: -1;
+    }
+
+    /* Capa semitransparente */
+    .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1;
+    }
+
+    /* Contenedor del formulario */
+    .contenedor-formulario {
+        position: relative;
+        z-index: 2;
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 15px;
+        padding: 30px;
+        max-width: 600px;
+        margin: 0 auto;
+        margin-top: 50px;
+        color: black;
+    }
+
+    .btn-primary, .btn-secondary {
+        margin-right: 10px;
+        border-radius: 5px;
+        padding: 10px 15px;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+        color: white;
+    }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #4e555b;
+        }
+</style>
+
+<div class="fondo"></div>
+<div class="overlay"></div>
 <div class="contenedor-formulario">
     <h3>Editar Recurso</h3>
 
@@ -46,8 +114,15 @@
         </div>
 
         <div class="form-group">
-            <label>Unidad ID:</label>
-            <InputNumber class="form-control" @bind-Value="recurso.Unidad_Id" />
+            <label>Unidad:</label>
+            <InputSelect @bind-Value="recurso.Unidad_Id" class="form-control">
+                <option value="">Selecciona una unidad</option>
+                @foreach (var unidad in listaUnidades)
+                {
+                    <option value="@unidad.Id">@unidad.Nombre</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => recurso.Unidad_Id)" />
         </div>
 
         <br />
@@ -61,11 +136,13 @@
 @code {
     [Parameter] public int recursoId { get; set; }
     private EditarRecursoDTO recurso = new EditarRecursoDTO();
+    private List<Unidad> listaUnidades = new List<Unidad>();
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
         await Mostrar();
+        await CargarUnidades();
     }
 
     private async Task Mostrar()
@@ -79,6 +156,15 @@
         else
         {
             nav.NavigateTo("/api/Recursos");
+        }
+    }
+
+    private async Task CargarUnidades()
+    {
+        var respuesta = await http.Get<List<Unidad>>("api/Unidades");
+        if (!respuesta.Error)
+        {
+            listaUnidades = respuesta.Respuesta;
         }
     }
 
