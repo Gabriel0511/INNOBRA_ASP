@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace INNOBRA_ASP.DB.Data.Entity
 {
@@ -18,6 +15,9 @@ namespace INNOBRA_ASP.DB.Data.Entity
         [Required(ErrorMessage = "La fecha de fin es obligatoria.")]
         public DateTime FechaFin { get; set; }
 
+        public byte[] Imagen { get; set; }  // Atributo para almacenar la imagen
+
         public ICollection<Presupuesto> Presupuestos { get; set; }
     }
 }
+

@@ -3,56 +3,59 @@
 @using INNOBRA_ASP.Shared.DTO
 @using System.Net.Http.Json
 @inject NavigationManager nav
+@using Microsoft.AspNetCore.Components.Forms
 
 <div class="fondo"></div>
 <div class="overlay"></div>
 <div class="contenedor-formulario">
-        <h3>Crear Obra</h3>
+    <h3>Crear Obra</h3>
 
-        <EditForm Model="@obra" OnValidSubmit="Grabar">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
+    <EditForm Model="@obra" OnValidSubmit="Grabar">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
-            <div class="mb-3">
-                <label>Nombre:</label>
-                <InputText @bind-Value="obra.Nombre" />
-                <ValidationMessage For="@(() => obra.Nombre)" />
-            </div>
+        <div class="mb-3">
+            <label>Nombre:</label>
+            <InputText @bind-Value="obra.Nombre" />
+            <ValidationMessage For="@(() => obra.Nombre)" />
+        </div>
 
-            <div class="mb-3">
-                <label>Fecha de Inicio:</label>
-                <InputDate @bind-Value="obra.FechaInicio" />
-                <ValidationMessage For="@(() => obra.FechaInicio)" />
-            </div>
+        <div class="mb-3">
+            <label>Fecha de Inicio:</label>
+            <InputDate @bind-Value="obra.FechaInicio" />
+            <ValidationMessage For="@(() => obra.FechaInicio)" />
+        </div>
 
-            <div class="mb-3">
-                <label>Fecha de Fin:</label>
-                <InputDate @bind-Value="obra.FechaFin" />
-                <ValidationMessage For="@(() => obra.FechaFin)" />
-            </div>
+        <div class="mb-3">
+            <label>Fecha de Fin:</label>
+            <InputDate @bind-Value="obra.FechaFin" />
+            <ValidationMessage For="@(() => obra.FechaFin)" />
+        </div>
 
-            <button type="submit" class="btn btn-primary">Guardar</button>
-            <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-        </EditForm>
+        <div class="mb-3">
+            <label>Imagen:</label>
+            <InputFile OnChange="OnInputFileChange" />
+        </div>
 
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+    </EditForm>
 </div>
 
 @code {
     private Obra obra = new Obra();
     private List<Obra> listaObra = new List<Obra>();
 
-    // Esta es la única definición de OnInitializedAsync
     protected override async Task OnInitializedAsync()
     {
-        obra.FechaInicio = DateTime.Now.Date;  // Solo fecha, sin hora
-        obra.FechaFin = DateTime.Now.Date;     // Solo fecha, sin hora
+        obra.FechaInicio = DateTime.Now.Date;
+        obra.FechaFin = DateTime.Now.Date;
 
         await CargarObra();
     }
 
     private async Task CargarObra()
     {
-        // Llama al servicio para obtener la lista de obras
         var respuesta = await http.Get<List<Obra>>("api/Obras");
         if (!respuesta.Error)
         {
@@ -65,7 +68,7 @@
         var httpRespuesta = await http.Post<Obra>("api/Obras", obra);
         if (httpRespuesta.Error)
         {
-            var body = httpRespuesta.HttpResponseMessage; // Aquí podrías manejar el error de la forma que prefieras
+            var body = httpRespuesta.HttpResponseMessage;
         }
         nav.NavigateTo("/api/Obras");
     }
@@ -73,5 +76,15 @@
     private void Cancelar()
     {
         nav.NavigateTo("/api/Obras");
+    }
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        var imageFile = e.File;
+        using (var stream = new MemoryStream())
+        {
+            await imageFile.OpenReadStream().CopyToAsync(stream);
+            obra.Imagen = stream.ToArray(); // Guarda la imagen en byte[]
+        }
     }
 }

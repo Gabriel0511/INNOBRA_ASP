@@ -3,45 +3,55 @@
 @using INNOBRA_ASP.Shared.DTO
 @using System.Net.Http.Json
 @inject NavigationManager nav
+@using Microsoft.AspNetCore.Components.Forms
 
 <div class="fondo"></div>
 <div class="overlay"></div>
 <div class="contenedor-formulario">
-<h3>Editar Obra</h3>
+    <h3>Editar Obra</h3>
 
-@if (!string.IsNullOrEmpty(mensaje))
-{
-    <div class="alert alert-success">
-        @mensaje
-    </div>
-}
+    @if (!string.IsNullOrEmpty(mensaje))
+    {
+        <div class="alert alert-success">
+            @mensaje
+        </div>
+    }
 
-<EditForm Model="@obra" OnValidSubmit="Actualizar">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+    <EditForm Model="@obra" OnValidSubmit="Actualizar">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
-            <div class ="mb-3">
-        <label>Nombre:</label>
-        <InputText @bind-Value="obra.Nombre" />
-        <ValidationMessage For="@(() => obra.Nombre)" />
-    </div>
+        <div class="mb-3">
+            <label>Nombre:</label>
+            <InputText @bind-Value="obra.Nombre" />
+            <ValidationMessage For="@(() => obra.Nombre)" />
+        </div>
 
-            <div class="mb-3">
-        <label>Fecha Inicio</label>
-        <InputDate @bind-Value="obra.FechaInicio" />
-        <ValidationMessage For="@(() => obra.FechaInicio)" />
-    </div>
+        <div class="mb-3">
+            <label>Fecha Inicio</label>
+            <InputDate @bind-Value="obra.FechaInicio" />
+            <ValidationMessage For="@(() => obra.FechaInicio)" />
+        </div>
 
-            <div class="mb-3">
-        <label>Fecha fin</label>
-        <InputDate @bind-Value="obra.FechaFin" />
-        <ValidationMessage For="@(() => obra.FechaFin)" />
-    </div>
+        <div class="mb-3">
+            <label>Fecha fin</label>
+            <InputDate @bind-Value="obra.FechaFin" />
+            <ValidationMessage For="@(() => obra.FechaFin)" />
+        </div>
 
-    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-</EditForm>
-    </div>
+        <div class="mb-3">
+            <label>Imagen:</label>
+            <InputFile OnChange="OnInputFileChange" />
+            @if (obra.Imagen != null)
+            {
+                <img src="data:image;base64,@Convert.ToBase64String(obra.Imagen)" alt="Imagen actual" style="width: 200px; height: auto; margin-top: 10px;" />
+            }
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+    </EditForm>
+</div>
 
 @code {
     [Parameter] public int id { get; set; }
@@ -78,7 +88,17 @@
         else
         {
             var errorContent = await respuesta.HttpResponseMessage.Content.ReadAsStringAsync();
-            mensaje = $"Error: {errorContent}"; // Muestra el error
+            mensaje = $"Error: {errorContent}";
+        }
+    }
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        var imageFile = e.File;
+        using (var stream = new MemoryStream())
+        {
+            await imageFile.OpenReadStream().CopyToAsync(stream);
+            obra.Imagen = stream.ToArray(); // Asigna la imagen a obra.Imagen
         }
     }
 
