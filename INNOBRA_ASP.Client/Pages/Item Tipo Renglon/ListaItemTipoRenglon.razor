@@ -2,104 +2,131 @@
 @inject IHttpServicio http
 
 <style>
-    body {
-        background-image: url('/images/InnObra.jpg');
+    .fondo {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('/images/fondo.png');
         background-size: cover;
-        background-attachment: fixed;
         background-position: center;
-        filter: brightness(0.7); /* Oscurece la imagen de fondo */
+        background-repeat: no-repeat;
+        z-index: -2;
     }
 
-    h3, table, p, a, button {
-        color: white; /* Asegura que el texto resalte */
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: -1;
+    }
+
+    .contenedor {
+        position: relative;
+        z-index: 1;
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 15px;
+        padding: 20px;
+        max-width: 800px;
+        margin: auto;
+        color: black;
+        margin-top: 20px;
     }
 
     table {
-        background-color: rgba(0, 0, 0, 0.6); /* Fondo semitransparente para la tabla */
-        padding: 1rem;
-        border-radius: 8px;
+        width: 100%;
+        border-collapse: collapse;
     }
 
     th, td {
         padding: 10px;
+        border: 1px solid #ddd;
+        text-align: center;
+    }
+
+    th {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .btn-primary, .btn-danger {
+        border: none;
+        border-radius: 5px;
+        padding: 8px 12px;
+        color: white;
+        text-decoration: none;
     }
 
     .btn-primary {
         background-color: #007bff;
-        border-color: #007bff;
     }
 
     .btn-danger {
         background-color: #dc3545;
-        border-color: #dc3545;
     }
 </style>
 
-<h3>Lista de Item Tipo Renglon</h3>
-<br />
-<a class="btn btn-primary" href="/api/ItemTipoRenglon/crear">Nuevo Item Tipo Renglon</a>
-<br />
-<table>
-    <tr>
-        <th>Item</th>
-        <th>Recurso</th>
-    </tr>
-    @if (Mensaje == "")
-    {
-        @if (listaItemTipoRenglon == null)
+<div class="fondo"></div>
+<div class="overlay"></div>
+<div class="contenedor">
+    <h3>Lista de Item Tipo Renglones</h3>
+    <br />
+    <a class="btn btn-primary" href="/api/ItemTipoRenglon/crear">Nuevo Item Tipo Renglon</a>
+    <br /><br />
+    <table>
+        <tr>
+            <th>ItemTipo</th>
+            <th>Recurso</th>
+            <th>Acciones</th>
+        </tr>
+        @if (Mensaje == "")
         {
-            <p>Buscando....</p>
-        }
-        else if (listaItemTipoRenglon.Count == 0)
-        {
-            <p>No existen item tipo renglon</p>
+            @if (listaItemTipoRenglon == null)
+            {
+                <p>Buscando....</p>
+            }
+            else if (listaItemTipoRenglon.Count == 0)
+            {
+                <p>No existen items tipo renglon</p>
+            }
+            else
+            {
+                @foreach (var item in listaItemTipoRenglon)
+                {
+                    <tr>
+                        <td>@item.ItemTipo.Nombre</td>
+                        <td>@item.Recurso.Nombre</td>
+                        <td>
+                            <a class="btn btn-primary" href="api/ItemTipoRengon/editar/@item.Id">Editar</a>
+                            <button class="btn btn-danger" @onclick="() => Eliminar(item)">Borrar</button>
+                        </td>
+                    </tr>
+                }
+            }
         }
         else
         {
-            @foreach (var item in listaItemTipoRenglon)
-            {
-                <tr>
-                    <td>@item.Recurso?.Nombre</td> <!-- Asegúrate de que la clase Recurso tenga una propiedad Nombre -->
-                    <td>
-                        <a class="btn btn-primary"
-                           href="api/ItemTipoRenglon/editar/@item.Id">
-                            Editar
-                        </a>
-                    </td>
-                    <td>
-                        <button class="btn btn-danger"
-                                @onclick="() => Eliminar(item)">
-                            Borrar
-                        </button>
-                    </td>
-                </tr>
-            }
+            <p>Error: @Mensaje</p>
         }
-    }
-    else
-    {
-        <p>Error: @Mensaje</p>
-    }
-</table>
+    </table>
+</div>
 
-<Confirmacion @ref="confirmacion"
-              Titulo="CUIDADO"
-              textCancelar="Salir"
-              onCancel="Cancelar"
-              onConfirm="Borrar">
-    <h5>Está por borrar el Item Tipo Renglon</h5>
+<Confirmacion @ref="confirmacion" Titulo="CUIDADO" textCancelar="Salir" onCancel="Cancelar" onConfirm="Borrar">
+    <h5>Está por borrar el recurso</h5>
     <br />
-    <p>¿Está seguro?</p>
+    <p>Está seguro?</p>
 </Confirmacion>
 
 @code {
     Confirmacion confirmacion;
-
     List<ItemTipoRenglon> listaItemTipoRenglon;
-    ItemTipoRenglon itemTipoRenglon;
+    ItemTipoRenglon itemtiporenglon;
     string Mensaje = "";
-
-    ItemTipoRenglon? itemTipoRenglonBorrar = null;
+    ItemTipoRenglon? itemtiporenglonBorrar = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -109,10 +136,41 @@
 
     private async Task Leer()
     {
+        // Obtener los recursos
         var resp = await http.Get<List<ItemTipoRenglon>>("api/ItemTipoRenglon");
         if (!resp.Error)
         {
             listaItemTipoRenglon = resp.Respuesta;
+
+            // Hacer las llamadas para cargar los item tipo correspondientes
+            foreach (var itemTipoRenglon in listaItemTipoRenglon)
+            {
+                // Obtener el item tipo correspondiente con el Id
+                var itemtipoResp = await http.Get<ItemTipo>($"api/ItemTipos/{itemTipoRenglon.Item_Tipos_Id}"); // Corregido aquí
+                if (!itemtipoResp.Error)
+                {
+                    itemTipoRenglon.ItemTipo = itemtipoResp.Respuesta; // Corregido aquí
+                }
+                else
+                {
+                    Mensaje = "Error al cargar los item tipo";
+                }
+            }
+
+            // Hacer las llamadas para cargar los recursos correspondientes
+            foreach (var itemTipoRenglon in listaItemTipoRenglon)
+            {
+                // Obtener el recurso correspondiente con el Id
+                var recursosResp = await http.Get<Recurso>($"api/Recursos/GetById/{itemTipoRenglon.Recurso_Id}"); // Corregido aquí
+                if (!recursosResp.Error)
+                {
+                    itemTipoRenglon.Recurso = recursosResp.Respuesta; // Corregido aquí
+                }
+                else
+                {
+                    Mensaje = "Error al cargar los recursos";
+                }
+            }
         }
         else
         {
@@ -120,26 +178,27 @@
         }
     }
 
-    private async Task Eliminar(ItemTipoRenglon itemTipoRenglon)
+    private async Task Eliminar(ItemTipoRenglon itemtiporenglon)
     {
-        itemTipoRenglonBorrar = itemTipoRenglon;
+        itemtiporenglonBorrar = itemtiporenglon;
         confirmacion.Ver();
     }
 
     private void Cancelar()
     {
         confirmacion.Ocultar();
-        itemTipoRenglonBorrar = null;
+        itemtiporenglonBorrar = null;
     }
 
     private async Task Borrar()
     {
-        var respuesta = await http.Delete($"api/ItemTipoRenglon/{itemTipoRenglonBorrar.Id}");
+        var respuesta = await http.Delete($"api/ItemTipoRenglon/{itemtiporenglonBorrar.Id}");
         if (respuesta.Error)
         {
-            Mensaje = "No se pudo borrar el Item Tipo Renglon";
+            var body = "No se pudo borrar";
         }
         Cancelar();
         await Leer();
     }
 }
+
