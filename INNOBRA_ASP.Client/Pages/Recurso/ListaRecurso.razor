@@ -1,78 +1,9 @@
 ﻿@page "/api/Recursos"
 @inject IHttpServicio http
 
-<style>
-    .fondo {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-image: url('/images/fondo.png');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        z-index: -2;
-    }
-
-    .overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: -1;
-    }
-
-    .contenedor {
-        position: relative;
-        z-index: 1;
-        background-color: rgba(255, 255, 255, 0.8);
-        border-radius: 15px;
-        padding: 20px;
-        max-width: 800px;
-        margin: auto;
-        color: black;
-        margin-top: 20px;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    th, td {
-        padding: 10px;
-        border: 1px solid #ddd;
-        text-align: center;
-    }
-
-    th {
-        background-color: #007bff;
-        color: white;
-    }
-
-    .btn-primary, .btn-danger {
-        border: none;
-        border-radius: 5px;
-        padding: 8px 12px;
-        color: white;
-        text-decoration: none;
-    }
-
-    .btn-primary {
-        background-color: #007bff;
-    }
-
-    .btn-danger {
-        background-color: #dc3545;
-    }
-</style>
-
 <div class="fondo"></div>
 <div class="overlay"></div>
-<div class="contenedor">
+<div class="contenedor-formulario">
     <h3>Lista de Recursos</h3>
     <br />
     <a class="btn btn-primary" href="/api/Recursos/crear">Nuevo Recurso</a>
@@ -83,7 +14,6 @@
             <th>Nombre</th>
             <th>Cantidad</th>
             <th>Unidad de Medida</th>
-            <th>Unidad</th> <!-- Nueva columna para Unidad -->
             <th>Acciones</th>
         </tr>
         @if (Mensaje == "")
@@ -105,7 +35,6 @@
                         <td>@item.Nombre</td>
                         <td>@item.Cantidad</td>
                         <td>@item.UnidadMedida</td>
-                        <td>@item.Unidad?.Nombre</td> <!-- Muestra el nombre de la Unidad obtenida -->
                         <td>
                             <a class="btn btn-primary" href="api/Recursos/editar/@item.Id">Editar</a>
                             <button class="btn btn-danger" @onclick="() => Eliminar(item)">Borrar</button>
@@ -142,26 +71,10 @@
 
     private async Task Leer()
     {
-        // Obtener los recursos
         var resp = await http.Get<List<Recurso>>("api/Recursos");
         if (!resp.Error)
         {
             listaRecursos = resp.Respuesta;
-
-            // Hacer las llamadas para cargar las Unidades correspondientes
-            foreach (var recurso in listaRecursos)
-            {
-                // Obtener la unidad correspondiente con el Id
-                var unidadResp = await http.Get<Unidad>($"api/Unidades/{recurso.Unidad_Id}");
-                if (!unidadResp.Error)
-                {
-                    recurso.Unidad = unidadResp.Respuesta; // Asigna la unidad a la propiedad
-                }
-                else
-                {
-                    Mensaje = "Error al cargar las unidades";
-                }
-            }
         }
         else
         {

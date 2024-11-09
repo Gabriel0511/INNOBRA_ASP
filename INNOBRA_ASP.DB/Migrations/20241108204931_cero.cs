@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace INNOBRA_ASP.DB.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class cero : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -113,7 +113,8 @@ namespace INNOBRA_ASP.DB.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Tiempo_estimado = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Tiempo_estimado = table.Column<int>(type: "int", nullable: false),
+                    Unidad_Tiempo = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Material_estimado = table.Column<int>(type: "int", nullable: false),
                     Item_Tipos_Id = table.Column<int>(type: "int", nullable: false),
                     Presupuesto_Id = table.Column<int>(type: "int", nullable: false)
@@ -198,15 +199,15 @@ namespace INNOBRA_ASP.DB.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     MaterialPrevisto = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Cantidad = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Items_idItems = table.Column<int>(type: "int", nullable: false),
+                    Item_Id = table.Column<int>(type: "int", nullable: false),
                     Recursos_Id = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ItemRenglones", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ItemRenglones_Items_Items_idItems",
-                        column: x => x.Items_idItems,
+                        name: "FK_ItemRenglones_Items_Item_Id",
+                        column: x => x.Item_Id,
                         principalTable: "Items",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -229,9 +230,9 @@ namespace INNOBRA_ASP.DB.Migrations
                 column: "Recurso_Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ItemRenglones_Items_idItems",
+                name: "IX_ItemRenglones_Item_Id",
                 table: "ItemRenglones",
-                column: "Items_idItems");
+                column: "Item_Id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ItemRenglones_Recursos_Id",

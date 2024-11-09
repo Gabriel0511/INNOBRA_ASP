@@ -71,10 +71,16 @@ namespace INNOBRA_ASP.DB.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("Presupuesto_Id")
+
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("Tiempo_estimado")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("Tiempo_estimado")
+
+                        .HasColumnType("int");
+
+                    b.Property<string>("Unidad_Tiempo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -97,7 +103,9 @@ namespace INNOBRA_ASP.DB.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Items_idItems")
+
+                    b.Property<int>("Item_Id")
+
                         .HasColumnType("int");
 
                     b.Property<string>("MaterialPrevisto")
@@ -109,7 +117,8 @@ namespace INNOBRA_ASP.DB.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Items_idItems");
+
+                    b.HasIndex("Item_Id");
 
                     b.HasIndex("Recursos_Id");
 
@@ -318,7 +327,7 @@ namespace INNOBRA_ASP.DB.Migrations
                 {
                     b.HasOne("INNOBRA_ASP.DB.Data.Entity.Item", "Item")
                         .WithMany("ItemRenglons")
-                        .HasForeignKey("Items_idItems")
+                        .HasForeignKey("Item_Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

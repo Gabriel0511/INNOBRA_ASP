@@ -1,0 +1,101 @@
+﻿@page "/Api/Items/editar/{id:int}"
+@inject IHttpServicio http
+@using INNOBRA_ASP.Shared.DTO
+@using System.Net.Http.Json
+@inject NavigationManager nav
+
+<div class="fondo">
+    <div class="contenido">
+
+<h3>Editar Item</h3>
+
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <div class="alert alert-success">
+        @mensaje
+    </div>
+}
+
+<EditForm Model="@item" OnValidSubmit="Actualizar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Tiempo Estimado:</label>
+        <InputNumber @bind-Value="item.Tiempo_estimado" />
+        <ValidationMessage For="@(() => item.Tiempo_estimado)" />
+    </div>
+
+    <div>
+        <label>Unidad de tiempo:</label>
+        <div>
+            <select class="form-control" @bind="item.Unidad_Tiempo">
+                <option value="">Seleccione la unidad de tiempo</option>
+                        @foreach (var undTiempo in undTiempo)
+                        {
+                            <option value="@undTiempo">@undTiempo</option>
+                        }
+            </select>
+            <ValidationMessage For="@(() => item.Unidad_Tiempo)" />
+        </div>
+    </div>
+
+    <div>
+        <label>Material Estimado:</label>
+        <InputNumber @bind-Value="item.Material_estimado" />
+        <ValidationMessage For="@(() => item.Material_estimado)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+</EditForm>
+
+    </div>
+</div>
+
+@code {
+    [Parameter] public int id { get; set; }
+    private EditarItemDTO item = new EditarItemDTO();
+    private List<string> undTiempo = new List<string> { "Horas", "Dias", "Meses", "Años" };
+
+    private string mensaje = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarItem();
+    }
+
+    private async Task CargarItem()
+    {
+        var respuesta = await http.Get<EditarItemDTO>($"Api/Items/GetById/{id}");
+        if (!respuesta.Error)
+        {
+            item = respuesta.Respuesta;
+        }
+        else
+        {
+            nav.NavigateTo("/Api/Items");
+        }
+    }
+
+    private async Task Actualizar()
+    {
+        var respuesta = await http.Put($"Api/Items/{id}", item);
+
+        if (!respuesta.Error)
+        {
+            mensaje = "Se cargó con éxito el item.";
+            nav.NavigateTo("/Api/Items");
+        }
+        else
+        {
+            var errorContent = await respuesta.HttpResponseMessage.Content.ReadAsStringAsync();
+            mensaje = $"Error: {errorContent}"; // Muestra el error
+        }
+    }
+
+    private void Cancelar()
+    {
+        nav.NavigateTo("/Api/Items");
+    }
+}

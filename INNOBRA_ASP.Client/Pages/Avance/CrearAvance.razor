@@ -4,10 +4,6 @@
 @using System.Net.Http.Json
 @inject NavigationManager nav
 
-<style>
-    /* ... Estilos existentes ... */
-</style>
-
 <div class="fondo"></div>
 <div class="overlay"></div>
 <div class="contenedor-formulario">
@@ -28,22 +24,15 @@
             <InputText @bind-Value="avance.MaterialEjecutado" class="form-control" />
         </div>
 
-        <!-- Selección de Item ID -->
+        <!-- FECHA FINALIZACION REAL -->
         <div>
             <label>Item ID:</label>
             <InputNumber @bind-Value="avance.Item_Id" class="form-control" />
         </div>
 
-        <!-- Selección del Recurso por Nombre -->
         <div>
-            <label>Recurso:</label>
-            <select @bind="avance.Recurso_Id" class="form-control">
-                <option value="">Seleccione un recurso</option>
-                @foreach (var recurso in listaRecursos)
-                {
-                    <option value="@recurso.Id">@recurso.Nombre</option>
-                }
-            </select>
+            <label>Recurso ID:</label>
+            <InputNumber @bind-Value="avance.Recurso_Id" class="form-control" />
         </div>
 
         <button type="submit" class="btn btn-primary">Guardar</button>
@@ -53,21 +42,20 @@
 
 @code {
     private CrearAvanceDTO avance = new CrearAvanceDTO();
-    private List<Recurso> listaRecursos = new(); // Lista para almacenar recursos
-
+    private List<Avance> listaAvances = new();
     protected override async Task OnInitializedAsync()
     {
         avance.Fecha = DateTime.Today;
-        await CargarRecursos();
+        await CargarAvances();
     }
 
-    private async Task CargarRecursos()
+    private async Task CargarAvances()
     {
-        // Llama al servicio para obtener la lista de recursos
-        var respuesta = await http.Get<List<Recurso>>("api/Recursos");
+        // Llama al servicio para obtener la lista de avances
+        var respuesta = await http.Get<List<Avance>>("api/Avances");
         if (!respuesta.Error)
         {
-            listaRecursos = respuesta.Respuesta;
+            listaAvances = respuesta.Respuesta;
         }
     }
 

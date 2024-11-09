@@ -1,6 +1,5 @@
 ﻿@page "/api/Unidades"
 @inject IHttpServicio http
-
 <style>
     .fondo {
         position: relative;
@@ -9,7 +8,7 @@
         background-position: center;
         background-repeat: no-repeat;
         height: 100vh;
-        color: white; /* Cambia el color del texto si es necesario */
+        color: white;
     }
 
         .fondo::after {
@@ -48,7 +47,7 @@
         }
 
         table td {
-            color: #333; /* Color negro oscuro para el texto en las celdas */
+            color: #333;
         }
 
         table th, table td {
@@ -71,44 +70,32 @@
                 <th>Nombre</th>
                 <th>Descripción</th>
                 <th>Costo</th>
+                <th>Acciones</th>
             </tr>
-            @if (Mensaje == "")
+            @if (listaUnidades == null)
             {
-                @if (listaUnidades == null)
-                {
-                    <p>Buscando....</p>
-                }
-                else if (listaUnidades.Count == 0)
-                {
-                    <p>No existen unidades</p>
-                }
-                else
-                {
-                    @foreach (var item in listaUnidades)
-                    {
-                        <tr>
-                            <td>@item.Nombre</td>
-                            <td>@item.Descripcion</td>
-                            <td>@item.Costo</td>
-                            <td>
-                                <a class="btn btn-primary"
-                                   href="api/Unidades/editar/@item.Id">
-                                    Editar
-                                </a>
-                            </td>
-                            <td>
-                                <button class="btn btn-danger"
-                                        @onclick="() => Eliminar(item)">
-                                    Borrar
-                                </button>
-                            </td>
-                        </tr>
-                    }
-                }
+                <p>Buscando....</p>
+            }
+            else if (listaUnidades.Count == 0)
+            {
+                <p>No existen unidades</p>
             }
             else
             {
-                <p> Error: @Mensaje</p>
+                @foreach (var item in listaUnidades)
+                {
+                    <tr>
+                        <td>@item.Nombre</td>
+                        <td>@item.Descripcion</td>
+                        <td>@item.Costo</td>
+                        <td>
+                            <a class="btn btn-primary" href="/api/Unidades/editar/@item.Id">Editar</a>
+                        </td>
+                        <td>
+                            <button class="btn btn-danger" @onclick="() => Eliminar(item)">Borrar</button>
+                        </td>
+                    </tr>
+                }
             }
         </table>
 

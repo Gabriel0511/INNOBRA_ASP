@@ -3,12 +3,8 @@
 @inject NavigationManager nav
 @using INNOBRA_ASP.Shared.DTO
 
-<style>
-    /* Estilos existentes aquí */
-</style>
-
-<div class="fondo"></div>
-<div class="overlay"></div>
+<div class="fondo"></div> <!-- Fondo que cubre toda la pantalla -->
+<div class="overlay"></div> <!-- Capa semitransparente -->
 <div class="contenedor-formulario">
     <h3>Editar Recurso</h3>
 
@@ -50,15 +46,8 @@
         </div>
 
         <div class="form-group">
-            <label>Unidad:</label>
-            <InputSelect @bind-Value="recurso.Unidad_Id" class="form-control">
-                <option value="">Selecciona una unidad</option>
-                @foreach (var unidad in listaUnidades)
-                {
-                    <option value="@unidad.Id">@unidad.Nombre</option>
-                }
-            </InputSelect>
-            <ValidationMessage For="@(() => recurso.Unidad_Id)" />
+            <label>Unidad ID:</label>
+            <InputNumber class="form-control" @bind-Value="recurso.Unidad_Id" />
         </div>
 
         <br />
@@ -72,13 +61,11 @@
 @code {
     [Parameter] public int recursoId { get; set; }
     private EditarRecursoDTO recurso = new EditarRecursoDTO();
-    private List<Unidad> listaUnidades = new List<Unidad>();
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
         await Mostrar();
-        await CargarUnidades();
     }
 
     private async Task Mostrar()
@@ -92,15 +79,6 @@
         else
         {
             nav.NavigateTo("/api/Recursos");
-        }
-    }
-
-    private async Task CargarUnidades()
-    {
-        var respuesta = await http.Get<List<Unidad>>("api/Unidades");
-        if (!respuesta.Error)
-        {
-            listaUnidades = respuesta.Respuesta;
         }
     }
 

@@ -10,15 +10,15 @@ namespace INNOBRA_ASP.DB.Data.Entity
 {
     public class ItemRenglon : EntityBase
     {
-        [Required(ErrorMessage = "El MaterialPrevisto es obligatorio.")]
+        [Required(ErrorMessage = "El material previsto es obligatorio.")]
         public string MaterialPrevisto { get; set; }
 
-        [Required(ErrorMessage = "El MaterialPrevisto es obligatorio.")]
+        [Required(ErrorMessage = "la cantidad es obligatoria.")]
         public string Cantidad { get; set; }
 
         //Clave Foranea
 
-        public int Items_idItems { get; set; }
+        public int Item_Id { get; set; }
 
         public Item Item { get; set; }
 

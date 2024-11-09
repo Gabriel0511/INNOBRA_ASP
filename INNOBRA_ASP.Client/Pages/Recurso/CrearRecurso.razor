@@ -4,41 +4,6 @@
 @using System.Net.Http.Json
 @inject NavigationManager nav
 
-<style>
-    /* Estilos del fondo y formulario */
-    .fondo {
-        ...
-    }
-
-    .overlay {
-        ...
-    }
-
-    .contenedor-formulario {
-        ...
-    }
-
-    h3 {
-        ...
-    }
-
-    .form-control {
-        ...
-    }
-
-    table {
-        ...
-    }
-
-    th, td {
-        ...
-    }
-
-    .btn-primary, .btn-secondary {
-        ...
-    }
-</style>
-
 <div class="fondo"></div>
 <div class="overlay"></div>
 <div class="contenedor-formulario">
@@ -75,14 +40,8 @@
         </div>
 
         <div>
-            <label>Unidad:</label>
-            <InputSelect @bind-Value="recurso.Unidad_Id" class="form-control">
-                <option value="">Seleccione una unidad</option>
-                @foreach (var unidad in listaUnidades)
-                {
-                    <option value="@unidad.Id">@unidad.Nombre</option>
-                }
-            </InputSelect>
+            <label>Unidad ID:</label>
+            <InputNumber @bind-Value="recurso.Unidad_Id" class="form-control" />
         </div>
 
         <button type="submit" class="btn btn-primary">Guardar</button>
@@ -93,12 +52,10 @@
 @code {
     private CrearRecursoDTO recurso = new CrearRecursoDTO();
     private List<Avance> listaRecursos = new();
-    private List<Unidad> listaUnidades = new();
 
     protected override async Task OnInitializedAsync()
     {
         await CargarRecursos();
-        await CargarUnidades();
     }
 
     private async Task CargarRecursos()
@@ -107,15 +64,6 @@
         if (!respuesta.Error)
         {
             listaRecursos = respuesta.Respuesta;
-        }
-    }
-
-    private async Task CargarUnidades()
-    {
-        var respuesta = await http.Get<List<Unidad>>("api/Unidades");
-        if (!respuesta.Error)
-        {
-            listaUnidades = respuesta.Respuesta;
         }
     }
 

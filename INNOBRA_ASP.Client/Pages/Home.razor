@@ -111,12 +111,13 @@
 
     private void Login()
     {
-        // Verificar si las credenciales son "admin" y "admin"
-        if (username == "admin" && password == "admin")
-            if (username == "Lucia" && password == "3516663047")
-                if (username == "Stefano" && password == "3572403100")
-                    if (username == "Gabriel" && password == "2975207696")
-                        if (username == "Pablo" && password == "3515407201")
+
+        // Verificar si las credenciales son válidas para alguno de los usuarios
+        if ((username == "admin" && password == "admin") ||
+            (username == "Lucia" && password == "3516663047") ||
+            (username == "Stefano" && password == "3572403100") ||
+            (username == "Gabriel" && password == "2975207696") ||
+            (username == "Pablo" && password == "3515407201"))
         {
             isLoggedIn = true;
             loginFailed = false;
