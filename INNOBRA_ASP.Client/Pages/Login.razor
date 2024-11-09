@@ -1,37 +1,58 @@
-﻿@page "/login"
+﻿@page "/Login"
 @inject NavigationManager NavigationManager
+@inject IJSRuntime js
 
 <h3>Iniciar Sesión</h3>
 
-<div class="login-container">
-    <form @onsubmit="HandleLogin">
-        <div class="form-group">
-            <label for="username">Usuario</label>
-            <input type="text" id="username" @bind="username" class="form-control" required />
-        </div>
+<div class="container">
+    <img src="images/innobra-logo.PNG" alt="logo Innobra" class="logo" />
+    <div class="formulario">
+        <form @onsubmit="HandleLogin">
+            <div class="username">
+                <input type="email" @bind="username" placeholder=" " required />
+                <label for="">Email</label>
+            </div>
+            <div class="username">
+                <input type="password" @bind="password" placeholder=" " required />
+                <label for="">Contraseña</label>
+            </div>
+            <input type="submit" value="Iniciar Sesión" />
+        </form>
 
-        <div class="form-group">
-            <label for="password">Contraseña</label>
-            <input type="password" id="password" @bind="password" class="form-control" required />
-        </div>
-
-        <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
-    </form>
-
-    @if (!string.IsNullOrEmpty(errorMessage))
-    {
-        <p class="text-danger">@errorMessage</p>
-    }
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <p class="text-danger">@errorMessage</p>
+        }
+    </div>
 </div>
 
+<script>
+    function openModal() {
+        document.getElementById("modal").style.display = "block";
+    }
+
+    function closeModal() {
+        document.getElementById("modal").style.display = "none";
+    }
+
+    // Cerrar el modal si se hace clic fuera de él
+    window.onclick = function (event) {
+        const modal = document.getElementById("modal");
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
+</script>
+
 <style>
-    .login-container {
-        max-width: 400px;
-        margin: 0 auto;
-        padding: 20px;
-        background-color: rgba(255, 255, 255, 0.8); /* Fondo semi-transparente */
-        border-radius: 8px;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    body {
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(150deg, #091c43, #0a265c);
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 </style>
 
