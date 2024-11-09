@@ -22,7 +22,7 @@
     }
     else if (listaObras != null && listaObras.Any())
     {
-        <table>
+        <table class="table-obras">
             <thead>
                 <tr>
                     <th scope="col">Nombre</th>
@@ -38,8 +38,8 @@
                     <tr>
                         <td>
                             <div class="d-flex justify-content-between">
-                                <span>   @obra.Nombre</span>
-                                <button class="btn btn-info btn-sm" @onclick="() => TogglePresupuestos(obra)">
+                                <span>@obra.Nombre</span>
+                                <button class="btn btn-info btn-sm" @onclick="() => TogglePresupuestos(obra)" title="Ver Presupuestos">
                                     <i class="bi bi-chevron-down"></i>
                                 </button>
                             </div>
@@ -57,30 +57,46 @@
                             }
                         </td>
                         <td>
-                            <a class="btn btn-warning btn-sm" href="/api/Presupuestos/crear/@obra.Id"><i class="bi bi-pencil"></i></a>
-                            <a class="btn btn-warning btn-sm" href="/api/Obras/editar/@obra.Id"><i class="bi bi-pencil"></i></a>
-                            <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(obra.Id)"><i class="bi bi-trash3"></i></button>
+                            <a class="btn btn-success btn-sm" href="/api/Presupuestos/crear/@obra.Id" title="Agregar Presupuesto"><i class="bi bi-plus"></i></a>
+                            <a class="btn btn-warning btn-sm" href="/api/Obras/editar/@obra.Id" title="Editar"><i class="bi bi-pencil"></i></a>
+                            <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(obra.Id)" title="Eliminar"><i class="bi bi-trash3"></i></button>
                         </td>
                     </tr>
 
-                    <!-- Mostrar presupuestos cuando la obra está seleccionada -->
-                    @if (obraSeleccionada?.Id == obra.Id && showPresupuestos)
+                    @if (obraSeleccionada?.Id == obra.Id)
                     {
-                        @foreach (var presupuesto in presupuestos.Where(p => p.Obra_Id == obra.Id))
-                        {
-                            <tr>
-                                <td colspan="5">
-                                    <div class="d-flex justify-content-between">
-                                        <span>@presupuesto.Nombre</span>
-                                        <div>
-                                            <a class="btn btn-warning btn-sm" href="/api/Presupuestos/editar/@presupuesto.Id"><i class="bi bi-pencil"></i></a>
-                                            <button class="btn btn-danger btn-sm" @onclick="() => EliminarPresupuesto(presupuesto.Id)"><i class="bi bi-trash3"></i></button>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
+                        <tr>
+                            <td colspan="5">
+                                <div class="expandable @(showPresupuestos ? "" : "collapsed")">
+                                    <table class="table-presupuestos">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Presupuesto</th>
+                                                <th scope="col">Fecha Inicio Prevista</th>
+                                                <th scope="col">Fecha Fin Prevista</th>
+                                                <th scope="col">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var presupuesto in presupuestos.Where(p => p.Obra_Id == obra.Id))
+                                            {
+                                                <tr>
+                                                    <td>@presupuesto.Nombre</td>
+                                                    <td>@presupuesto.FechaInicioPrevista.ToString("dd-MM-yyyy")</td>
+                                                    <td>@presupuesto.FechaFinPrevista.ToString("dd-MM-yyyy")</td>
+                                                    <td>
+                                                        <a class="btn btn-warning btn-sm" href="/api/Presupuestos/editar/@presupuesto.Id"><i class="bi bi-pencil"></i></a>
+                                                        <button class="btn btn-danger btn-sm" @onclick="() => EliminarPresupuesto(presupuesto.Id)"><i class="bi bi-trash3"></i></button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
                     }
+
                 }
             </tbody>
         </table>
@@ -96,6 +112,12 @@
         <i class="bi bi-building-fill-add"></i> Crear Obra
     </a>
 </div>
+
+<style>
+    .table-obras, .table-presupuestos {
+        width: 100%;
+    }
+</style>
 
 @code {
     List<Obra> listaObras = new List<Obra>();
@@ -176,8 +198,9 @@
 
     private async Task Eliminar(int id)
     {
-        bool confirmado = await js.InvokeAsync<bool>("confirm", "¿Estás seguro de que deseas eliminar esta obra?");
-        if (confirmado)
+        var resultado = await js.InvokeAsync<bool>("confirmSwal");
+
+        if (resultado)
         {
             try
             {
@@ -196,7 +219,9 @@
                 Mensaje = $"Ocurrió un error al eliminar la obra: {ex.Message}";
             }
         }
+
     }
+
 
     private async Task EliminarPresupuesto(int presupuestoId)
     {

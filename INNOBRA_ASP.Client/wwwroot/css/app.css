@@ -301,3 +301,15 @@ input[type="submit"] {
         border-color: #257b97;
         transition: .5s;
     }
+
+/* CSS para animar la apertura de presupuestos */
+.expandable {
+    max-height: 500px; /* Ajusta el valor según el contenido esperado */
+    transition: max-height 0.4s ease-in-out;
+    overflow: hidden;
+}
+
+    .expandable.collapsed {
+        max-height: 0;
+    }
+
