@@ -4,7 +4,80 @@
 @using System.Net.Http.Json
 @inject NavigationManager nav
 
-<h3>Editar Item Tipo Renglon</h3>
+<style>
+    .fondo {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('/images/fondo.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        z-index: -2;
+    }
+
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: -1;
+    }
+
+    .contenedor {
+        position: relative;
+        z-index: 1;
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 15px;
+        padding: 20px;
+        max-width: 800px;
+        margin: auto;
+        color: black;
+        margin-top: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: center;
+    }
+
+    th {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .btn-primary, .btn-danger {
+        border: none;
+        border-radius: 5px;
+        padding: 8px 12px;
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+    }
+</style>
+
+<div class="fondo"></div>
+<div class="overlay"></div>
+<div class="contenedor-formulario">
+
+    <h3>Editar Item Tipo Renglon</h3>
 
 <!-- Formulario para Editar ItemTipoRenglon -->
 <EditForm Model="@itemRenglonTipo" OnValidSubmit="Actualizar">
@@ -12,28 +85,58 @@
     <ValidationSummary />
 
     <div>
-        <label>Item Tipo ID:</label>
-        <InputNumber @bind-Value="itemRenglonTipo.Item_Tipos_Id" />
+        <label>Item Tipo:</label>
+        <select @bind="itemRenglonTipo.Item_Tipos_Id" class="form-select">
+            <option value="">Seleccione un Item Tipo</option>
+            @foreach (var item in itemTipos)
+            {
+                <option value="@item.Id">@item.Nombre</option>
+            }
+        </select>
     </div>
 
     <div>
-        <label>Recurso ID:</label>
-        <InputNumber @bind-Value="itemRenglonTipo.Recurso_Id" />
+        <label>Recurso:</label>
+        <select @bind="itemRenglonTipo.Recurso_Id" class="form-select">
+            <option value="">Seleccione un Recurso</option>
+            @foreach (var recurso in recursos)
+            {
+                <option value="@recurso.Id">@recurso.Nombre</option>
+            }
+        </select>
     </div>
 
     <button type="submit" class="btn btn-primary">Guardar Cambios</button>
     <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
 </EditForm>
+</div>
 
 <hr />
 
 @code {
     [Parameter] public int id { get; set; } // ID del ItemTipoRenglon a editar
     private CrearItemRenglonTipoDTO itemRenglonTipo = new CrearItemRenglonTipoDTO();
+    private List<ItemTipo> itemTipos = new List<ItemTipo>();
+    private List<Recurso> recursos = new List<Recurso>();
 
     protected override async Task OnInitializedAsync()
     {
+        // Cargar el ItemTipoRenglon a editar
         await CargarItemTipoRenglon();
+
+        // Llamar a la API para obtener los ItemTipos
+        var respuestaItemTipos = await http.Get<List<ItemTipo>>("api/ItemTipos");
+        if (!respuestaItemTipos.Error)
+        {
+            itemTipos = respuestaItemTipos.Respuesta;
+        }
+
+        // Llamar a la API para obtener los Recursos
+        var respuestaRecursos = await http.Get<List<Recurso>>("api/Recursos");
+        if (!respuestaRecursos.Error)
+        {
+            recursos = respuestaRecursos.Respuesta;
+        }
     }
 
     private async Task CargarItemTipoRenglon()
