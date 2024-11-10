@@ -81,7 +81,7 @@
         }
         else
         {
-            mensajeError = "Error al cargar los items.";
+            mensajeError = "Error al cargar los items renglones.";
         }
     }
 
@@ -132,7 +132,7 @@
 
             // Redirigir a la página de lista después de un breve retraso
             await Task.Delay(1500);
-            nav.NavigateTo("Api/ItemRenglones");
+            nav.NavigateTo("/api/Obras");
         }
         else
         {
@@ -160,6 +160,6 @@
 
     private void Cancelar()
     {
-        nav.NavigateTo("/Api/ItemRenglones");
+        nav.NavigateTo("/api/Obras");
     }
 }

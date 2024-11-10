@@ -3,6 +3,7 @@
 @using INNOBRA_ASP.Shared.DTO
 @using System.Net.Http.Json
 @inject NavigationManager nav
+@inject MensajeService mensajeService
 
 <style>
     /* Fondo */
@@ -185,15 +186,32 @@
     private async Task Grabar()
     {
         var httpRespuesta = await http.Post<CrearRecursoDTO>("api/Recursos", recurso);
-        if (httpRespuesta.Error)
+
+        if (!httpRespuesta.Error)
         {
-            var body = httpRespuesta.HttpResponseMessage;
+            // Si se crea correctamente, establecer el mensaje
+            mensajeService.Mensaje = "Unidad agregada con éxito.";
+
+            // Redirigir a la página de lista después de un breve retraso
+            await Task.Delay(1500);
+            nav.NavigateTo("/api/Obras");
         }
-        nav.NavigateTo("/api/Recursos");
+        else
+        {
+            // Si ocurre un error, establecer el mensaje de error
+            var errorContent = await httpRespuesta.HttpResponseMessage.Content.ReadAsStringAsync();
+            mensajeService.Mensaje = $"Error: {errorContent}";
+        }
+
+        // if (httpRespuesta.Error)
+        // {
+        //     var body = httpRespuesta.HttpResponseMessage;
+        // }
+        // nav.NavigateTo("/api/Recursos");
     }
 
     private void Cancelar()
     {
-        nav.NavigateTo("/api/Recursos");
+        nav.NavigateTo("/api/Obras");
     }
 }

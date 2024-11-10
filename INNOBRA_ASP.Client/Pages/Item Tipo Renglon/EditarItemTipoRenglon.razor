@@ -151,7 +151,7 @@
         else
         {
             // Manejo del error en caso de fallo en la carga
-            nav.NavigateTo("/api/ItemTipoRenglon");
+            nav.NavigateTo("/api/Obras");
         }
     }
 
@@ -169,7 +169,7 @@
 
             // Redirigimos a la página de lista de
             await Task.Delay(500); // Espera para mostrar el mensaje
-            nav.NavigateTo("/api/ItemTipoRenglon");
+            nav.NavigateTo("/api/Obras");
         }
         else
         {
@@ -189,6 +189,6 @@
 
     private void Cancelar()
     {
-        nav.NavigateTo("/api/ItemTipoRenglon");
+        nav.NavigateTo("/api/Obras");
     }
 }

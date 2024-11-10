@@ -54,7 +54,7 @@
         }
         else
         {
-            nav.NavigateTo("/api/ItemsRenglones");
+            nav.NavigateTo("/api/Obras");
         }
     }
 
@@ -72,7 +72,7 @@
 
             // Redirigimos a la página de lista de
             await Task.Delay(500); // Espera para mostrar el mensaje
-            nav.NavigateTo("/Api/ItemsRenglones");
+            nav.NavigateTo("/api/Obras");
         }
         else
         {
@@ -94,6 +94,6 @@
 
     private void Cancelar()
     {
-        nav.NavigateTo("/api/ItemsRenglones");
+        nav.NavigateTo("/api/Obras");
     }
 }
