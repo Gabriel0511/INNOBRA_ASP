@@ -304,7 +304,7 @@
         }
     }
 
-    private void ToggleItems(Presupuesto presupuesto)
+    private async Task ToggleItems(Presupuesto presupuesto)
     {
         if (presupuestoSeleccionado == presupuesto)
         {
@@ -314,8 +314,10 @@
         {
             presupuestoSeleccionado = presupuesto;
             showItems = true;
+            await LeerItems();  // Cargar los items cuando se selecciona un presupuesto
         }
     }
+
 
     private async Task Eliminar(int id)
     {
