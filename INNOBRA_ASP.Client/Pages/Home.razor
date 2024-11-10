@@ -1,137 +1,46 @@
-﻿@page "/"
+﻿@page "/Home"
 @inject NavigationManager nav
 
 <PageTitle>Home</PageTitle>
 
-<style>
-    html, body {
-        height: 100%; /* Asegura que el body ocupe todo el alto */
-        margin: 0;
-    }
+<div class="fondo"></div>
+<div class="overlay"></div>
 
-    .home-background {
-        background-image: url('/images/InnObra.jpg');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        color: white;
-        text-align: center;
-    }
+<div class="contenedor-formulario">
 
-    .overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro semitransparente */
-    }
+    <PageTitle>Sobre Nosotros</PageTitle>
 
-    .content {
-        position: relative;
-        z-index: 1;
-        padding: 20px;
-    }
-
-    .buttons {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        margin-top: 20px;
-    }
-
-    .btn {
-        padding: 10px;
-        background-color: #1e88e5;
-        color: white;
-        border: none;
-        cursor: pointer;
-        border-radius: 5px;
-        font-size: 16px;
-    }
-
-        .btn:hover {
-            background-color: #1565c0;
+    <style>
+        .about-content {
+            padding: 20px;
+            text-align: center;
         }
 
-    .login-form {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        margin-top: 20px;
-    }
-
-    .input-field {
-        padding: 10px;
-        font-size: 16px;
-        border-radius: 5px;
-        border: 1px solid #ddd;
-    }
-</style>
-
-<div class="home-background">
-    <div class="overlay"></div> <!-- Fondo oscuro -->
-    <div class="content">
-        <h1>InnObra</h1>
-        <p>Construyendo tu futuro.</p>
-
-        @if (!isLoggedIn)
-        {
-            <!-- Formulario de login -->
-            <div class="login-form">
-                <input class="input-field" type="text" placeholder="Usuario" @bind="username" />
-                <input class="input-field" type="password" placeholder="Contraseña" @bind="password" />
-                <button class="btn" @onclick="Login">Iniciar sesión</button>
-                @if (loginFailed)
-                {
-                    <p style="color:red;">Usuario o contraseña incorrectos</p>
-                }
-            </div>
+        h2 {
+            color: #1e88e5;
         }
-        else
-        {
-            <!-- Mostrar el botón "Sobre nosotros" después de iniciar sesión -->
-            <div class="buttons">
-                <button class="btn" @onclick="GoToAbout">Sobre nosotros</button>
-            </div>
+
+        p {
+            font-size: 18px;
         }
+
+        /* Centrar la imagen */
+        .contenedor-formulario img {
+            display: block;
+            margin: 0 auto; /* Centra la imagen */
+            max-width: 100%; /* Asegura que la imagen no sobrepase el contenedor */
+        }
+
+    </style>
+
+    <div class="about-content">
+        <h2>Sobre InnObra</h2>
+        <p>En InnObra, nos dedicamos a la construcción de proyectos innovadores para el futuro.</p>
+        <p>Nuestra misión es ofrecer soluciones efectivas y accesibles para todos nuestros clientes, siempre con un enfoque en la calidad y la seguridad.</p>
+        <p>¡Gracias por confiar en nosotros!</p>
     </div>
+
+    <img src="/images/INNOBRA-logo.jpg" width="400" height="auto" alt="Alternate Text" />
+
 </div>
-
-@code {
-    private string username = string.Empty;
-    private string password = string.Empty;
-    private bool isLoggedIn = false;
-    private bool loginFailed = false;
-
-    private void Login()
-    {
-
-        // Verificar si las credenciales son válidas para alguno de los usuarios
-        if ((username == "admin" && password == "admin") ||
-            (username == "Lucia" && password == "3516663047") ||
-            (username == "Stefano" && password == "3572403100") ||
-            (username == "Gabriel" && password == "2975207696") ||
-            (username == "Pablo" && password == "3515407201"))
-        {
-            isLoggedIn = true;
-            loginFailed = false;
-        }
-        else
-        {
-            loginFailed = true;
-        }
-    }
-
-    // Navegación para el botón "Sobre nosotros"
-    private void GoToAbout()
-    {
-        nav.NavigateTo("/about");
-    }
-}
 

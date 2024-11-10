@@ -2,134 +2,136 @@
 @inject IHttpServicio http
 @inject IJSRuntime js
 
-<style>
-    /* Configura la imagen de fondo para ocupar toda la pantalla */
-    .fondo {
-        position: fixed; /* Cambia a fixed para mantener el fondo detrás al hacer scroll */
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-image: url('/images/fondo.png');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        z-index: -2; /* Asegura que el fondo esté detrás de todos los elementos */
-    }
-    /* Capa semitransparente */
-    .overlay {
-        position: fixed; /* También cambia a fixed para estar alineado con el fondo */
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: -1; /* Debe estar detrás del contenedor principal */
-    }
-    /* Contenedor principal */
-    .contenedor {
-        position: relative;
-        z-index: 1; /* Por encima de fondo y overlay */
-        background-color: rgba(255, 255, 255, 0.8);
-        border-radius: 15px;
-        padding: 20px;
-        max-width: 800px;
-        margin: auto;
-        color: black;
-        margin-top: 20px;
-    }
-    /* Estilo de la tabla */
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    th, td {
-        padding: 10px;
-        border: 1px solid #ddd;
-        text-align: center;
-    }
-
-    th {
-        background-color: #007bff;
-        color: white;
-    }
-
-    .btn-primary, .btn-danger {
-        border: none;
-        border-radius: 5px;
-        padding: 8px 12px;
-        color: white;
-        text-decoration: none;
-    }
-
-    .btn-primary {
-        background-color: #007bff;
-    }
-
-    .btn-danger {
-        background-color: #dc3545;
-    }
-</style>
-
 <div class="fondo"></div>
 <div class="overlay"></div>
-    <div class="contenedor">
-        <h3>Obras</h3>
+<div class="contenedor-formulario">
+    <h3>Obras</h3>
 
-        @if (!string.IsNullOrEmpty(Mensaje))
-        {
-            <div class="alert alert-danger" role="alert">
-                @Mensaje
-            </div>
-        }
+    @if (!string.IsNullOrEmpty(Mensaje))
+    {
+        <div class="alert alert-danger" role="alert">
+            @Mensaje
+        </div>
+    }
 
-        @if (cargando)
-        {
-            <div class="spinner-border" role="status">
-                <span class="visually-hidden">Cargando...</span>
-            </div>
-        }
-        else if (listaObras != null && listaObras.Any())
-        {
-            <table>
-                <thead>
+    @if (cargando)
+    {
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+    }
+    else if (listaObras != null && listaObras.Any())
+    {
+        <table class="table-obras">
+            <thead>
+                <tr>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Fecha Inicio</th>
+                    <th scope="col">Fecha Fin</th>
+                    <th scope="col">Imagen</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var obra in listaObras)
+                {
                     <tr>
-                        <th scope="col">Nombre</th>
-                        <th scope="col">Fecha Inicio</th>
-                        <th scope="col">Fecha Fin</th>
-                        <th scope="col">Acciones</th>
+                        <td>
+                            <div class="d-flex justify-content-between">
+                                <span>@obra.Nombre</span>
+                                <button class="btn btn-info btn-sm" @onclick="() => TogglePresupuestos(obra)" title="Ver Presupuestos">
+                                    <i class="bi bi-chevron-down"></i>
+                                </button>
+                            </div>
+                        </td>
+                        <td>@obra.FechaInicio.ToString("dd-MM-yyyy")</td>
+                        <td>@obra.FechaFin.ToString("dd-MM-yyyy")</td>
+                        <td>
+                            @if (obra.Imagen != null && obra.Imagen.Length > 0)
+                            {
+                                <img src="data:image/png;base64,@Convert.ToBase64String(obra.Imagen)" alt="Imagen de la obra" style="width: 100px; height: auto;" />
+                            }
+                            else
+                            {
+                                <span>No disponible</span>
+                            }
+                        </td>
+                        <td>
+                            <a class="btn btn-success btn-sm" href="/api/Presupuestos/crear/@obra.Id" title="Agregar Presupuesto"><i class="bi bi-plus"></i></a>
+                            <a class="btn btn-warning btn-sm" href="/api/Obras/editar/@obra.Id" title="Editar"><i class="bi bi-pencil"></i></a>
+                            <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(obra.Id)" title="Eliminar"><i class="bi bi-trash3"></i></button>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @foreach (var obra in listaObras)
+
+                    @if (obraSeleccionada?.Id == obra.Id)
                     {
                         <tr>
-                            <td>@obra.Nombre</td>
-                            <td>@obra.FechaInicio.ToString("dd-MM-yyyy")</td>
-                            <td>@obra.FechaFin.ToString("dd-MM-yyyy")</td>
-                            <td>
-                                <a class="btn btn-warning btn-sm" href="/api/Obras/editar/@obra.Id"><i class="bi bi-pencil"></i></a>
-                                <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(obra.Id)"><i class="bi bi-trash3"></i></button>
+                            <td colspan="5">
+                                <div class="expandable @(showPresupuestos ? "" : "collapsed")">
+                                    @if (presupuestos.Where(p => p.Obra_Id == obra.Id).Any())
+                                    {
+                                        <table class="table-presupuestos">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Presupuesto</th>
+                                                    <th scope="col">Fecha Inicio Prevista</th>
+                                                    <th scope="col">Fecha Fin Prevista</th>
+                                                    <th scope="col">Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var presupuesto in presupuestos.Where(p => p.Obra_Id == obra.Id))
+                                                {
+                                                    <tr>
+                                                        <td>@presupuesto.Nombre</td>
+                                                        <td>@presupuesto.FechaInicioPrevista.ToString("dd-MM-yyyy")</td>
+                                                        <td>@presupuesto.FechaFinPrevista.ToString("dd-MM-yyyy")</td>
+                                                        <td>
+                                                            <a class="btn btn-warning btn-sm" href="/api/Presupuestos/editar/@presupuesto.Id"><i class="bi bi-pencil"></i></a>
+                                                            <button class="btn btn-danger btn-sm" @onclick="() => EliminarPresupuesto(presupuesto.Id)"><i class="bi bi-trash3"></i></button>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    }
+                                    else
+                                    {
+                                        <div class="alert alert-info" role="alert">
+                                            Esta obra no tiene presupuestos disponibles.
+                                        </div>
+                                    }
+                                </div>
                             </td>
                         </tr>
                     }
-                </tbody>
-            </table>
-        }
-        else
-        {
-            <div class="alert alert-warning" role="alert">
-                No hay obras disponibles.
-            </div>
-        }
-    <a class="btn btn-primary" href="/api/Obras/crear">
-        <i class="bi bi-building-fill-add"></i> Crear Obra
-    </a>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-warning" role="alert">
+            No hay obras disponibles.
         </div>
+    }
+    <br />
+    <a class="btn btn-success btn-sm" href="/api/Obras/crear">
+        <i class="bi bi-plus-circle"></i> Agregar Obra
+    </a>
+</div>
+
+<style>
+    .table-obras, .table-presupuestos {
+        width: 100%;
+    }
+</style>
 
 @code {
     List<Obra> listaObras = new List<Obra>();
+    List<Presupuesto> presupuestos = new List<Presupuesto>();
+    Obra obraSeleccionada;
+    bool showPresupuestos = false;
     string Mensaje = "";
     bool cargando = true;
 
@@ -137,6 +139,7 @@
     {
         await base.OnInitializedAsync();
         await Leer();
+        await LeerPresupuestos();
     }
 
     private async Task Leer()
@@ -166,10 +169,46 @@
         }
     }
 
+    private async Task LeerPresupuestos()
+    {
+        try
+        {
+            var resp = await http.Get<List<Presupuesto>>("api/Presupuestos");
+            if (!resp.Error)
+            {
+                presupuestos = resp.Respuesta;
+            }
+            else
+            {
+                Mensaje = await resp.ObtenerError();
+            }
+        }
+        catch (Exception ex)
+        {
+            Mensaje = $"Ocurrió un error al cargar los presupuestos: {ex.Message}";
+        }
+    }
+
+    private void TogglePresupuestos(Obra obra)
+    {
+        if (obraSeleccionada == obra)
+        {
+            // Si la obra seleccionada es la misma, la ocultamos
+            showPresupuestos = !showPresupuestos;
+        }
+        else
+        {
+            // Si no es la misma obra, mostramos los presupuestos
+            obraSeleccionada = obra;
+            showPresupuestos = true;
+        }
+    }
+
     private async Task Eliminar(int id)
     {
-        bool confirmado = await js.InvokeAsync<bool>("confirm", "¿Estás seguro de que deseas eliminar esta obra?");
-        if (confirmado)
+        var resultado = await js.InvokeAsync<bool>("confirmSwal");
+
+        if (resultado)
         {
             try
             {
@@ -186,6 +225,32 @@
             catch (Exception ex)
             {
                 Mensaje = $"Ocurrió un error al eliminar la obra: {ex.Message}";
+            }
+        }
+
+    }
+
+
+    private async Task EliminarPresupuesto(int presupuestoId)
+    {
+        var resultado = await js.InvokeAsync<bool>("confirmSwal");
+        if (resultado)
+        {
+            try
+            {
+                var resp = await http.Delete($"api/Presupuestos/{presupuestoId}");
+                if (!resp.Error)
+                {
+                    await LeerPresupuestos(); // Recargar los presupuestos después de eliminar
+                }
+                else
+                {
+                    Mensaje = await resp.ObtenerError();
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensaje = $"Ocurrió un error al eliminar el presupuesto: {ex.Message}";
             }
         }
     }

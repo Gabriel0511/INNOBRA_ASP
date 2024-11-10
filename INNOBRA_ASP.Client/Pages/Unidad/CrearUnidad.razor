@@ -4,33 +4,40 @@
 @using System.Net.Http.Json
 @inject NavigationManager nav
 
-<h3>Gestión de Unidades</h3>
+<div class="fondo"></div>
+<div class="overlay"></div>
+
+<div class="contenedor-formulario">
+<h3>Agregar Unidad</h3>
 
 <!-- Formulario para Crear/Editar Unidad -->
 <EditForm Model="@unidad" OnValidSubmit="Grabar">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
-    <div>
+    <div class="mb-3">
         <label>Nombre:</label>
         <InputText @bind-Value="unidad.Nombre" />
+        <ValidationMessage For="@(() => unidad.Nombre)" />
     </div>
 
-    <div>
+    <div class="mb-3">
         <label>Descripcion:</label>
         <InputText @bind-Value="unidad.Descripcion" />
+        <ValidationMessage For="@(() => unidad.Descripcion)" />
     </div>
 
-    <div>
+    <div class="mb-3">
         <label>Costo:</label>
         <InputNumber @bind-Value="unidad.Costo" />
+        <ValidationMessage For="@(() => unidad.Costo)" />
     </div>
 
     <button type="submit" class="btn btn-primary">Guardar</button>
     <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
 </EditForm>
 
-<hr />
+</div>
 
 
 @code {
@@ -65,6 +72,6 @@
 
     private void Cancelar()
     {
-
+        nav.NavigateTo("/api/Unidades");
     }
 }

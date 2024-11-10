@@ -1,57 +1,67 @@
 ﻿@page "/api/ItemRenglones"
 @inject IHttpServicio http
 
-<div class="fondo">
-    <div class="contenido">
+<div class="fondo"></div>
+    <div class="overlay"></div>
 
-<h3>Items Renglones</h3>
+<div class="contenedor-formulario">
 
-@if (listaItemsRenglones != null && listaItemsRenglones.Any())
-{
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th scope="col">Material Previsto</th>
-                <th scope="col">Cantidad</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var itemRenglon in listaItemsRenglones)
-            {
+    <h3>Items Renglones</h3>
+
+    @if (listaItemsRenglones != null && listaItemsRenglones.Any())
+    {
+        <table>
+            <thead>
                 <tr>
-                    <td>@itemRenglon.MaterialPrevisto</td>
-                    <td>@itemRenglon.Cantidad</td>
-                    <td>
-                        <a class="btn btn-warning btn-sm" href="/api/ItemRenglones/editar/@itemRenglon.Id">Editar</a>
-                        <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(itemRenglon.Id)">Eliminar</button>
-                    </td>
+                    <th scope="col">Material Previsto</th>
+                    <th scope="col">Cantidad</th>
+                    <th scope="col">Item</th>
+                    <th scope="col">Recurso</th>
+                    <th scope="col">Acciones</th>
                 </tr>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <div class="alert alert-warning" role="alert">
-        No hay items renglones registrados.
-    </div>
-}
+            </thead>
+            <tbody>
+                @foreach (var itemRenglon in listaItemsRenglones)
+                {
+                    <tr>
+                        <td>@itemRenglon.MaterialPrevisto</td>
+                        <td>@itemRenglon.Cantidad</td>
+                        <td>@itemRenglon.Item_Id</td>
+                        <td>@MostrarNombreRecurso(itemRenglon.Recursos_Id)</td>
+                        <td>
+                            <a class="btn btn-warning btn-sm" href="/api/ItemRenglones/editar/@itemRenglon.Id">Editar</a>
+                            <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(itemRenglon.Id)">Eliminar</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-warning" role="alert">
+            No hay items renglones registrados.
+        </div>
+    }
 
-<a class="btn btn-primary" href="/api/ItemRenglones/Crear">
-    <i class="bi bi-plus-circle"></i> Crear Item Renglon
-</a>
+    <br/>
 
-    </div>
+    <a class="btn btn-primary" href="/api/ItemRenglones/Crear">
+        <i class="bi bi-plus-circle"></i> Crear Item Renglon
+    </a>
+
 </div>
 
 @code {
     List<ItemRenglon> listaItemsRenglones = new List<ItemRenglon>();
+    List<Recurso> listaRecursos = new List<Recurso>();
     string Mensaje = "";
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
         await Leer();
+        await CargarRecurso();
     }
 
     private async Task Leer()
@@ -65,6 +75,21 @@ else
         {
             Mensaje = await resp.ObtenerError();
         }
+    }
+
+    private async Task CargarRecurso()
+    {
+        var respuesta = await http.Get<List<Recurso>>("api/Recursos");
+        if (!respuesta.Error)
+        {
+            listaRecursos = respuesta.Respuesta;
+        }
+    }
+
+    private string MostrarNombreRecurso(int RecursoId)
+    {
+        var recurso = listaRecursos?.FirstOrDefault(r => r.Id == RecursoId);
+        return recurso?.Nombre ?? "Sin asignar";
     }
 
     private async Task Eliminar(int id)
