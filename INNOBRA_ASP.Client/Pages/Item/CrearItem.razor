@@ -1,12 +1,15 @@
-﻿@page "/Api/Items/crear"
+﻿@page "/Api/Items/crear/{id:int}"
 @inject IHttpServicio http
 @using INNOBRA_ASP.Shared.DTO
 @using System.Net.Http.Json
 @inject NavigationManager nav
 @inject MensajeService mensajeService
+@inject NavigationManager NavigationManager
 
-<div class="fondo">
-    <div class="contenido">
+
+<div class="fondo"></div>
+    <div class="overlay"></div>
+    <div class="contenedor-formulario">
 
 <h3>Crear Item</h3>
 
@@ -23,7 +26,7 @@
 
     <div class="mb-3">
         <label>Tiempo Estimado:</label>
-        <InputNumber @bind-Value="item.Tiempo_estimado" />
+        <InputNumber class="form-control" @bind-Value="item.Tiempo_estimado" />
         <ValidationMessage For="@(() => item.Tiempo_estimado)" />
     </div >
 
@@ -43,7 +46,7 @@
 
     <div class="mb-3">
         <label>Material Estimado:</label>
-        <InputNumber @bind-Value="item.Material_estimado" />
+        <InputNumber class="form-control" @bind-Value="item.Material_estimado" />
         <ValidationMessage For="@(() => item.Material_estimado)" />
     </div >
 
@@ -57,7 +60,11 @@
                     <option value="@itemTipo.Id">@itemTipo.Nombre</option>
                 }
             </select>
-            <ValidationMessage For="@(() => item.Item_Tipos_Id)" />
+                <button class="btn btn-secondary" @onclick="() => NavigateToCrearItemTipo()" title="Crear nuevo Item Tipo">
+                    <i class="bi bi-plus"></i> Crear
+                </button>
+
+                <ValidationMessage For="@(() => item.Item_Tipos_Id)" />
         </div>
     </div>
 
@@ -81,10 +88,12 @@
 </EditForm>
 
     </div>
-</div>
 
 @code {
-    private Item item = new Item();
+    [Parameter] public int id { get; set; }
+    [Parameter] public int idPresupuesto { get; set; }
+    private CrearItemDTO item = new CrearItemDTO();
+    private Presupuesto presupuestoSeleccionado;
     private List<Item> listaItems = new();
     private List<ItemTipo> itemTipos = new List<ItemTipo>();
     private List<Presupuesto> presupuestos = new List<Presupuesto>();
@@ -97,6 +106,18 @@
         await CargarItems();
         await CargarItemsTipos();
         await CargarPresupuesto();
+
+        // Asignar la obra seleccionada a la propiedad presupuesto.Obra_Id
+        presupuestoSeleccionado = presupuestos.FirstOrDefault(p => p.Id == id);
+
+        if (presupuestoSeleccionado != null)
+        {
+            item.Presupuesto_Id = presupuestoSeleccionado.Id; // Asigna el ID del presupuesto seleccionado al item
+        }
+        else
+        {
+            mensajeError = "Presupuesto no encontrado.";
+        }
     }
 
     private async Task CargarItems()
@@ -140,6 +161,19 @@
         }
     }
 
+    private Item MapearACrearItem(CrearItemDTO dto)
+    {
+        return new Item
+            {
+                Tiempo_estimado = dto.Tiempo_estimado,
+                Unidad_Tiempo = dto.Unidad_Tiempo,
+                Material_estimado = dto.Material_estimado,
+                Item_Tipos_Id = dto.Item_Tipos_Id,
+                Presupuesto_Id = dto.Presupuesto_Id
+            };
+    }
+
+
     private async Task Grabar()
     {
         if (item.Item_Tipos_Id == 0 || item.Presupuesto_Id == 0)
@@ -148,7 +182,8 @@
             return;
         }
 
-        var httpRespuesta = await http.Post<Item>("Api/Items", item);
+        // Mapear el DTO a la entidad Item
+        var itemEntidad = MapearACrearItem(item);
 
         if (!httpRespuesta.Error)
         {
@@ -176,9 +211,13 @@
         // }
     }
 
+    private void NavigateToCrearItemTipo()
+    {
+        NavigationManager.NavigateTo("/api/ItemTipos/crear");
+    }
 
     private void Cancelar()
     {
-        nav.NavigateTo("/Api/Items");
+        nav.NavigateTo("/api/Obras");
     }
 }

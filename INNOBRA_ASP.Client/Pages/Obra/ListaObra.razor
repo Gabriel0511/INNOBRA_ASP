@@ -42,11 +42,13 @@
                 {
                     <tr>
                         <td>
-                            <div class="d-flex justify-content-between">
-                                <span>@obra.Nombre</span>
-                                <button class="btn btn-info btn-sm" @onclick="() => TogglePresupuestos(obra)" title="Ver Presupuestos">
-                                    <i class="bi bi-chevron-down"></i>
-                                </button>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="flex-grow-1">@obra.Nombre</span>
+                                <div style="flex-shrink: 0;">
+                                    <button class="btn btn-info btn-sm" @onclick="() => TogglePresupuestos(obra)" title="Ver Presupuestos">
+                                        <i class="bi bi-chevron-down"></i>
+                                    </button>
+                                </div>
                             </div>
                         </td>
                         <td>@obra.FechaInicio.ToString("dd-MM-yyyy")</td>
@@ -88,14 +90,69 @@
                                                 @foreach (var presupuesto in presupuestos.Where(p => p.Obra_Id == obra.Id))
                                                 {
                                                     <tr>
-                                                        <td>@presupuesto.Nombre</td>
+                                                        <td>
+                                                            <div class="d-flex justify-content-between align-items-center">
+                                                                <span class="flex-grow-1">@presupuesto.Nombre</span>
+                                                                <div style="flex-shrink: 0;">
+                                                                    <button class="btn btn-info btn-sm" @onclick="() => ToggleItems(presupuesto)" title="Ver Nombre">
+                                                                        <i class="bi bi-chevron-down"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </td>
                                                         <td>@presupuesto.FechaInicioPrevista.ToString("dd-MM-yyyy")</td>
                                                         <td>@presupuesto.FechaFinPrevista.ToString("dd-MM-yyyy")</td>
                                                         <td>
+                                                            <a class="btn btn-success btn-sm" href="/Api/Items/crear/@presupuesto.Id" title="Agregar Items"><i class="bi bi-plus"></i></a>
                                                             <a class="btn btn-warning btn-sm" href="/api/Presupuestos/editar/@presupuesto.Id"><i class="bi bi-pencil"></i></a>
                                                             <button class="btn btn-danger btn-sm" @onclick="() => EliminarPresupuesto(presupuesto.Id)"><i class="bi bi-trash3"></i></button>
                                                         </td>
                                                     </tr>
+
+                                                    @if (presupuestoSeleccionado?.Id == presupuesto.Id)
+                                                    {
+                                                        <tr>
+                                                            <td colspan="4">
+                                                                <div class="expandable @(showItems ? "" : "collapsed")">
+                                                                    @if (items.Where(i => i.Presupuesto_Id == presupuesto.Id).Any())
+                                                                    {
+                                                                        <table class="table-presupuestos">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th scope="col">Tiempo estimado</th>
+                                                                                    <th scope="col">Unidad Tiempo</th>
+                                                                                    <th scope="col">Material estimado</th>
+                                                                                    <th scope="col">Tipo de item</th>
+                                                                                    <th scope="col">Acciones</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                @foreach (var item in items.Where(i => i.Presupuesto_Id == presupuesto.Id))
+                                                                                {
+                                                                                    <tr>
+                                                                                        <td>@item.Tiempo_estimado</td>
+                                                                                        <td>@item.Unidad_Tiempo</td>
+                                                                                        <td>@item.Material_estimado</td>
+                                                                                        <td></td>
+                                                                                        <td>
+                                                                                            <a class="btn btn-warning btn-sm" href="/Api/Items/editar/@item.Id"><i class="bi bi-pencil"></i></a>
+                                                                                            <button class="btn btn-danger btn-sm" @onclick="() => EliminarItem(item.Id)"><i class="bi bi-trash3"></i></button>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                }
+                                                                            </tbody>
+                                                                        </table>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <div class="alert alert-info" role="alert">
+                                                                            Este presupuesto no tiene items disponibles.
+                                                                        </div>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    }
                                                 }
                                             </tbody>
                                         </table>
@@ -127,16 +184,29 @@
 </div>
 
 <style>
-    .table-obras, .table-presupuestos {
-        width: 100%;
-    }
+/* Estilos para restringir datos largos en celdas de tabla */
+.table-obras td, .table-presupuestos td {
+    word-wrap: break-word;
+    word-break: break-word;
+    white-space: normal;
+    max-width: 150px; /* Ajusta este valor según el ancho máximo deseado */
+    overflow: hidden;
+}
+
+/* Opcional: ajustar también el ancho de las columnas de encabezado si es necesario */
+.table-obras th, .table-presupuestos th {
+    max-width: 150px;
+}
 </style>
 
 @code {
     List<Obra> listaObras = new List<Obra>();
     List<Presupuesto> presupuestos = new List<Presupuesto>();
+    List<Item> items = new List<Item>();
     Obra obraSeleccionada;
+    Presupuesto presupuestoSeleccionado;
     bool showPresupuestos = false;
+    bool showItems = false;
     string Mensaje = "";
     bool cargando = true;
 
@@ -199,6 +269,26 @@
         }
     }
 
+    private async Task LeerItems()
+    {
+        try
+        {
+            var resp = await http.Get<List<Item>>("Api/Items");
+            if (!resp.Error)
+            {
+                items = resp.Respuesta;
+            }
+            else
+            {
+                Mensaje = await resp.ObtenerError();
+            }
+        }
+        catch (Exception ex)
+        {
+            Mensaje = $"Ocurrió un error al cargar los items: {ex.Message}";
+        }
+    }
+
     private void TogglePresupuestos(Obra obra)
     {
         if (obraSeleccionada == obra)
@@ -211,6 +301,19 @@
             // Si no es la misma obra, mostramos los presupuestos
             obraSeleccionada = obra;
             showPresupuestos = true;
+        }
+    }
+
+    private void ToggleItems(Presupuesto presupuesto)
+    {
+        if (presupuestoSeleccionado == presupuesto)
+        {
+            showItems = !showItems;
+        }
+        else
+        {
+            presupuestoSeleccionado = presupuesto;
+            showItems = true;
         }
     }
 
@@ -252,6 +355,30 @@
                 if (!resp.Error)
                 {
                     await LeerPresupuestos(); // Recargar los presupuestos después de eliminar
+                }
+                else
+                {
+                    Mensaje = await resp.ObtenerError();
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensaje = $"Ocurrió un error al eliminar el presupuesto: {ex.Message}";
+            }
+        }
+    }
+
+    private async Task EliminarItem(int itemId)
+    {
+        var resultado = await js.InvokeAsync<bool>("confirmSwal");
+        if (resultado)
+        {
+            try
+            {
+                var resp = await http.Delete($"Api/Items/{itemId}");
+                if (!resp.Error)
+                {
+                    await LeerItems();
                 }
                 else
                 {
