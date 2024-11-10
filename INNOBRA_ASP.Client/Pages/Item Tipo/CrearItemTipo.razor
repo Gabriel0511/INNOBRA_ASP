@@ -4,64 +4,96 @@
 @using System.Net.Http.Json
 @inject NavigationManager nav
 
-<h3>Gestión de ItemTipo</h3>
+<div class="fondo"></div>
+<div class="overlay"></div>
+<div class="contenedor-formulario">
+    <h3>Gestión de ItemTipo</h3>
 
-<!-- Formulario para Crear/Editar Unidad -->
-<EditForm Model="@itemtipo" OnValidSubmit="Grabar">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+    @if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <div class="alert alert-danger" role="alert">
+            @mensajeError
+        </div>
+    }
 
-    <div>
-        <label>Codigo:</label>
-        <InputText @bind-Value="itemtipo.Codigo" />
-    </div>
+    <!-- Formulario para Crear/Editar Unidad -->
+    <EditForm Model="@itemtipo" OnValidSubmit="Grabar">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
-    <div>
-        <label>Nombre:</label>
-        <InputText @bind-Value="itemtipo.Nombre" />
-    </div>
-    <div>
-        <label>Unidad :</label>
-        <InputNumber @bind-Value="itemtipo.Unidad_Id" />
-    </div>
+        <div class="mb-3">
+            <label>Codigo:</label>
+            <InputText @bind-Value="itemtipo.Codigo" />
+            <ValidationMessage For="@(() => itemtipo.Codigo)" />
+        </div>
 
-    <button type="submit" class="btn btn-primary">Guardar</button>
-    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-</EditForm>
+        <div class="mb-3">
+            <label>Nombre:</label>
+            <InputText @bind-Value="itemtipo.Nombre" />
+            <ValidationMessage For="@(() => itemtipo.Nombre)" />
+        </div>
 
-<hr />
+        <div class="mb-3">
+            <label>Unidad:</label>
+            <div>
+                <select class="form-control" @bind="itemtipo.Unidad_Id">
+                    <option value="">Seleccione la unidad</option>
+                    @foreach (var unidad in unidades)
+                    {
+                        <option value="@unidad.Id">@unidad.Nombre</option>
+                    }
+                </select>
+                <ValidationMessage For="@(() => itemtipo.Unidad_Id)" />
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+    </EditForm>
+</div>
 
 @code {
+    [Parameter] public int id { get; set; }
     private CrearItemTipoDTO itemtipo = new CrearItemTipoDTO();
-    private List<CrearItemTipo> listaItemTipo = new();
+    private List<Unidad> unidades = new List<Unidad>();  // Lista de unidades
+    private string mensajeError;
 
     protected override async Task OnInitializedAsync()
     {
-        await CargarItemTipo();
+        await CargarUnidades();
     }
 
-    private async Task CargarItemTipo()
+    // Cargar unidades de la API
+    private async Task CargarUnidades()
     {
-        // Llama al servicio para obtener la lista de unidades
-        var respuesta = await http.Get<List<CrearItemTipo>>("api/ItemTipos");
+        var respuesta = await http.Get<List<Unidad>>("api/Unidades");
         if (!respuesta.Error)
         {
-            listaItemTipo = respuesta.Respuesta;
+            unidades = respuesta.Respuesta;
+        }
+        else
+        {
+            mensajeError = "Error al cargar las unidades.";
         }
     }
 
+    // Guardar ItemTipo
     private async Task Grabar()
     {
         var httpRespuesta = await http.Post<CrearItemTipoDTO>("api/ItemTipos", itemtipo);
         if (httpRespuesta.Error)
         {
-            var body = httpRespuesta.HttpResponseMessage;
+            mensajeError = $"Error al guardar el ItemTipo: {httpRespuesta.HttpResponseMessage.ReasonPhrase}";
         }
-        nav.NavigateTo("/api/ItemTipos");
+        else
+        {
+            nav.NavigateTo($"/Api/Items/crear/{id}");
+        }
     }
 
+    // Cancelar y navegar a la lista de ItemTipos
     private void Cancelar()
     {
-        nav.NavigateTo("/api/ItemTipos");
+        nav.NavigateTo($"/Api/Items/crear/{id}");
     }
 }

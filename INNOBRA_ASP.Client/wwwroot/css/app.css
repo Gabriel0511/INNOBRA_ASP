@@ -224,6 +224,7 @@ th {
         opacity: 1; /* Efecto hover */
     }
 
+
 /* CSS para animar la apertura de presupuestos */
 .expandable {
     max-height: 500px; /* Ajusta el valor según el contenido esperado */
