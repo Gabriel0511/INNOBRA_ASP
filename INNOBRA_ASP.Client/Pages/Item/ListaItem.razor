@@ -1,5 +1,10 @@
 ﻿@page "/Api/Items"
 @inject IHttpServicio http
+@inject MensajeService mensajeService
+
+<div class="alert alert-info" style="display: @(!string.IsNullOrEmpty(mensajeService.Mensaje) ? "block" : "none")">
+    @mensajeService.Mensaje
+</div> @* Muestra el mensaje que se actualizò con exito. *@
 
 <div class="fondo"></div>
     <div class="overlay"></div>
@@ -64,6 +69,11 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        if (!string.IsNullOrEmpty(mensajeService.Mensaje))
+        {
+            await Task.Delay(3000);  // Espera 3 segundos
+            mensajeService.Mensaje = string.Empty;  // Borra el mensaje
+        }
         await Leer();
         await CargarItemTipo();
         await CargarPresupuesto();

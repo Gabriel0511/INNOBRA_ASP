@@ -63,7 +63,7 @@
         var httpRespuesta = await http.Post<Unidad>("api/Unidades", unidad);
         if (!httpRespuesta.Error)
         {
-            // Si la unidad se crea correctamente, establecer el mensaje
+            // Si se crea correctamente, establecer el mensaje
             mensajeService.Mensaje = "Unidad agregada con éxito.";
 
             // Redirigir a la página de lista después de un breve retraso

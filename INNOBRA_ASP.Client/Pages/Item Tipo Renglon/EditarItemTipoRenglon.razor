@@ -3,6 +3,7 @@
 @using INNOBRA_ASP.Shared.DTO
 @using System.Net.Http.Json
 @inject NavigationManager nav
+@inject MensajeService mensajeService
 
 <style>
     .fondo {
@@ -157,14 +158,33 @@
     private async Task Actualizar()
     {
         var respuesta = await http.Put($"api/ItemTipoRenglon/{id}", itemRenglonTipo);
+
         if (!respuesta.Error)
         {
+            // Actualizamos el mensaje globalmente a través del servicio
+            mensajeService.Mensaje = "Se actualizó con éxito el item tipo renglon.";
+
+            // Forzamos el renderizado (opcional, pero puede ser útil)
+            StateHasChanged();
+
+            // Redirigimos a la página de lista de
+            await Task.Delay(1500); // Espera para mostrar el mensaje
             nav.NavigateTo("/api/ItemTipoRenglon");
         }
         else
         {
-            // Manejo de error en caso de fallo en la actualización
+            var errorContent = await respuesta.HttpResponseMessage.Content.ReadAsStringAsync();
+            mensajeService.Mensaje = $"Error: {errorContent}";
         }
+
+        // if (!respuesta.Error)
+        // {
+        //     nav.NavigateTo("/api/ItemTipoRenglon");
+        // }
+        // else
+        // {
+        //     // Manejo de error en caso de fallo en la actualización
+        // }
     }
 
     private void Cancelar()

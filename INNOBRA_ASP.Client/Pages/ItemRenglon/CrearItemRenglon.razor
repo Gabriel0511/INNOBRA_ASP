@@ -3,6 +3,8 @@
 @using INNOBRA_ASP.Shared.DTO
 @using System.Net.Http.Json
 @inject NavigationManager nav
+@inject MensajeService mensajeService
+
 
 <h3>Crear Item Renglon</h3>
 
@@ -123,14 +125,30 @@
 
         var httpRespuesta = await http.Post<ItemRenglon>("Api/ItemRenglones", itemRenglon);
 
-        if (httpRespuesta.Error)
+        if (!httpRespuesta.Error)
         {
-            mensajeError = $"Error al guardar el item: {httpRespuesta.HttpResponseMessage.ReasonPhrase}";
+            // Si se crea correctamente, establecer el mensaje
+            mensajeService.Mensaje = "Item tipo renglon agregado con éxito.";
+
+            // Redirigir a la página de lista después de un breve retraso
+            await Task.Delay(1500);
+            nav.NavigateTo("Api/ItemRenglones");
         }
         else
         {
-            nav.NavigateTo("/Api/ItemRenglones");
+            // Si ocurre un error, establecer el mensaje de error
+            var errorContent = await httpRespuesta.HttpResponseMessage.Content.ReadAsStringAsync();
+            mensajeService.Mensaje = $"Error: {errorContent}";
         }
+
+        // if (httpRespuesta.Error)
+        // {
+        //     mensajeError = $"Error al guardar el item: {httpRespuesta.HttpResponseMessage.ReasonPhrase}";
+        // }
+        // else
+        // {
+        //     nav.NavigateTo("/Api/ItemRenglones");
+        // }
         
         // var httpRespuesta = await http.Post<ItemRenglon>("Api/ItemsRenglones", itemRenglon);
         // if (httpRespuesta.Error)

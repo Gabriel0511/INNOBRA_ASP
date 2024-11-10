@@ -1,6 +1,7 @@
 ﻿@page "/api/Avances/editar/{avanceId:int}"
 @inject IHttpServicio http
 @inject NavigationManager nav
+@inject MensajeService mensajeService
 @using INNOBRA_ASP.Shared.DTO
 
 <style>
@@ -161,16 +162,37 @@
         {
             listaRecursos = respuesta.Respuesta;
         }
+
     }
 
     private async Task Grabar()
     {
         var httpRespuesta = await http.Put<EditarAvanceDTO>($"api/Avances/{avanceId}", avance);
+        
         if (httpRespuesta.Error)
         {
-            var body = httpRespuesta.HttpResponseMessage;
+            // Actualizamos el mensaje globalmente a través del servicio
+            mensajeService.Mensaje = "Se actualizó con éxito el avance.";
+
+            // Forzamos el renderizado (opcional, pero puede ser útil)
+            StateHasChanged();
+
+            // Redirigimos a la página de lista de
+            await Task.Delay(1500); // Espera para mostrar el mensaje
+            nav.NavigateTo("/api/Avances");
         }
-        nav.NavigateTo("/api/Avances");
+        else
+        {
+            var errorContent = await httpRespuesta.HttpResponseMessage.Content.ReadAsStringAsync();
+            mensajeService.Mensaje = $"Error: {errorContent}";
+        }
+        
+        // if (httpRespuesta.Error)
+        // {
+        //     var body = httpRespuesta.HttpResponseMessage;
+        // }
+        //nav.NavigateTo("/api/Avances");
+       
     }
 
     private void Cancelar()

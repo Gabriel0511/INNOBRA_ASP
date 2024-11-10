@@ -3,8 +3,7 @@
 @using INNOBRA_ASP.Shared.DTO
 @using System.Net.Http.Json
 @inject NavigationManager nav
-
-
+@inject MensajeService mensajeService
 
 <h3>Editar Item Renglon</h3>
 
@@ -65,14 +64,32 @@
 
         if (!respuesta.Error)
         {
-            mensaje = "Se cargó con éxito el item renglon.";
+            // Actualizamos el mensaje globalmente a través del servicio
+            mensajeService.Mensaje = "Se actualizó con éxito el item tipo renglon.";
+
+            // Forzamos el renderizado (opcional, pero puede ser útil)
+            StateHasChanged();
+
+            // Redirigimos a la página de lista de
+            await Task.Delay(1500); // Espera para mostrar el mensaje
             nav.NavigateTo("/Api/ItemsRenglones");
         }
         else
         {
             var errorContent = await respuesta.HttpResponseMessage.Content.ReadAsStringAsync();
-            mensaje = $"Error: {errorContent}"; // Muestra el error
+            mensajeService.Mensaje = $"Error: {errorContent}";
         }
+
+        // if (!respuesta.Error)
+        // {
+        //     mensaje = "Se cargó con éxito el item renglon.";
+        //     nav.NavigateTo("/Api/ItemsRenglones");
+        // }
+        // else
+        // {
+        //     var errorContent = await respuesta.HttpResponseMessage.Content.ReadAsStringAsync();
+        //     mensaje = $"Error: {errorContent}"; // Muestra el error
+        // }
     }
 
     private void Cancelar()

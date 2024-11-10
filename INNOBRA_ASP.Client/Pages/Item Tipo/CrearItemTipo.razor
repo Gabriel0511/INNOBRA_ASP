@@ -3,6 +3,8 @@
 @using INNOBRA_ASP.Shared.DTO
 @using System.Net.Http.Json
 @inject NavigationManager nav
+@inject MensajeService mensajeService
+
 
 <h3>Gestión de ItemTipo</h3>
 
@@ -53,11 +55,28 @@
     private async Task Grabar()
     {
         var httpRespuesta = await http.Post<CrearItemTipoDTO>("api/ItemTipos", itemtipo);
-        if (httpRespuesta.Error)
+
+        if (!httpRespuesta.Error)
         {
-            var body = httpRespuesta.HttpResponseMessage;
+            // Si el item tipo se crea correctamente, establecer el mensaje
+            mensajeService.Mensaje = "Item tipo agregado con éxito.";
+
+            // Redirigir a la página de lista después de un breve retraso
+            await Task.Delay(1500);
+            nav.NavigateTo("/api/ItemTipos");
         }
-        nav.NavigateTo("/api/ItemTipos");
+        else
+        {
+            // Si ocurre un error, establecer el mensaje de error
+            var errorContent = await httpRespuesta.HttpResponseMessage.Content.ReadAsStringAsync();
+            mensajeService.Mensaje = $"Error: {errorContent}";
+        }
+
+        // if (httpRespuesta.Error)
+        // {
+        //     var body = httpRespuesta.HttpResponseMessage;
+        // }
+        // nav.NavigateTo("/api/ItemTipos");
     }
 
     private void Cancelar()

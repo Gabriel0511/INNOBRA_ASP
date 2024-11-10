@@ -3,7 +3,7 @@
 @using INNOBRA_ASP.Shared.DTO
 @using System.Net.Http.Json
 @inject NavigationManager nav
-
+@inject MensajeService mensajeService
 
 <div class="fondo"></div>
 <div class="overlay"></div>
@@ -124,14 +124,31 @@
         }
 
         var httpRespuesta = await http.Post<Presupuesto>("api/Presupuestos", presupuesto);
-        if (httpRespuesta.Error)
+
+        if (!httpRespuesta.Error)
         {
-            mensajeError = "Hubo un error al guardar el presupuesto.";
+            // Si se crea correctamente, establecer el mensaje
+            mensajeService.Mensaje = "Presupuesto agregado con éxito.";
+
+            // Redirigir a la página de lista después de un breve retraso
+            await Task.Delay(1500);
+            nav.NavigateTo("/api/Obras");
         }
         else
         {
-            nav.NavigateTo("/api/Presupuestos");
+            // Si ocurre un error, establecer el mensaje de error
+            var errorContent = await httpRespuesta.HttpResponseMessage.Content.ReadAsStringAsync();
+            mensajeService.Mensaje = $"Error: {errorContent}";
         }
+
+        // if (httpRespuesta.Error)
+        // {
+        //     mensajeError = "Hubo un error al guardar el presupuesto.";
+        // }
+        // else
+        // {
+        //     nav.NavigateTo("/api/Presupuestos");
+        // }
     }
 
     private void Cancelar()
