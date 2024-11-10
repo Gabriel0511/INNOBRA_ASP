@@ -30,10 +30,10 @@ namespace INNOBRA_ASP.Server.Controllers
             return await repositorio.Select();
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<Unidad>> Get(int id)
+        [HttpGet("GetById/{id:int}")]
+        public async Task<ActionResult<Unidad>> GetById(int id)
         {
-            Unidad? sel = await repositorio.SelectById(id);
+            var sel = await repositorio.SelectById(id);
             if (sel == null)
             {
                 return NotFound();

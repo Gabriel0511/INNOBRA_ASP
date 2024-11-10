@@ -3,6 +3,7 @@
 @using INNOBRA_ASP.Shared.DTO
 @using System.Net.Http.Json
 @inject NavigationManager nav
+@inject MensajeService mensajeService
 @using Microsoft.AspNetCore.Components.Forms
 
 <div class="fondo"></div>
@@ -19,7 +20,6 @@
 
     <EditForm Model="@obra" OnValidSubmit="Actualizar">
         <DataAnnotationsValidator />
-        <ValidationSummary />
 
         <div class="mb-3">
             <label>Nombre:</label>
@@ -78,17 +78,24 @@
 
     private async Task Actualizar()
     {
-        var respuesta = await http.Put($"Api/Obras/{id}", obra);
+        var respuesta = await http.Put($"Api/obras/{id}", obra);
 
         if (!respuesta.Error)
         {
-            mensaje = "Se cargó con éxito la obra.";
+            // Actualizamos el mensaje globalmente a través del servicio
+            mensajeService.Mensaje = "Se actualizó con éxito la obra.";
+
+            // Forzamos el renderizado (opcional, pero puede ser útil)
+            StateHasChanged();
+
+            // Redirigimos a la página de lista de unidades
+            await Task.Delay(1500); // Espera para mostrar el mensaje
             nav.NavigateTo("/api/Obras");
         }
         else
         {
             var errorContent = await respuesta.HttpResponseMessage.Content.ReadAsStringAsync();
-            mensaje = $"Error: {errorContent}";
+            mensajeService.Mensaje = $"Error: {errorContent}";
         }
     }
 

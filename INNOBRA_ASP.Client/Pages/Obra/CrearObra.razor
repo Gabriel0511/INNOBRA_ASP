@@ -3,6 +3,7 @@
 @using INNOBRA_ASP.Shared.DTO
 @using System.Net.Http.Json
 @inject NavigationManager nav
+@inject MensajeService mensajeService
 @using Microsoft.AspNetCore.Components.Forms
 
 <div class="fondo"></div>
@@ -12,7 +13,6 @@
 
     <EditForm Model="@obra" OnValidSubmit="Grabar">
         <DataAnnotationsValidator />
-        <ValidationSummary />
 
         <div class="mb-3">
             <label>Nombre:</label>
@@ -66,11 +66,21 @@
     private async Task Grabar()
     {
         var httpRespuesta = await http.Post<Obra>("api/Obras", obra);
-        if (httpRespuesta.Error)
+        if (!httpRespuesta.Error)
         {
-            var body = httpRespuesta.HttpResponseMessage;
+            // Si la obra se crea correctamente, establecer el mensaje
+            mensajeService.Mensaje = "Obra agregada con éxito.";
+
+            // Redirigir a la página de lista después de un breve retraso
+            await Task.Delay(1500);
+            nav.NavigateTo("/api/Obras");
         }
-        nav.NavigateTo("/api/Obras");
+        else
+        {
+            // Si ocurre un error, establecer el mensaje de error
+            var errorContent = await httpRespuesta.HttpResponseMessage.Content.ReadAsStringAsync();
+            mensajeService.Mensaje = $"Error: {errorContent}";
+        }
     }
 
     private void Cancelar()

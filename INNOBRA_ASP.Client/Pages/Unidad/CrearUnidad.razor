@@ -3,75 +3,84 @@
 @using INNOBRA_ASP.Shared.DTO
 @using System.Net.Http.Json
 @inject NavigationManager nav
+@inject MensajeService mensajeService
+@using Microsoft.AspNetCore.Components.Forms
 
 <div class="fondo"></div>
 <div class="overlay"></div>
 
 <div class="contenedor-formulario">
-<h3>Agregar Unidad</h3>
 
-<!-- Formulario para Crear/Editar Unidad -->
-<EditForm Model="@unidad" OnValidSubmit="Grabar">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+    <h3>Agregar Unidad</h3>
 
-    <div class="mb-3">
-        <label>Nombre:</label>
-        <InputText @bind-Value="unidad.Nombre" />
-        <ValidationMessage For="@(() => unidad.Nombre)" />
-    </div>
+    <EditForm Model="@unidad" OnValidSubmit="Grabar">
+        <DataAnnotationsValidator />
 
-    <div class="mb-3">
-        <label>Descripcion:</label>
-        <InputText @bind-Value="unidad.Descripcion" />
-        <ValidationMessage For="@(() => unidad.Descripcion)" />
-    </div>
+        <div class="mb-3">
+            <label>Nombre:</label>
+            <InputText @bind-Value="unidad.Nombre" />
+            <ValidationMessage For="@(() => unidad.Nombre)" />
+        </div>
 
-    <div class="mb-3">
-        <label>Costo:</label>
-        <InputNumber @bind-Value="unidad.Costo" />
-        <ValidationMessage For="@(() => unidad.Costo)" />
-    </div>
+        <div class="mb-3">
+            <label>Descripcion:</label>
+            <InputText @bind-Value="unidad.Descripcion" />
+            <ValidationMessage For="@(() => unidad.Descripcion)" />
+        </div>
 
-    <button type="submit" class="btn btn-primary">Guardar</button>
-    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-</EditForm>
+        <div class="mb-3">
+            <label>Costo:</label>
+            <InputNumber  @bind-Value="unidad.Costo" />
+            <ValidationMessage For="@(() => unidad.Costo)" />
+        </div>
 
+
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+    </EditForm>
 </div>
 
-
 @code {
-    private CrearUnidadDTO unidad = new CrearUnidadDTO();
-    private List<CrearUnidadDTO> listaUnidades = new();
+    private Unidad unidad = new Unidad();
+    private List<Unidad> listaUnidad = new List<Unidad>();
 
     protected override async Task OnInitializedAsync()
     {
-        await CargarUnidades();
+        await CargarUnidad();
     }
 
-    private async Task CargarUnidades()
+    private async Task CargarUnidad()
     {
-        // Llama al servicio para obtener la lista de unidades
-        var respuesta = await http.Get<List<CrearUnidadDTO>>("api/Unidades");
+        var respuesta = await http.Get<List<Unidad>>("api/Unidades");
         if (!respuesta.Error)
         {
-            listaUnidades = respuesta.Respuesta;
+            listaUnidad = respuesta.Respuesta;
         }
     }
 
     private async Task Grabar()
     {
-        var httpRespuesta = await http.Post<CrearUnidadDTO>("api/Unidades", unidad);
-        if (httpRespuesta.Error)
+        var httpRespuesta = await http.Post<Unidad>("api/Unidades", unidad);
+        if (!httpRespuesta.Error)
         {
-            var body = httpRespuesta.HttpResponseMessage;
-        }
-        nav.NavigateTo("/api/Unidades");
-    }
+            // Si la unidad se crea correctamente, establecer el mensaje
+            mensajeService.Mensaje = "Unidad agregada con éxito.";
 
+            // Redirigir a la página de lista después de un breve retraso
+            await Task.Delay(1500);
+            nav.NavigateTo("/api/Unidades");
+        }
+        else
+        {
+            // Si ocurre un error, establecer el mensaje de error
+            var errorContent = await httpRespuesta.HttpResponseMessage.Content.ReadAsStringAsync();
+            mensajeService.Mensaje = $"Error: {errorContent}";
+        }
+    }
 
     private void Cancelar()
     {
         nav.NavigateTo("/api/Unidades");
     }
+
 }

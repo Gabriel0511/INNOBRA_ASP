@@ -15,7 +15,7 @@ namespace INNOBRA_ASP.Shared.DTO
         [Required(ErrorMessage = "El nombre es obligatorio.")]
         public string Nombre { get; set; }
 
-        public string Descripcion { get; set; }
+        public string? Descripcion { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal Costo { get; set; }
