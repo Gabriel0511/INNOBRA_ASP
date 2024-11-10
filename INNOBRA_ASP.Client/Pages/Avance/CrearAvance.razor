@@ -1,4 +1,4 @@
-﻿@page "/api/Avances/crear"
+﻿@page "/api/Avances/crear/{id:int}"
 @inject IHttpServicio http
 @using INNOBRA_ASP.Shared.DTO
 @using System.Net.Http.Json
@@ -8,31 +8,38 @@
 <div class="fondo"></div>
 <div class="overlay"></div>
 <div class="contenedor-formulario">
-    <h3>Gestión de Avances</h3>
+    <h3>Crear Avance</h3>
+
+    @if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <div class="alert alert-danger" role="alert">
+            @mensajeError
+        </div>
+    }
 
     <!-- Formulario para Crear/Editar Avance -->
     <EditForm Model="@avance" OnValidSubmit="Grabar">
         <DataAnnotationsValidator />
         <ValidationSummary />
 
-        <div>
+        <div class="mb-3">
             <label>Fecha:</label>
             <InputDate @bind-Value="avance.Fecha" class="form-control" />
         </div>
 
-        <div>
+        <div class="mb-3">
             <label>Material Ejecutado: (numero)</label>
             <InputText @bind-Value="avance.MaterialEjecutado" class="form-control" />
         </div>
 
         <!-- Selección de Item ID -->
-        <div>
+        <div class="mb-3">
             <label>Item ID:</label>
             <InputNumber @bind-Value="avance.Item_Id" class="form-control" />
         </div>
 
         <!-- Selección del Recurso por Nombre -->
-        <div>
+        <div class="mb-3">
             <label>Recurso:</label>
             <select @bind="avance.Recurso_Id" class="form-control">
                 <option value="">Seleccione un recurso</option>
@@ -49,13 +56,29 @@
 </div>
 
 @code {
+    [Parameter] public int id { get; set; }
     private CrearAvanceDTO avance = new CrearAvanceDTO();
+    private List<Item> items = new List<Item>();
+    private Item itemSeleccionado;
     private List<Recurso> listaRecursos = new(); // Lista para almacenar recursos
+
+    private string mensajeError;
 
     protected override async Task OnInitializedAsync()
     {
         avance.Fecha = DateTime.Today;
         await CargarRecursos();
+
+        itemSeleccionado = items.FirstOrDefault(p => p.Id == id);
+
+        if (itemSeleccionado != null)
+        {
+            avance.Item_Id = itemSeleccionado.Id; // Asigna el ID del presupuesto seleccionado al item
+        }
+        else
+        {
+            mensajeError = "Presupuesto no encontrado.";
+        }
     }
 
     private async Task CargarRecursos()
