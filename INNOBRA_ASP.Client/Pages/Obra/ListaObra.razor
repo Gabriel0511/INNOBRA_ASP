@@ -10,6 +10,7 @@
 <div class="fondo"></div>
 <div class="overlay"></div>
 <div class="contenedor-formulario">
+
     <h3>Obras</h3>
 
     @if (!string.IsNullOrEmpty(Mensaje))
@@ -136,7 +137,7 @@
                                                                                         <td>@MostrarItemTipos(item.Item_Tipos_Id)</td>
 
                                                                                         <td>
-                                                                                            <a class="btn btn-info btn-sm" href=""><i class="bi bi-list"></i></a>
+                                                                                            <a class="btn btn-info btn-sm" href="/api/Avances" title="Ver Avances"><i class="bi bi-list"></i></a>
                                                                                             <a class="btn btn-success btn-sm" href="" title="Agregar Avance"><i class="bi bi-plus"></i></a>
                                                                                             <a class="btn btn-warning btn-sm" href="/Api/Items/editar/@item.Id"><i class="bi bi-pencil"></i></a>
                                                                                             <button class="btn btn-danger btn-sm" @onclick="() => EliminarItem(item.Id)"><i class="bi bi-trash3"></i></button>
