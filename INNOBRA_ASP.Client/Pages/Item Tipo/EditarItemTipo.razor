@@ -54,7 +54,7 @@
         else
         {
             // Manejo del error en caso de fallo en la carga
-            nav.NavigateTo("/api/ItemTipos");
+            nav.NavigateTo("/api/Obras");
         }
     }
 
@@ -71,8 +71,8 @@
             StateHasChanged();
 
             // Redirigimos a la página de lista de
-            await Task.Delay(1500); // Espera para mostrar el mensaje
-            nav.NavigateTo("/api/ItemTipos");
+            await Task.Delay(500); // Espera para mostrar el mensaje
+            nav.NavigateTo("/api/Obras");
         }
         else
         {
@@ -93,6 +93,6 @@
 
     private void Cancelar()
     {
-        nav.NavigateTo("/api/ItemTipos");
+        nav.NavigateTo("/api/Obras");
     }
 }

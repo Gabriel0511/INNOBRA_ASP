@@ -82,7 +82,7 @@
         await base.OnInitializedAsync();
         if (!string.IsNullOrEmpty(mensajeService.Mensaje))
         {
-            await Task.Delay(3000);  // Espera 3 segundos
+            await Task.Delay(1500);  // Espera 3 segundos
             mensajeService.Mensaje = string.Empty;  // Borra el mensaje
         }
         await Leer();
