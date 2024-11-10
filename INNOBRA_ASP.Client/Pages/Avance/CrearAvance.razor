@@ -1,136 +1,45 @@
-﻿@page "/api/Avances/crear"
+﻿@page "/api/Avances/crear/{id:int}"
 @inject IHttpServicio http
 @using INNOBRA_ASP.Shared.DTO
 @using System.Net.Http.Json
 @inject NavigationManager nav
 @inject MensajeService mensajeService
 
-<style>
-    /* Fondo */
-    .fondo {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-image: url('/images/fondo.png');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        z-index: -2;
-    }
-    /* Capa semitransparente para oscurecer el fondo */
-    .overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro */
-        z-index: -1; /* Capa debajo del contenedor */
-    }
-    /* Contenedor principal de la página */
-    .contenedor-formulario {
-        position: relative;
-        z-index: 1;
-        background-color: rgba(255, 255, 255, 0.9); /* Fondo blanco semitransparente */
-        border-radius: 15px;
-        padding: 30px;
-        margin: 50px auto;
-        width: 90%;
-        max-width: 900px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra ligera */
-    }
-    /* Estilo del título */
-    h3 {
-        text-align: center;
-        color: #333;
-        font-family: 'Arial', sans-serif;
-        font-size: 2rem;
-        margin-bottom: 20px;
-    }
-    /* Estilos para los formularios */
-    .form-control {
-        width: 100%;
-        padding: 10px;
-        border-radius: 8px;
-        border: 1px solid #ddd;
-        margin-bottom: 15px;
-    }
-    /* Estilo para la tabla */
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    th, td {
-        padding: 10px;
-        border: 1px solid #ddd;
-        text-align: center;
-    }
-
-    th {
-        background-color: #007bff;
-        color: white;
-    }
-
-    .btn-primary, .btn-secondary {
-        border: none;
-        border-radius: 5px;
-        padding: 10px 15px;
-        color: white;
-        font-weight: bold;
-    }
-
-    .btn-primary {
-        background-color: #007bff;
-    }
-
-    .btn-secondary {
-        background-color: #6c757d;
-    }
-    /* Estilos para botones de cancelación */
-    .btn-primary:hover {
-        background-color: #0056b3;
-    }
-
-    .btn-secondary:hover {
-        background-color: #5a6268;
-    }
-    /* Estilos para el input de tipo Select */
-    .form-control.select {
-        padding: 8px;
-        border-radius: 8px;
-    }
-</style>
 <div class="fondo"></div>
 <div class="overlay"></div>
 <div class="contenedor-formulario">
-    <h3>Gestión de Avances</h3>
+    <h3>Crear Avance</h3>
+
+    @if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <div class="alert alert-danger" role="alert">
+            @mensajeError
+        </div>
+    }
 
     <!-- Formulario para Crear/Editar Avance -->
     <EditForm Model="@avance" OnValidSubmit="Grabar">
         <DataAnnotationsValidator />
         <ValidationSummary />
 
-        <div>
+        <div class="mb-3">
             <label>Fecha:</label>
             <InputDate @bind-Value="avance.Fecha" class="form-control" />
         </div>
 
-        <div>
+        <div class="mb-3">
             <label>Material Ejecutado: (numero)</label>
             <InputText @bind-Value="avance.MaterialEjecutado" class="form-control" />
         </div>
 
         <!-- Selección de Item ID -->
-        <div>
+        <div class="mb-3">
             <label>Item ID:</label>
             <InputNumber @bind-Value="avance.Item_Id" class="form-control" />
         </div>
 
         <!-- Selección del Recurso por Nombre -->
-        <div>
+        <div class="mb-3">
             <label>Recurso:</label>
             <select @bind="avance.Recurso_Id" class="form-control">
                 <option value="">Seleccione un recurso</option>
@@ -147,13 +56,29 @@
 </div>
 
 @code {
+    [Parameter] public int id { get; set; }
     private CrearAvanceDTO avance = new CrearAvanceDTO();
+    private List<Item> items = new List<Item>();
+    private Item itemSeleccionado;
     private List<Recurso> listaRecursos = new(); // Lista para almacenar recursos
+
+    private string mensajeError;
 
     protected override async Task OnInitializedAsync()
     {
         avance.Fecha = DateTime.Today;
         await CargarRecursos();
+
+        itemSeleccionado = items.FirstOrDefault(p => p.Id == id);
+
+        if (itemSeleccionado != null)
+        {
+            avance.Item_Id = itemSeleccionado.Id; // Asigna el ID del presupuesto seleccionado al item
+        }
+        else
+        {
+            mensajeError = "Presupuesto no encontrado.";
+        }
     }
 
     private async Task CargarRecursos()
