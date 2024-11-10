@@ -184,7 +184,10 @@
 
         // Mapear el DTO a la entidad Item
         var itemEntidad = MapearACrearItem(item);
+        //chan
+        // el de arriba me da error si pongo que sea Item y el de abajo si pongo que sea CrearItemDTO
 
+        var httpRespuesta = await http.Post<CrearItemDTO>("/Api/Items", item);
         if (!httpRespuesta.Error)
         {
             // Si el item se crea correctamente, establecer el mensaje
