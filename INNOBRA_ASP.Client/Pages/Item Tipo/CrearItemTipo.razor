@@ -89,7 +89,7 @@
             mensajeService.Mensaje = "Item tipo agregado con éxito.";
 
             // Redirigir a la página de lista después de un breve retraso
-            await Task.Delay(1500);
+            await Task.Delay(500);
             nav.NavigateTo("/api/Obras");
         }
         else
@@ -109,6 +109,6 @@
     // Cancelar y navegar a la lista de ItemTipos
     private void Cancelar()
     {
-        nav.NavigateTo($"/api/Obras");
+        nav.NavigateTo($"/Api/Items/crear/{id}");
     }
 }

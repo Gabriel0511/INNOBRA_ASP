@@ -133,7 +133,8 @@
                                                                                         <td>@item.Tiempo_estimado</td>
                                                                                         <td>@item.Unidad_Tiempo</td>
                                                                                         <td>@item.Material_estimado</td>
-                                                                                        <td></td>
+                                                                                        <td>@MostrarItemTipos(item.Item_Tipos_Id)</td>
+
                                                                                         <td>
                                                                                             <a class="btn btn-info btn-sm" href=""><i class="bi bi-list"></i></a>
                                                                                             <a class="btn btn-success btn-sm" href="" title="Agregar Avance"><i class="bi bi-plus"></i></a>
@@ -205,11 +206,13 @@
     List<Obra> listaObras = new List<Obra>();
     List<Presupuesto> presupuestos = new List<Presupuesto>();
     List<Item> items = new List<Item>();
+    List<ItemTipo> itemTipos = new List<ItemTipo>();
     Obra obraSeleccionada;
     Presupuesto presupuestoSeleccionado;
     bool showPresupuestos = false;
     bool showItems = false;
     string Mensaje = "";
+    string mensajeError;
     bool cargando = true;
 
     protected override async Task OnInitializedAsync()
@@ -220,6 +223,7 @@
             await Task.Delay(1500);  // Espera 3 segundos
             mensajeService.Mensaje = string.Empty;  // Borra el mensaje
         }
+        await CargarItemTipos();
         await Leer();
         await LeerPresupuestos();
     }
@@ -290,6 +294,22 @@
             Mensaje = $"Ocurrió un error al cargar los items: {ex.Message}";
         }
     }
+
+    private async Task CargarItemTipos()
+    {
+        var respuesta = await http.Get<List<ItemTipo>>("api/ItemTipos");
+        if (!respuesta.Error)
+        {
+            itemTipos = respuesta.Respuesta;
+        }
+    }
+
+    private string MostrarItemTipos(int itemTiposId)
+    {
+        var itemTipo = itemTipos?.FirstOrDefault(r => r.Id == itemTiposId);
+        return itemTipo?.Nombre ?? "Sin asignar";
+    }
+
 
     private void TogglePresupuestos(Obra obra)
     {

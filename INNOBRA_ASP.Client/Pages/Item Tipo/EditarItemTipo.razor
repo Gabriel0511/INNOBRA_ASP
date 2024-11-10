@@ -5,7 +5,9 @@
 @inject NavigationManager nav
 @inject MensajeService mensajeService
 
-
+<div class="fondo"></div>
+<div class="overlay"></div>
+<div class="contenedor-formulario">
 <h3>Editar Item Tipo</h3>
 
 <!-- Formulario para Editar ItemTipo -->
@@ -32,7 +34,7 @@
     <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
 </EditForm>
 
-<hr />
+</div>
 
 @code {
     [Parameter] public int id { get; set; } // ID del ItemTipo a editar

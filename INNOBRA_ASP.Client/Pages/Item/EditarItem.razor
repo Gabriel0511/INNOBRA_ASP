@@ -5,9 +5,10 @@
 @inject NavigationManager nav
 @inject MensajeService mensajeService
 
-<div class="fondo">
-    <div class="contenido">
+<div class="fondo"></div>
+<div class="overlay"></div>
 
+<div class="contenedor-formulario">
 <h3>Editar Item</h3>
 
 @if (!string.IsNullOrEmpty(mensaje))
@@ -52,7 +53,6 @@
 </EditForm>
 
     </div>
-</div>
 
 @code {
     [Parameter] public int id { get; set; }
