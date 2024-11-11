@@ -10,6 +10,8 @@ namespace INNOBRA_ASP.Shared.DTO
 {
     public class EditarUnidadDTO
     {
+        public int Id { get; set; }
+
         [Required(ErrorMessage = "El nombre es obligatorio.")]
         public string Nombre { get; set; }
     }

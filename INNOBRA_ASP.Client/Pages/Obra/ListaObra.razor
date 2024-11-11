@@ -120,10 +120,10 @@
                                                                         <table class="table-items">
                                                                             <thead>
                                                                                 <tr>
+                                                                                    <th scope="col">Tipo de item</th>
                                                                                     <th scope="col">Tiempo estimado</th>
                                                                                     <th scope="col">Unidad Tiempo</th>
                                                                                     <th scope="col">Material estimado</th>
-                                                                                    <th scope="col">Tipo de item</th>
                                                                                     <th scope="col">Acciones</th>
                                                                                 </tr>
                                                                             </thead>
@@ -131,10 +131,10 @@
                                                                                 @foreach (var item in items.Where(i => i.Presupuesto_Id == presupuesto.Id))
                                                                                 {
                                                                                     <tr>
+                                                                                        <td>@MostrarItemTipos(item.Item_Tipos_Id)</td>
                                                                                         <td>@item.Tiempo_estimado</td>
                                                                                         <td>@item.Unidad_Tiempo</td>
                                                                                         <td>@item.Material_estimado</td>
-                                                                                        <td>@MostrarItemTipos(item.Item_Tipos_Id)</td>
 
                                                                                         <td>
                                                                                             <a class="btn btn-info btn-sm" href="/api/Avances/@item.Id" title="Ver Avance"><i class="bi bi-list"></i></a>
