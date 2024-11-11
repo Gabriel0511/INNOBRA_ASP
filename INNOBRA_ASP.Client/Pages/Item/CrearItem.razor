@@ -51,20 +51,26 @@
         <ValidationMessage For="@(() => item.Material_estimado)" />
     </div >
 
-    <div class="mb-3">
-        <label>Item Tipo</label>
-            <a type="submit" class="btn btn-success btn-sm" href="/api/ItemTipos/crear" title="Agregar item tipo"><i class="bi bi-plus"></i></a>
-        <div>
-            <select class="form-control" @bind="item.Item_Tipos_Id">
-                <option value="">Seleccione un item tipo</option>
-                @foreach (var itemTipo in itemTipos)
-                {
-                    <option value="@itemTipo.Id">@itemTipo.Nombre</option>
-                }
-            </select>
-                <ValidationMessage For="@(() => item.Item_Tipos_Id)" />
+        <div class="mb-3">
+            <label>Item Tipo</label>
+            <div class="d-flex align-items-center" style="width: 100%;">
+                <select class="form-control" @bind="item.Item_Tipos_Id" style="flex: 1;">
+                    <option value="">Seleccione un item tipo</option>
+                    @foreach (var itemTipo in itemTipos)
+                    {
+                        <option value="@itemTipo.Id">@itemTipo.Nombre</option>
+                    }
+                </select>
+                <a class="btn btn-success btn-sm ms-2 d-flex align-items-center justify-content-center"
+                   href="/api/ItemTipos/crear" title="Agregar item tipo" style="height: 100%;">
+                    <i class="bi bi-plus"></i>
+                </a>
+            </div>
+            <ValidationMessage For="@(() => item.Item_Tipos_Id)" />
         </div>
-    </div>
+
+
+
 
         <div class="mb-3">
             <label>Presupuesto</label>
