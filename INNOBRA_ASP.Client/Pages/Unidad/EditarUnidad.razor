@@ -17,27 +17,26 @@
             @mensaje
         </div>
     }
+    else if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <div class="alert alert-danger">
+            @mensajeError
+        </div>
+    }
 
-    <EditForm Model="@unidad" OnValidSubmit="Actualizar">
+    <EditForm Model="unidad" OnValidSubmit="Actualizar">
         <DataAnnotationsValidator />
 
-        <div class="mb-3">
-            <label>Nombre:</label>
-            <InputText @bind-Value="unidad.Nombre" />
+@*         <div class="form-group">
+            <label>Unidad Medida:</label>
+            <InputSelect @bind-Value="unidad.Nombre" class="form-control">
+                @foreach (var tipo in Enum.GetValues(typeof(EditarUnidadDTO.UnidadMedidaDTO)))
+                {
+                    <option value="@tipo">@tipo</option>
+                }
+            </InputSelect>
             <ValidationMessage For="@(() => unidad.Nombre)" />
-        </div>
-
-        <div class="mb-3">
-            <label>Descripcion:</label>
-            <InputText @bind-Value="unidad.Descripcion" />
-            <ValidationMessage For="@(() => unidad.Descripcion)" />
-        </div>
-
-        <div class="mb-3">
-            <label>Costo:</label>
-            <InputNumber @bind-Value="unidad.Costo" />
-            <ValidationMessage For="@(() => unidad.Costo)" />
-        </div>
+        </div> *@
 
         <button type="submit" class="btn btn-primary">Guardar Cambios</button>
         <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
@@ -48,6 +47,7 @@
     [Parameter] public int id { get; set; }
     private EditarUnidadDTO unidad = new EditarUnidadDTO();
     private string mensaje = "";
+    private string mensajeError = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -73,20 +73,13 @@
 
         if (!respuesta.Error)
         {
-            // Actualizamos el mensaje globalmente a través del servicio
             mensajeService.Mensaje = "Se actualizó con éxito la unidad.";
-
-            // Forzamos el renderizado (opcional, pero puede ser útil)
-            StateHasChanged();
-
-            // Redirigimos a la página de lista de 
-            await Task.Delay(500); // Espera para mostrar el mensaje
+            await Task.Delay(500);
             nav.NavigateTo("/api/unidades");
         }
         else
         {
-            var errorContent = await respuesta.HttpResponseMessage.Content.ReadAsStringAsync();
-            mensajeService.Mensaje = $"Error: {errorContent}";
+            mensajeError = $"Error: {await respuesta.HttpResponseMessage.Content.ReadAsStringAsync()}";
         }
     }
 

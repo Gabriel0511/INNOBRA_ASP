@@ -32,12 +32,6 @@
             <InputText @bind-Value="avance.MaterialEjecutado" class="form-control" />
         </div>
 
-        <!-- Selección de Item ID -->
-        <div class="mb-3">
-            <label>Item ID:</label>
-            <InputNumber @bind-Value="avance.Item_Id" class="form-control" />
-        </div>
-
         <!-- Selección del Recurso por Nombre -->
         <div class="mb-3">
             <label>Recurso:</label>
@@ -67,17 +61,30 @@
     protected override async Task OnInitializedAsync()
     {
         avance.Fecha = DateTime.Today;
+
+        // Cargar recursos
         await CargarRecursos();
 
-        itemSeleccionado = items.FirstOrDefault(p => p.Id == id);
+        // Cargar Items (esto debería ser parte de tu lógica para obtener los items)
+        await CargarItems();
 
         if (itemSeleccionado != null)
         {
-            avance.Item_Id = itemSeleccionado.Id; // Asigna el ID del presupuesto seleccionado al item
+            avance.Item_Id = itemSeleccionado.Id; // Asigna el ID del item al avance
         }
         else
         {
-            mensajeError = "Presupuesto no encontrado.";
+            mensajeError = "Item no encontrado.";
+        }
+    }
+
+    private async Task CargarItems()
+    {
+        var respuesta = await http.Get<List<Item>>("api/Items");
+        if (!respuesta.Error)
+        {
+            items = respuesta.Respuesta;
+            itemSeleccionado = items.FirstOrDefault(p => p.Id == id);
         }
     }
 

@@ -5,111 +5,13 @@
 @inject NavigationManager nav
 @inject MensajeService mensajeService
 
-<style>
-    /* Fondo */
-    .fondo {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-image: url('/images/fondo.png');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        z-index: -2;
-    }
-    /* Capa semitransparente para oscurecer el fondo */
-    .overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro */
-        z-index: -1; /* Capa debajo del contenedor */
-    }
-    /* Contenedor principal de la página */
-    .contenedor-formulario {
-        position: relative;
-        z-index: 1;
-        background-color: rgba(255, 255, 255, 0.9); /* Fondo blanco semitransparente */
-        border-radius: 15px;
-        padding: 30px;
-        margin: 50px auto;
-        width: 90%;
-        max-width: 900px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra ligera */
-    }
-    /* Estilo del título */
-    h3 {
-        text-align: center;
-        color: #333;
-        font-family: 'Arial', sans-serif;
-        font-size: 2rem;
-        margin-bottom: 20px;
-    }
-    /* Estilos para los formularios */
-    .form-control {
-        width: 100%;
-        padding: 10px;
-        border-radius: 8px;
-        border: 1px solid #ddd;
-        margin-bottom: 15px;
-    }
-    /* Estilo para la tabla */
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    th, td {
-        padding: 10px;
-        border: 1px solid #ddd;
-        text-align: center;
-    }
-
-    th {
-        background-color: #007bff;
-        color: white;
-    }
-
-    .btn-primary, .btn-secondary {
-        border: none;
-        border-radius: 5px;
-        padding: 10px 15px;
-        color: white;
-        font-weight: bold;
-    }
-
-    .btn-primary {
-        background-color: #007bff;
-    }
-
-    .btn-secondary {
-        background-color: #6c757d;
-    }
-    /* Estilos para botones de cancelación */
-    .btn-primary:hover {
-        background-color: #0056b3;
-    }
-
-    .btn-secondary:hover {
-        background-color: #5a6268;
-    }
-    /* Estilos para el input de tipo Select */
-    .form-control.select {
-        padding: 8px;
-        border-radius: 8px;
-    }
-</style>
 <div class="fondo"></div>
 <div class="overlay"></div>
 <div class="contenedor-formulario">
     <h3>Gestión de Recursos</h3>
 
     <!-- Formulario para Crear/Editar Recurso -->
-    <EditForm Model="@recurso" OnValidSubmit="Grabar">
+    <EditForm Model="@recurso" OnValidSubmit="() => Grabar()">
         <DataAnnotationsValidator />
         <ValidationSummary />
 
@@ -124,11 +26,6 @@
         </div>
 
         <div>
-            <label>Unidad de Medida:</label>
-            <InputText @bind-Value="recurso.UnidadMedida" class="form-control" />
-        </div>
-
-        <div>
             <label>Tipo de Recurso:</label>
             <InputSelect @bind-Value="recurso.Tipo" class="form-control">
                 @foreach (var tipo in Enum.GetValues(typeof(CrearRecursoDTO.TipoRecursoDTO)))
@@ -139,15 +36,15 @@
         </div>
 
         <div>
-            <label>Unidad:</label>
+            <label>Unidad de Medida:</label>
             <InputSelect @bind-Value="recurso.Unidad_Id" class="form-control">
-                <option value="">Seleccione una unidad</option>
-                @foreach (var unidad in listaUnidades)
+                @foreach (var unidad in listaUnidad)
                 {
                     <option value="@unidad.Id">@unidad.Nombre</option>
                 }
             </InputSelect>
         </div>
+
 
         <button type="submit" class="btn btn-primary">Guardar</button>
         <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
@@ -156,13 +53,14 @@
 
 @code {
     private CrearRecursoDTO recurso = new CrearRecursoDTO();
+    private CrearUnidadDTO unidad = new CrearUnidadDTO();
+    private List<Unidad> listaUnidad = new List<Unidad>();
     private List<Avance> listaRecursos = new();
-    private List<Unidad> listaUnidades = new();
 
     protected override async Task OnInitializedAsync()
     {
         await CargarRecursos();
-        await CargarUnidades();
+        await CargarUnidad();
     }
 
     private async Task CargarRecursos()
@@ -174,40 +72,45 @@
         }
     }
 
-    private async Task CargarUnidades()
+    private async Task CargarUnidad()
     {
-        var respuesta = await http.Get<List<Unidad>>("api/Unidades");
-        if (!respuesta.Error)
+        // Aquí inicializamos manualmente las unidades con los valores que necesitas
+        listaUnidad = new List<Unidad>
         {
-            listaUnidades = respuesta.Respuesta;
-        }
+            new Unidad { Id = 1, Nombre = "Metro" },
+            new Unidad { Id = 2, Nombre = "Centímetros" },
+            new Unidad { Id = 3, Nombre = "Kilómetros" },
+            new Unidad { Id = 4, Nombre = "Metros Cuadrados" },
+            new Unidad { Id = 5, Nombre = "Kilómetros Cuadrados" },
+            new Unidad { Id = 6, Nombre = "Toneladas" },
+            new Unidad { Id = 7, Nombre = "Unidades" }
+            // Puedes agregar más unidades según sea necesario
+        };
     }
 
     private async Task Grabar()
     {
-        var httpRespuesta = await http.Post<CrearRecursoDTO>("api/Recursos", recurso);
-
-        if (!httpRespuesta.Error)
+        if (recurso != null)
         {
-            // Si se crea correctamente, establecer el mensaje
-            mensajeService.Mensaje = "Unidad agregada con éxito.";
+            // Llamada al método Post para enviar el recurso
+            var respuesta = await http.Post<CrearRecursoDTO>("api/Recursos", recurso);
 
-            // Redirigir a la página de lista después de un breve retraso
-            await Task.Delay(1500);
-            nav.NavigateTo("/api/Obras");
+            if (!respuesta.Error)
+            {
+                mensajeService.Mensaje = "Recurso agregado con éxito.";
+                await Task.Delay(1500);
+                nav.NavigateTo("/api/Recursos");
+            }
+            else
+            {
+                var errorContent = await respuesta.ObtenerError();
+                mensajeService.Mensaje = $"Error: {errorContent}";
+            }
         }
         else
         {
-            // Si ocurre un error, establecer el mensaje de error
-            var errorContent = await httpRespuesta.HttpResponseMessage.Content.ReadAsStringAsync();
-            mensajeService.Mensaje = $"Error: {errorContent}";
+            mensajeService.Mensaje = "Error: Entidad desconocida.";
         }
-
-        // if (httpRespuesta.Error)
-        // {
-        //     var body = httpRespuesta.HttpResponseMessage;
-        // }
-        // nav.NavigateTo("/api/Recursos");
     }
 
     private void Cancelar()

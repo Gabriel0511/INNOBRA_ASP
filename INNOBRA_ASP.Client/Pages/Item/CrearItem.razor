@@ -33,13 +33,14 @@
     <div class="mb-3">
         <label>Unidad de tiempo:</label>
         <div>
-            <select class="form-control" @bind="item.Unidad_Tiempo">
-                <option value="">Seleccione la unidad de tiempo</option>
-                        @foreach (var undTiempo in undTiempo)
-                        {
-                        <option value="@undTiempo">@undTiempo</option>
-                        }
-            </select>
+                <select class="form-control" @bind="item.Unidad_Tiempo">
+                    <option value="">Seleccione la unidad de tiempo</option>
+                    @foreach (var unidad in undTiempo)
+                    {
+                        <option value="@unidad">@unidad</option>
+                    }
+                </select>
+
             <ValidationMessage For="@(() => item.Unidad_Tiempo)" />
         </div>
     </div>
@@ -160,19 +161,6 @@
         }
     }
 
-    private Item MapearACrearItem(CrearItemDTO dto)
-    {
-        return new Item
-            {
-                Tiempo_estimado = dto.Tiempo_estimado,
-                Unidad_Tiempo = dto.Unidad_Tiempo,
-                Material_estimado = dto.Material_estimado,
-                Item_Tipos_Id = dto.Item_Tipos_Id,
-                Presupuesto_Id = dto.Presupuesto_Id
-            };
-    }
-
-
     private async Task Grabar()
     {
         if (item.Item_Tipos_Id == 0 || item.Presupuesto_Id == 0)
@@ -181,37 +169,32 @@
             return;
         }
 
-        // Mapear el DTO a la entidad Item
-        var itemEntidad = MapearACrearItem(item);
-        //chan
-        // el de arriba me da error si pongo que sea Item y el de abajo si pongo que sea CrearItemDTO
+        // Mapea CrearItemDTO a la entidad Item
+        var nuevoItem = new Item
+            {
+                Tiempo_estimado = item.Tiempo_estimado,
+                Unidad_Tiempo = item.Unidad_Tiempo,
+                Material_estimado = item.Material_estimado,
+                Item_Tipos_Id = item.Item_Tipos_Id,
+                Presupuesto_Id = item.Presupuesto_Id
+            };
 
-        var httpRespuesta = await http.Post<CrearItemDTO>("/Api/Items", item);
+        // Envía nuevoItem como el objeto esperado en el POST
+        var httpRespuesta = await http.Post<Item>("/Api/Items", nuevoItem);
+
         if (!httpRespuesta.Error)
         {
-            // Si el item se crea correctamente, establecer el mensaje
             mensajeService.Mensaje = "Item agregado con éxito.";
-
-            // Redirigir a la página de lista después de un breve retraso
             await Task.Delay(1500);
             nav.NavigateTo("/api/Obras");
         }
         else
         {
-            // Si ocurre un error, establecer el mensaje de error
             var errorContent = await httpRespuesta.HttpResponseMessage.Content.ReadAsStringAsync();
             mensajeService.Mensaje = $"Error: {errorContent}";
         }
-
-        // if (httpRespuesta.Error)
-        // {
-        //     mensajeError = $"Error al guardar el item: {httpRespuesta.HttpResponseMessage.ReasonPhrase}";
-        // }
-        // else
-        // {
-        //     nav.NavigateTo("/Api/Items");
-        // }
     }
+
 
     private void NavigateToCrearItemTipo()
     {

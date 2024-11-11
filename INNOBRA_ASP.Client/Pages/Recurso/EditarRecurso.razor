@@ -107,14 +107,6 @@
         </div>
 
         <div class="form-group">
-            <label>Unidad de medida</label>
-            <div>
-                <InputText class="form-control" @bind-Value="@recurso.UnidadMedida" />
-                <ValidationMessage For="@(() => recurso.Nombre)" />
-            </div>
-        </div>
-
-        <div class="form-group">
             <label>Unidad:</label>
             <InputSelect @bind-Value="recurso.Unidad_Id" class="form-control">
                 <option value="">Selecciona una unidad</option>
