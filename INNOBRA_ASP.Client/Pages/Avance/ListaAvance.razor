@@ -1,4 +1,4 @@
-﻿@page "/api/Avances"
+﻿@page "/api/Avances/{id:int}"
 @inject IHttpServicio http
 @inject MensajeService mensajeService
 
@@ -65,7 +65,7 @@
 
     <br />
 
-    <a class="btn btn-success btn-sm" href="/api/Avances/crear">
+    <a class="btn btn-success btn-sm" href="/api/Avances/crear/@item.Id">
         <i class="bi bi-plus-circle"></i> Agregar Avance
     </a>
 
@@ -125,8 +125,8 @@
 </Confirmacion>*@
 
 @code {
+    [Parameter] public int id { get; set; }
     Confirmacion confirmacion;
-
     List<Avance> listaAvances;
     Avance avance;
     string Mensaje = "";
@@ -146,7 +146,7 @@
 
     private async Task Leer()
     {
-        var resp = await http.Get<List<Avance>>("api/Avances");
+        var resp = await http.Get<List<Avance>>($"api/Avances/GetById/{id}");
         if (!resp.Error)
         {
             listaAvances = resp.Respuesta;
