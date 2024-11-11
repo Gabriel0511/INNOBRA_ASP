@@ -53,6 +53,7 @@
 
     <div class="mb-3">
         <label>Item Tipo</label>
+            <a type="submit" class="btn btn-success btn-sm" href="/api/ItemTipos/crear" title="Agregar item tipo"><i class="bi bi-plus"></i></a>
         <div>
             <select class="form-control" @bind="item.Item_Tipos_Id">
                 <option value="">Seleccione un item tipo</option>
@@ -61,27 +62,17 @@
                     <option value="@itemTipo.Id">@itemTipo.Nombre</option>
                 }
             </select>
-                <button class="btn btn-secondary" @onclick="() => NavigateToCrearItemTipo()" title="Crear nuevo Item Tipo">
-                    <i class="bi bi-plus"></i> Crear
-                </button>
-
                 <ValidationMessage For="@(() => item.Item_Tipos_Id)" />
         </div>
     </div>
 
-    <div class="mb-3">
-        <label>Presupuesto</label>
-        <div>
-            <select class="form-control" @bind="item.Presupuesto_Id">
-                <option value="">Seleccione un presupuesto</option>
-                @foreach (var presupuesto in presupuestos)
-                {
-                    <option value="@presupuesto.Id">@presupuesto.Nombre</option>
-                }
-            </select>
-            <ValidationMessage For="@(() => item.Presupuesto_Id)" />
+        <div class="mb-3">
+            <label>Presupuesto</label>
+            <div>
+                <input type="text" class="form-control" value="@presupuestoSeleccionado?.Nombre" readonly />
+                <ValidationMessage For="@(() => item.Presupuesto_Id)" />
+            </div>
         </div>
-    </div>
 
 
     <button type="submit" class="btn btn-primary">Guardar</button>
