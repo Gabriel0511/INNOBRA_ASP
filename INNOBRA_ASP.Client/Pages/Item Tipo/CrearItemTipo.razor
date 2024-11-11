@@ -24,28 +24,32 @@
 
         <div class="mb-3">
             <label>Codigo:</label>
-            <InputText @bind-Value="itemtipo.Codigo" />
+            <InputText class="form-control" @bind-Value="itemtipo.Codigo" />
             <ValidationMessage For="@(() => itemtipo.Codigo)" />
         </div>
 
         <div class="mb-3">
             <label>Nombre:</label>
-            <InputText @bind-Value="itemtipo.Nombre" />
+            <InputText class="form-control" @bind-Value="itemtipo.Nombre" />
             <ValidationMessage For="@(() => itemtipo.Nombre)" />
         </div>
 
         <div class="mb-3">
             <label>Unidad:</label>
-            <div>
-                <select class="form-control" @bind="itemtipo.Unidad_Id">
+            <div class="d-flex align-items-center" style="width: 100%;">
+                <select class="form-control" @bind="itemtipo.Unidad_Id" style="flex: 1;">
                     <option value="">Seleccione la unidad</option>
                     @foreach (var unidad in unidades)
                     {
                         <option value="@unidad.Id">@unidad.Nombre</option>
                     }
                 </select>
-                <ValidationMessage For="@(() => itemtipo.Unidad_Id)" />
+                <a class="btn btn-success btn-sm mb-3 ms-2 d-flex align-items-center justify-content-center"
+                   href="/api/Unidades/crear" title="Agregar item tipo" style="height: 100%;">
+                    <i class="bi bi-plus"></i>
+                </a>
             </div>
+            <ValidationMessage For="@(() => itemtipo.Unidad_Id)" />
         </div>
 
         <button type="submit" class="btn btn-primary">Guardar</button>
