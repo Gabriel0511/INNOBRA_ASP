@@ -25,21 +25,27 @@
             <InputText @bind-Value="recurso.Cantidad" class="form-control" />
         </div>
 
-        <div>
-            <label>Unidad de Medida</label> 
-            <br />
-            <a type="submit" class="btn btn-success btn-sm" href="/api/Unidades/crear" title="Agregar unidad de medida"><i class="bi bi-plus"></i></a>
-            <a type="submit" class="btn btn-info btn-sm" href="/api/Unidades" title="Ver unidades de medida"><i class="bi bi-list"></i></a>
-            <br />
-            <select class="form-control" @bind="recurso.Unidad_Id">
-                <option value="">Seleccione la unidad de medida</option>
-                @foreach (var unidad in listaUnidad)
-                {
-                    <option value="@unidad.Id">@unidad.Nombre</option>
-                }
-            </select>
+        <div class="mb-3">
+            <label>Item Tipo</label>
+            <div class="d-flex align-items-center" style="width: 100%;">
+                <select class="form-control" @bind="recurso.Unidad_Id"> style="flex: 1;">
+                    <option value="">Seleccione la unidad de medida</option>
+                    @foreach (var unidad in listaUnidad)
+                    {
+                        <option value="@unidad.Id">@unidad.Nombre</option>
+                    }
+                </select>
+                <a class="btn btn-success btn-sm ms-2 d-flex align-items-center justify-content-center"
+                   href="/api/Unidades/crear" title="Agregar unidad de medida" style="height: 100%;">
+                    <i class="bi bi-plus"></i>
+                </a>
+                <a class="btn btn-info btn-sm ms-2 d-flex align-items-center justify-content-center"
+                   href="/api/Unidades" title="Ver unidades de medida" style="height: 100%;">
+                    <i class="bi bi-list"></i>
+                </a>
+            </div>
             <ValidationMessage For="@(() => recurso.Unidad_Id)" />
-        </div>  
+        </div>
 
         <div>
             <label>Tipo de Recurso:</label>
