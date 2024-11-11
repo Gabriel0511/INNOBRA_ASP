@@ -29,11 +29,10 @@
         <table>
             <thead>
                 <tr>
-                    <th>Fecha</th>
-                    <th>Material Ejecutado</th>
+                    <th>Fecha de Finalización Prevista</th>
                     <th>Fecha de Finalización Real</th>
-                    <th>Item Id</th>
-                    <th>Recurso Id</th>
+                    <th>Recurso</th>
+                    <th>Material Ejecutado</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -41,11 +40,10 @@
                 @foreach (var item in listaAvances)
                 {
                     <tr>
-                        <td>@item.Fecha</td>
+                        <td>@item.Fecha.ToString("dd-MM-yyyy")</td>
+                        <td>@item.FechaFinalizacionReal.ToString("dd-MM-yyyy")</td>
+                        <td>@MostrarRecurso(item.Recurso_Id)</td>
                         <td>@item.MaterialEjecutado</td>
-                        <td>@item.FechaFinalizacionReal</td>
-                        <td>@item.Item_Id</td>
-                        <td>@item.Recurso_Id</td>
 
                         <td>
                             <a class="btn btn-warning btn-sm" href="api/Avances/editar/@item.Id"><i class="bi bi-pencil"></i></a>
@@ -129,6 +127,7 @@
     [Parameter] public int id { get; set; }
     Confirmacion confirmacion;
     List<Avance> listaAvances;
+    List<Recurso> listaRecursos = new List<Recurso>();
     Avance avance;
     string Mensaje = "";
     bool cargando = true;
@@ -143,6 +142,7 @@
             mensajeService.Mensaje = string.Empty;  // Borra el mensaje
         }
         await Leer();
+        await CargarRecurso();
     }
 
     private async Task Leer()
@@ -157,6 +157,21 @@
             Mensaje = await resp.ObtenerError();
         }
         cargando = false;
+    }
+
+    private async Task CargarRecurso()
+    {
+        var respuesta = await http.Get<List<Recurso>>("/api/Recursos");
+        if (!respuesta.Error)
+        {
+            listaRecursos = respuesta.Respuesta;
+        }
+    }
+
+    private string MostrarRecurso(int recursoId)
+    {
+        var recurso = listaRecursos?.FirstOrDefault(r => r.Id == recursoId);
+        return recurso?.Nombre ?? "Sin asignar";
     }
 
     private async Task Eliminar(Avance avance)

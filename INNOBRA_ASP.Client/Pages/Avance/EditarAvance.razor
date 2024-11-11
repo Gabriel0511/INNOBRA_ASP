@@ -81,23 +81,15 @@
     <EditForm Model="avance" OnValidSubmit="Grabar">
         <DataAnnotationsValidator />
 
-        <div class="form-group">
-            <label>Fecha</label>
+        <div class="mb-3">
+            <label>Fecha de Finalizacion Prevista</label>
             <div>
                 <InputDate class="form-control" @bind-Value="@avance.Fecha" />
                 <ValidationMessage For="@(() => avance.Fecha)" />
             </div>
         </div>
 
-        <div class="form-group">
-            <label>Material Ejecutado</label>
-            <div>
-                <InputText class="form-control" @bind-Value="@avance.MaterialEjecutado" />
-                <ValidationMessage For="@(() => avance.MaterialEjecutado)" />
-            </div>
-        </div>
-
-        <div class="form-group">
+        <div class="mb-3">
             <label>Fecha de Finalizacion Real</label>
             <div>
                 <InputDate class="form-control" @bind-Value="@avance.FechaFinalizacionReal" />
@@ -105,14 +97,9 @@
             </div>
         </div>
 
-        <div class="form-group">
-            <label>Item ID:</label>
-            <InputNumber class="form-control" @bind-Value="avance.Item_Id" />
-        </div>
-
-        <div class="form-group">
+        <div class="mb-3">
             <label>Recurso:</label>
-            <select class="form-control" @bind="avance.Recurso_Id">
+            <select @bind="avance.Recurso_Id" class="form-control">
                 <option value="">Seleccione un recurso</option>
                 @foreach (var recurso in listaRecursos)
                 {
@@ -120,6 +107,15 @@
                 }
             </select>
         </div>
+
+        <div class="mb-3">
+            <label>Material Ejecutado</label>
+            <div>
+                <InputText class="form-control" @bind-Value="@avance.MaterialEjecutado" />
+                <ValidationMessage For="@(() => avance.MaterialEjecutado)" />
+            </div>
+        </div>
+
 
         <br />
         <div class="text-center">
@@ -137,6 +133,7 @@
     protected override async Task OnInitializedAsync()
     {
         avance.FechaFinalizacionReal = DateTime.Today;
+        avance.Fecha = DateTime.Today;
         await base.OnInitializedAsync();
         await Mostrar();
         await CargarRecursos();
@@ -151,7 +148,7 @@
         }
         else
         {
-            nav.NavigateTo("/api/Obras");
+            nav.NavigateTo("api/Obras");
         }
     }
 
@@ -179,7 +176,7 @@
 
             // Redirigimos a la página de lista de
             await Task.Delay(500); // Espera para mostrar el mensaje
-            nav.NavigateTo("/api/Obras");
+            nav.NavigateTo("api/Obras");
         }
         else
         {

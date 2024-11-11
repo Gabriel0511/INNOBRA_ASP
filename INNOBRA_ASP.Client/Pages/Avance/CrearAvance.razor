@@ -23,13 +23,13 @@
         <ValidationSummary />
 
         <div class="mb-3">
-            <label>Fecha:</label>
+            <label>Fecha de Finalización Prevista:</label>
             <InputDate @bind-Value="avance.Fecha" class="form-control" />
         </div>
 
         <div class="mb-3">
-            <label>Material Ejecutado: (numero)</label>
-            <InputText @bind-Value="avance.MaterialEjecutado" class="form-control" />
+            <label>Fecha de Finalización Real:</label>
+            <InputDate @bind-Value="avance.FechaFinalizacionReal" class="form-control" />
         </div>
 
         <!-- Selección del Recurso por Nombre -->
@@ -42,6 +42,11 @@
                     <option value="@recurso.Id">@recurso.Nombre</option>
                 }
             </select>
+        </div>
+
+        <div class="mb-3">
+            <label>Material Ejecutado: (numero)</label>
+            <InputText @bind-Value="avance.MaterialEjecutado" class="form-control" />
         </div>
 
         <button type="submit" class="btn btn-primary">Guardar</button>
@@ -61,6 +66,7 @@
     protected override async Task OnInitializedAsync()
     {
         avance.Fecha = DateTime.Today;
+        avance.FechaFinalizacionReal = DateTime.Today;
 
         // Cargar recursos
         await CargarRecursos();
@@ -108,7 +114,7 @@
 
             // Redirigir a la página de lista después de un breve retraso
             await Task.Delay(1500);
-            nav.NavigateTo("/api/Obras");
+            nav.NavigateTo("api/Obras");
         }
         else
         {
@@ -127,6 +133,6 @@
 
     private void Cancelar()
     {
-        nav.NavigateTo("/api/Obras");
+        nav.NavigateTo("api/Obras");
     }
 }
