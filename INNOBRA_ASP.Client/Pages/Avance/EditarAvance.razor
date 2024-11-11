@@ -4,75 +4,6 @@
 @inject MensajeService mensajeService
 @using INNOBRA_ASP.Shared.DTO
 
-<style>
-    .fondo {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-image: url('/images/fondo.png');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        z-index: -2;
-    }
-
-    .overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: -1;
-    }
-
-    .contenedor {
-        position: relative;
-        z-index: 1;
-        background-color: rgba(255, 255, 255, 0.8);
-        border-radius: 15px;
-        padding: 20px;
-        max-width: 800px;
-        margin: auto;
-        color: black;
-        margin-top: 20px;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    th, td {
-        padding: 10px;
-        border: 1px solid #ddd;
-        text-align: center;
-    }
-
-    th {
-        background-color: #007bff;
-        color: white;
-    }
-
-    .btn-primary, .btn-danger {
-        border: none;
-        border-radius: 5px;
-        padding: 8px 12px;
-        color: white;
-        text-decoration: none;
-    }
-
-    .btn-primary {
-        background-color: #007bff;
-    }
-
-    .btn-danger {
-        background-color: #dc3545;
-    }
-</style>
-
 <div class="fondo"></div>
 <div class="overlay"></div>
 <div class="contenedor-formulario">
@@ -165,32 +96,25 @@
     private async Task Grabar()
     {
         var httpRespuesta = await http.Put<EditarAvanceDTO>($"api/Avances/{avanceId}", avance);
-        
-        if (httpRespuesta.Error)
+
+        if (!httpRespuesta.Error)
         {
-            // Actualizamos el mensaje globalmente a través del servicio
+            // Se actualizó con éxito
             mensajeService.Mensaje = "Se actualizó con éxito el avance.";
 
             // Forzamos el renderizado (opcional, pero puede ser útil)
             StateHasChanged();
 
-            // Redirigimos a la página de lista de
-            await Task.Delay(500); // Espera para mostrar el mensaje
-            nav.NavigateTo("api/Obras");
+            // Redirigimos a la página de lista de Obras
+            nav.NavigateTo("/api/Obras");
         }
         else
         {
             var errorContent = await httpRespuesta.HttpResponseMessage.Content.ReadAsStringAsync();
             mensajeService.Mensaje = $"Error: {errorContent}";
         }
-        
-        // if (httpRespuesta.Error)
-        // {
-        //     var body = httpRespuesta.HttpResponseMessage;
-        // }
-        //nav.NavigateTo("/api/Avances");
-       
     }
+
 
     private void Cancelar()
     {
