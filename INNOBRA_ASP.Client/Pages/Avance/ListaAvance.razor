@@ -1,5 +1,6 @@
 ﻿@page "/api/Avances/{id:int}"
 @inject IHttpServicio http
+@inject IJSRuntime js
 @inject MensajeService mensajeService
 
 <div class="alert alert-info" style="display: @(!string.IsNullOrEmpty(mensajeService.Mensaje) ? "block" : "none")">
@@ -47,7 +48,7 @@
 
                         <td>
                             <a class="btn btn-warning btn-sm" href="api/Avances/editar/@item.Id"><i class="bi bi-pencil"></i></a>
-                            <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(item)"><i class="bi bi-trash3"></i></button>
+                            <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(item.Id)"><i class="bi bi-trash3"></i></button>
                         </td>
                     </tr>
                 }
@@ -186,14 +187,39 @@
         avanceBorrar = null;
     }
 
-    private async Task Borrar()
+    // private async Task Borrar()
+    // {
+    //     var respuesta = await http.Delete($"api/Avances/{avanceBorrar.Id}");
+    //     if (respuesta.Error)
+    //     {
+    //         var body = "No se pudo borrar";
+    //     }
+    //     Cancelar();
+    //     await Leer();
+    // }
+    private async Task Eliminar(int id)
     {
-        var respuesta = await http.Delete($"api/Avances/{avanceBorrar.Id}");
-        if (respuesta.Error)
+        var resultado = await js.InvokeAsync<bool>("confirmSwal");
+
+        if (resultado)
         {
-            var body = "No se pudo borrar";
+            try
+            {
+                var resp = await http.Delete($"api/Avances/{id}");
+                if (!resp.Error)
+                {
+                    await Leer(); // Recarga la lista después de eliminar
+                }
+                else
+                {
+                    Mensaje = await resp.ObtenerError();
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensaje = $"Ocurrió un error al eliminar el avance: {ex.Message}";
+            }
         }
-        Cancelar();
-        await Leer();
+
     }
 }
