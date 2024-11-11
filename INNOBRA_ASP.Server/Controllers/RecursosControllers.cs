@@ -63,18 +63,24 @@ namespace INNOBRA_ASP.Server.Controllers
         {
             try
             {
+                // Aquí mapeas el DTO a la entidad Recurso
                 Recurso entidad = mapper.Map<Recurso>(entidadDTO);
 
-                await repositorio.Update(entidad.Id, entidad);
-                return Ok();
-                //return Ok(new { message = "Actualización exitosa" });
-            }
+                // Revisa que la entidad tenga el ID correcto antes de actualizar
+                if (entidad.Id != Id)
+                {
+                    return BadRequest("El ID del recurso no coincide.");
+                }
 
+                await repositorio.Update(entidad.Id, entidad); // Asegúrate de que este método funcione correctamente
+                return Ok();
+            }
             catch (Exception e)
             {
-                return BadRequest(e.InnerException.Message);
+                return BadRequest(e.InnerException?.Message ?? e.Message);
             }
         }
+
 
         [HttpDelete("{id:int}")] //api/Recursos/2
         public async Task<ActionResult> Delete(int id)

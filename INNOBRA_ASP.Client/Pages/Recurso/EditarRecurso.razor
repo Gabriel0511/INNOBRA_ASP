@@ -105,18 +105,14 @@
 
     private async Task Grabar()
     {
-        var respuesta = await http.Put($"api/Recursos/{recursoId}", recurso);
+        Console.WriteLine($"Grabar recurso: {recurso.Nombre}, {recurso.Cantidad}, {recurso.Unidad_Id}"); // Debugging
+        var respuesta = await http.Put<EditarRecursoDTO>($"api/Recursos/{recursoId}", recurso);
 
         if (!respuesta.Error)
         {
-            // Actualizamos el mensaje globalmente a través del servicio
             mensajeService.Mensaje = "Se actualizó con éxito el Recurso.";
-
-            // Forzamos el renderizado (opcional, pero puede ser útil)
             StateHasChanged();
-
-            // Redirigimos a la página de lista de 
-            await Task.Delay(500); // Espera para mostrar el mensaje
+            await Task.Delay(500);
             nav.NavigateTo("/api/Recursos");
         }
         else
@@ -124,13 +120,8 @@
             var errorContent = await respuesta.HttpResponseMessage.Content.ReadAsStringAsync();
             mensajeService.Mensaje = $"Error: {errorContent}";
         }
-
-        // if (httpRespuesta.Error)
-        // {
-        //     var body = httpRespuesta.HttpResponseMessage;
-        // }
-        // nav.NavigateTo("/api/Recursos");
     }
+
 
     private void Cancelar()
     {

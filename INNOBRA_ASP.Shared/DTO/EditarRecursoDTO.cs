@@ -18,6 +18,8 @@ namespace INNOBRA_ASP.Shared.DTO
 
         public TipoRecursoDTOEditar Tipo { get; set; }
 
+        public int Id { get; set; }
+
         public string Nombre { get; set; }
 
         public string Cantidad { get; set; }
