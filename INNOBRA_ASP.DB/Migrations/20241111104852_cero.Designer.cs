@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace INNOBRA_ASP.DB.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20241111033706_correcionrecursofinal")]
-    partial class correcionrecursofinal
+    [Migration("20241111104852_cero")]
+    partial class cero
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

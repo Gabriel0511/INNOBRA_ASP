@@ -34,7 +34,9 @@
                 <thead>
                     <tr>
                         <th scope="col">Nombre</th>
+                        <th scope="col">Tipo de Recurso</th>
                         <th scope="col">Cantidad</th>
+                        <th scope="col">Unidad de Medida</th>
                         <th scope="col">Acciones</th>
                     </tr>
                 </thead>
@@ -43,7 +45,9 @@
                 {
                             <tr>
                                 <td>@recurso.Nombre</td>
+                                <td>@recurso.Tipo</td>
                                 <td>@recurso.Cantidad</td>
+                                <td>@MostrarNombreUnidad(recurso.Unidad_Id)</td>
 
                                 <td>
                                     <a class="btn btn-warning btn-sm" href="/api/Recursos/editar/@recurso.Id"><i class="bi bi-pencil"></i></a>
@@ -147,9 +151,10 @@
 </Confirmacion> *@
 
 @code {
-        List<Recurso> listaRecursos = new List<Recurso>();
-        string Mensaje = "";
-        bool cargando = true;
+    List<Recurso> listaRecursos = new List<Recurso>();
+    List<Unidad> listaUnidades = new List<Unidad>();
+    string Mensaje = "";
+    bool cargando = true;
 
         protected override async Task OnInitializedAsync()
         {
@@ -160,6 +165,7 @@
                 mensajeService.Mensaje = string.Empty;  // Borra el mensaje
             }
             await Leer();
+            await CargarUnidad();
         }
 
         private async Task Leer()
@@ -176,7 +182,20 @@
             cargando = false; // Cambiar cargando a false al finalizar la carga
         }
 
+        private async Task CargarUnidad()
+        {
+            var respuesta = await http.Get<List<Unidad>>("api/Unidades");
+            if (!respuesta.Error)
+            {
+                listaUnidades = respuesta.Respuesta;
+            }
+        }
 
+        private string MostrarNombreUnidad(int unidadId)
+        {
+            var unidad = listaUnidades?.FirstOrDefault(r => r.Id == unidadId);
+            return unidad?.Nombre ?? "Sin asignar";
+        }
 
         private async Task Eliminar(int id)
         {
