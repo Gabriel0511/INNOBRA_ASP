@@ -147,7 +147,7 @@
 
     private async Task Leer()
     {
-        var resp = await http.Get<List<Avance>>($"api/Avances/GetById/{id}");
+        var resp = await http.Get<List<Avance>>($"api/Avances");
         if (!resp.Error)
         {
             listaAvances = resp.Respuesta;
