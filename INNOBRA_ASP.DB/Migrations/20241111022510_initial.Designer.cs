@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace INNOBRA_ASP.DB.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20241111000650_initial")]
+    [Migration("20241111022510_initial")]
     partial class initial
     {
         /// <inheritdoc />
