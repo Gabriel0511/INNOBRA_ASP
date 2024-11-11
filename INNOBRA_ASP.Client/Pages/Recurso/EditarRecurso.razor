@@ -38,23 +38,27 @@
             </div>
         </div>
 
-        <div class="form-group">
+        <div class="mb-3">
             <label>Unidad de medida:</label>
-                <select class="form-control" @bind="recurso.Unidad_Id"> style="flex: 1;">
+            <div class="d-flex align-items-center" style="width: 100%;">
+                <select class="form-control" @bind="recurso.Unidad_Id">
+                    style="flex: 1;">
                     <option value="">Seleccione la unidad de medida</option>
                     @foreach (var unidad in listaUnidad)
                     {
                         <option value="@unidad.Id">@unidad.Nombre</option>
                     }
                 </select>
-                <a class="btn btn-success btn-sm ms-2 d-flex align-items-center justify-content-center"
+                <a class="btn btn-success btn-sm mb-3 ms-2 d-flex align-items-center justify-content-center"
                    href="/api/Unidades/crear" title="Agregar unidad de medida" style="height: 100%;">
                     <i class="bi bi-plus"></i>
                 </a>
-                <a class="btn btn-info btn-sm ms-2 d-flex align-items-center justify-content-center"
+                <a class="btn btn-info btn-sm mb-3 ms-2 d-flex align-items-center justify-content-center"
                    href="/api/Unidades" title="Ver unidades de medida" style="height: 100%;">
                     <i class="bi bi-list"></i>
                 </a>
+            </div>
+            <ValidationMessage For="@(() => recurso.Unidad_Id)" />
         </div>
 
         <br />
