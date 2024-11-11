@@ -124,8 +124,19 @@
         </div>
 
         <div>
-            <label>Unidad de Medida:</label>
-            <InputText @bind-Value="recurso.UnidadMedida" class="form-control" />
+            <div class="mb-3">
+        <label>Unidad de Medida:</label>
+        <div>
+            <select class="form-control" @bind="recurso.UnidadMedida">
+                <option value="">Seleccione la unidad de medida</option>
+                        @foreach (var listundMedida in listundMedida)
+                        {
+                            <option value="@listundMedida">@listundMedida</option>
+                        }
+            </select>
+            <ValidationMessage For="@(() => recurso.UnidadMedida)" />
+        </div>
+    </div>
         </div>
 
         <div>
@@ -158,11 +169,13 @@
     private CrearRecursoDTO recurso = new CrearRecursoDTO();
     private List<Avance> listaRecursos = new();
     private List<Unidad> listaUnidades = new();
+    private List<string> listundMedida = new List<string> { "Centimetros", "Milimetros", "Kilometros", "MetrosCuadrados", 
+            "CentimetrosCuadrados", "KilometrosCuadrados", "MetrosCubicos", "CentimetrosCubicos", "Kg", "Obreros", 
+            "Metros", "Litros", "Toneladas", "Unidades" };
 
     protected override async Task OnInitializedAsync()
     {
         await CargarRecursos();
-        await CargarUnidades();
     }
 
     private async Task CargarRecursos()
@@ -171,15 +184,6 @@
         if (!respuesta.Error)
         {
             listaRecursos = respuesta.Respuesta;
-        }
-    }
-
-    private async Task CargarUnidades()
-    {
-        var respuesta = await http.Get<List<Unidad>>("api/Unidades");
-        if (!respuesta.Error)
-        {
-            listaUnidades = respuesta.Respuesta;
         }
     }
 
