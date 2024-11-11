@@ -13,18 +13,21 @@
 
     <h3>Agregar Unidad</h3>
 
+    <!-- Sección para mostrar mensajes -->
+    @if (!string.IsNullOrEmpty(mensajeService.Mensaje))
+    {
+        <div class="alert alert-info">
+            @mensajeService.Mensaje
+        </div>
+    }
+
     <EditForm Model="@unidad" OnValidSubmit="Grabar">
         <DataAnnotationsValidator />
 
-@*         <div>
-            <label>Tipo de Recurso:</label>
-            <InputSelect @bind-Value="unidad.Nombre" class="form-control">
-                @foreach (var tipo in Enum.GetValues(typeof(CrearUnidadDTO.UnidadMedidaDTO)))
-                {
-                    <option value="@tipo">@tipo</option>
-                }
-            </InputSelect>
-        </div> *@
+        <div>
+            <label>Nombre:</label>
+            <InputText @bind-Value="unidad.Nombre" class="form-control" />
+        </div>
 
         <button type="submit" class="btn btn-primary">Guardar</button>
         <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
@@ -51,6 +54,14 @@
 
     private async Task Grabar()
     {
+        // Verificar si la unidad ya existe en la lista
+        if (listaUnidad.Any(u => u.Nombre.Equals(unidad.Nombre, StringComparison.OrdinalIgnoreCase)))
+        {
+            mensajeService.Mensaje = "Error: La unidad ya existe.";
+            return;
+        }
+
+        // Intentar crear la unidad si no existe
         var httpRespuesta = await http.Post<CrearUnidadDTO>("api/Unidades", unidad);
         if (!httpRespuesta.Error)
         {
