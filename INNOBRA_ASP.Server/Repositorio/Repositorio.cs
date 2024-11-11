@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using INNOBRA_ASP.DB.Data;
 using Microsoft.AspNetCore.Mvc;
+using INNOBRA_ASP.DB.Data.Entity;
 
 namespace INNOBRA_ASP.Server.Repositorio
 { 

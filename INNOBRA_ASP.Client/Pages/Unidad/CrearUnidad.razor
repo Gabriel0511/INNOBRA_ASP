@@ -16,24 +16,15 @@
     <EditForm Model="@unidad" OnValidSubmit="Grabar">
         <DataAnnotationsValidator />
 
-        <div class="mb-3">
-            <label>Nombre:</label>
-            <InputText @bind-Value="unidad.Nombre" />
-            <ValidationMessage For="@(() => unidad.Nombre)" />
-        </div>
-
-        <div class="mb-3">
-            <label>Descripcion:</label>
-            <InputText @bind-Value="unidad.Descripcion" />
-            <ValidationMessage For="@(() => unidad.Descripcion)" />
-        </div>
-
-        <div class="mb-3">
-            <label>Costo:</label>
-            <InputNumber  @bind-Value="unidad.Costo" />
-            <ValidationMessage For="@(() => unidad.Costo)" />
-        </div>
-
+@*         <div>
+            <label>Tipo de Recurso:</label>
+            <InputSelect @bind-Value="unidad.Nombre" class="form-control">
+                @foreach (var tipo in Enum.GetValues(typeof(CrearUnidadDTO.UnidadMedidaDTO)))
+                {
+                    <option value="@tipo">@tipo</option>
+                }
+            </InputSelect>
+        </div> *@
 
         <button type="submit" class="btn btn-primary">Guardar</button>
         <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
@@ -41,7 +32,7 @@
 </div>
 
 @code {
-    private Unidad unidad = new Unidad();
+    private CrearUnidadDTO unidad = new CrearUnidadDTO();
     private List<Unidad> listaUnidad = new List<Unidad>();
 
     protected override async Task OnInitializedAsync()
@@ -60,19 +51,14 @@
 
     private async Task Grabar()
     {
-        var httpRespuesta = await http.Post<Unidad>("api/Unidades", unidad);
+        var httpRespuesta = await http.Post<CrearUnidadDTO>("api/Unidades", unidad);
         if (!httpRespuesta.Error)
         {
-            // Si se crea correctamente, establecer el mensaje
             mensajeService.Mensaje = "Unidad agregada con éxito.";
-
-            // Redirigir a la página de lista después de un breve retraso
-            await Task.Delay(1500);
             nav.NavigateTo("/api/Unidades");
         }
         else
         {
-            // Si ocurre un error, establecer el mensaje de error
             var errorContent = await httpRespuesta.HttpResponseMessage.Content.ReadAsStringAsync();
             mensajeService.Mensaje = $"Error: {errorContent}";
         }
@@ -82,5 +68,4 @@
     {
         nav.NavigateTo("/api/Unidades");
     }
-
 }

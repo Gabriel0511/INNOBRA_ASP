@@ -26,10 +26,6 @@ namespace INNOBRA_ASP.DB.Data.Entity
         [MaxLength(12, ErrorMessage = "Maximo numero de caracteres {1}.")]
         public string Cantidad { get; set; }
 
-        [Required(ErrorMessage = "La unidad de medida es obligatoria.")]
-        [MaxLength(45, ErrorMessage = "Maximo numero de caracteres {1}.")]
-        public string UnidadMedida { get; set; }
-
         //CLAVE FORANEA
         public int Unidad_Id { get; set; }
 

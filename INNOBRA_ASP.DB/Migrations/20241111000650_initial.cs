@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace INNOBRA_ASP.DB.Migrations
 {
     /// <inheritdoc />
-    public partial class restart : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -33,9 +33,7 @@ namespace INNOBRA_ASP.DB.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Costo = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -94,7 +92,6 @@ namespace INNOBRA_ASP.DB.Migrations
                     Tipo = table.Column<int>(type: "int", nullable: false),
                     Nombre = table.Column<string>(type: "nvarchar(45)", maxLength: 45, nullable: false),
                     Cantidad = table.Column<string>(type: "nvarchar(12)", maxLength: 12, nullable: false),
-                    UnidadMedida = table.Column<string>(type: "nvarchar(45)", maxLength: 45, nullable: false),
                     Unidad_Id = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
