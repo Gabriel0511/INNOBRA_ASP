@@ -88,7 +88,7 @@
 
     private async Task Leer()
     {
-        var resp = await http.Get<List<Unidad>>("Api/Unidades");
+        var resp = await http.Get<List<Unidad>>("api/Unidades");
         if (!resp.Error)
         {
             listaUnidades = resp.Respuesta;
