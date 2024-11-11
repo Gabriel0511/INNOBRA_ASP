@@ -26,7 +26,10 @@
         </div>
 
         <div>
-            <label>Unidad de Medida</label><button type="submit" class="btn btn-success btn-sm" href="/api/Unidades/crear" title="Agregar unidad de medida"><i class="bi bi-plus"></i></button>
+            <label>Unidad de Medida</label> 
+            <br />
+            <a type="submit" class="btn btn-success btn-sm" href="/api/Unidades/crear" title="Agregar unidad de medida"><i class="bi bi-plus"></i></a>
+            <br />
             <select class="form-control" @bind="recurso.Unidad_Id">
                 <option value="">Seleccione la unidad de medida</option>
                 @foreach (var unidad in listaUnidad)
