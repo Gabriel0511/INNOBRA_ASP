@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using INNOBRA_ASP.Client.Servicios;
 
 
 namespace INNOBRA_ASP.Server.Controllers
@@ -30,10 +31,10 @@ namespace INNOBRA_ASP.Server.Controllers
             return await repositorio.Select();
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<Unidad>> Get(int id)
+        [HttpGet("GetById/{id:int}")]
+        public async Task<ActionResult<Unidad>> GetById(int id)
         {
-            Unidad? sel = await repositorio.SelectById(id);
+            var sel = await repositorio.SelectById(id);
             if (sel == null)
             {
                 return NotFound();
@@ -49,7 +50,7 @@ namespace INNOBRA_ASP.Server.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<int>> Posts(CrearUnidadDTO entidadDTO)
+        public async Task<ActionResult<int>> Post(CrearUnidadDTO entidadDTO)
         {
             try
             {
@@ -58,15 +59,10 @@ namespace INNOBRA_ASP.Server.Controllers
             }
             catch (Exception e)
             {
-                {
-                    if (e.InnerException != null)
-                    {
-                        return BadRequest($"Error: {e.Message}. Inner Exception: {e.InnerException.Message}");
-                    }
-                    return BadRequest(e.Message);
-                }
+                return BadRequest(e.InnerException.Message);
             }
         }
+
 
         [HttpPut("{id:int}")]
         public async Task<ActionResult> Put(int id, [FromBody] EditarUnidadDTO entidadDTO)

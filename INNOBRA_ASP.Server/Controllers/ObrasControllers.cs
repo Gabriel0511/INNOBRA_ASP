@@ -51,21 +51,25 @@ namespace INNOBRA_ASP.Server.Controllers
         {
             try
             {
-                Obra entidad = mapper.Map<Obra>(entidadDTO);
+                // Mapear el DTO a la entidad de base de datos
+                var entidad = mapper.Map<Obra>(entidadDTO);
 
-                return await repositorio.Insert(entidad);
+                // Insertar la entidad en la base de datos
+                var id = await repositorio.Insert(entidad);
+
+                return CreatedAtAction(nameof(Post), new { id }, id);
             }
             catch (Exception e)
             {
-                {
-                    if (e.InnerException != null)
-                    {
-                        return BadRequest($"Error: {e.Message}. Inner Exception: {e.InnerException.Message}");
-                    }
-                    return BadRequest(e.Message);
-                }
+                // Manejo de excepciones más limpio
+                var errorMessage = e.InnerException != null
+                    ? $"Error: {e.Message}. Inner Exception: {e.InnerException.Message}"
+                    : e.Message;
+
+                return BadRequest(errorMessage);
             }
         }
+
 
         [HttpPut("{id:int}")]
         public async Task<ActionResult> Put(int id, [FromBody] EditarObraDTO entidadDTO)
@@ -87,6 +91,7 @@ namespace INNOBRA_ASP.Server.Controllers
             obra.Nombre = entidadDTO.Nombre;
             obra.FechaInicio = entidadDTO.FechaInicio;
             obra.FechaFin = entidadDTO.FechaFin;
+            obra.Imagen = entidadDTO.Imagen;
 
             // Aquí no modificamos la relación con 'Obra' ni 'Items', solo los campos mencionados.
 

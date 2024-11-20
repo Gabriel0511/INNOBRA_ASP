@@ -1,4 +1,9 @@
-﻿@page "/about"
+﻿@* @page "/about"
+
+<div class="fondo"></div>
+<div class="overlay"></div>
+
+<div class="contenedor-formulario">
 
 <PageTitle>Sobre Nosotros</PageTitle>
 
@@ -15,6 +20,15 @@
     p {
         font-size: 18px;
     }
+
+    /* Centrar la imagen */
+        .contenedor-formulario img {
+            display: block;
+            margin: 0 auto;  /* Centra la imagen */
+            max-width: 100%; /* Asegura que la imagen no sobrepase el contenedor */
+        }
+
+
 </style>
 
 <div class="about-content">
@@ -23,3 +37,9 @@
     <p>Nuestra misión es ofrecer soluciones efectivas y accesibles para todos nuestros clientes, siempre con un enfoque en la calidad y la seguridad.</p>
     <p>¡Gracias por confiar en nosotros!</p>
 </div>
+
+<img src="/images/INNOBRA-logo.jpg" width="400" height="auto" alt="Alternate Text" />
+
+</div> *@
+
+

@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using INNOBRA_ASP.DB.Data;
+using Microsoft.AspNetCore.Mvc;
+using INNOBRA_ASP.DB.Data.Entity;
 
 namespace INNOBRA_ASP.Server.Repositorio
 { 
@@ -101,19 +103,43 @@ namespace INNOBRA_ASP.Server.Repositorio
                 return false; // Si la obra no existe, retornar falso
             }
 
-            // Eliminar Items asociados a cada Presupuesto
+            // Eliminar los Items de cada Presupuesto
             foreach (var presupuesto in obra.Presupuestos)
             {
-                context.Items.RemoveRange(presupuesto.Items);
+                context.Items.RemoveRange(presupuesto.Items); // Eliminar todos los Items relacionados con el presupuesto
             }
 
-            // Eliminar Presupuestos asociados
-            context.Presupuestos.RemoveRange(obra.Presupuestos);
+            // Eliminar los Presupuestos asociados
+            context.Presupuestos.RemoveRange(obra.Presupuestos); // Eliminar todos los presupuestos relacionados con la obra
 
             // Eliminar la Obra
-            context.Obras.Remove(obra);
+            context.Obras.Remove(obra); // Eliminar la obra
 
-            // Guardar cambios en la base de datos
+            // Guardar los cambios en la base de datos
+            await context.SaveChangesAsync();
+
+            return true; // Retornar true si se eliminó correctamente
+        }
+
+        public async Task<bool> EliminarPresupuestosYItems(int id)
+        {
+            var presupuesto = await context.Presupuestos
+                .Include(o => o.Items)
+                    .ThenInclude(p => p.ItemTipo) // Incluir los Items de cada Presupuesto
+                .FirstOrDefaultAsync(o => o.Id == id);
+
+            if (presupuesto == null)
+            {
+                return false; // Si el presupuesto no existe, retornar falso
+            }
+
+            // Eliminar los Items asociados al presupuesto
+            context.Items.RemoveRange(presupuesto.Items); // Eliminar todos los Items relacionados con el presupuesto
+
+            // Eliminar el presupuesto
+            context.Presupuestos.Remove(presupuesto); // Eliminar el presupuesto
+
+            // Guardar los cambios en la base de datos
             await context.SaveChangesAsync();
 
             return true; // Retornar true si se eliminó correctamente

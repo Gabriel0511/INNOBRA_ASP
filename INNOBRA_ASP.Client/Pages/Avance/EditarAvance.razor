@@ -1,89 +1,123 @@
 ﻿@page "/api/Avances/editar/{avanceId:int}"
 @inject IHttpServicio http
 @inject NavigationManager nav
+@inject MensajeService mensajeService
 @using INNOBRA_ASP.Shared.DTO
 
-<h3>Editar Avance</h3>
+<div class="fondo"></div>
+<div class="overlay"></div>
+<div class="contenedor-formulario">
+    <h3>Editar Avance</h3>
 
-<EditForm Model="avance" OnValidSubmit="Grabar">
-    <DataAnnotationsValidator />
-    
-    <div class="form-group">
-        <label>Fecha</label>
-        <div>
-            <InputDate class="form-control" @bind-Value="@avance.Fecha" />
-            <ValidationMessage For="@(() => avance.Fecha)" />
-        </div>
-    </div>
-    <div>
-        <label>Material Ejecutado</label>
-        <div>
-            <InputText class="form-control" @bind-Value="@avance.MaterialEjecutado" />
-            <ValidationMessage For="@(() => avance.MaterialEjecutado)" />
-        </div>
-    </div>
-    <div>
-        <label>Fecha de Finalizacion Real</label>
-        <div>
-            <InputDate class="form-control" @bind-Value="@avance.FechaFinalizacionReal" />
-            <ValidationMessage For="@(() => avance.FechaFinalizacionReal)" />
-        </div>
-    </div>
-    <div>
-        <label>Item ID:</label>
-        <InputNumber @bind-Value="avance.Item_Id" />
-    </div>
-    <div>
-        <label>Recurso ID:</label>
-        <InputNumber @bind-Value="avance.Recurso_Id" />
-    </div>
+    <EditForm Model="avance" OnValidSubmit="Grabar">
+        <DataAnnotationsValidator />
 
-    <br />
-    <button class="btn btn-primary" type="submit">Aceptar</button>
-    <button class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-</EditForm>
+        <div class="mb-3">
+            <label>Fecha de Finalizacion Prevista</label>
+            <div>
+                <InputDate class="form-control" @bind-Value="@avance.Fecha" />
+                <ValidationMessage For="@(() => avance.Fecha)" />
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label>Fecha de Finalizacion Real</label>
+            <div>
+                <InputDate class="form-control" @bind-Value="@avance.FechaFinalizacionReal" />
+                <ValidationMessage For="@(() => avance.FechaFinalizacionReal)" />
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label>Recurso:</label>
+            <select @bind="avance.Recurso_Id" class="form-control">
+                <option value="">Seleccione un recurso</option>
+                @foreach (var recurso in listaRecursos)
+                {
+                    <option value="@recurso.Id">@recurso.Nombre</option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label>Material Ejecutado</label>
+            <div>
+                <InputText class="form-control" @bind-Value="@avance.MaterialEjecutado" />
+                <ValidationMessage For="@(() => avance.MaterialEjecutado)" />
+            </div>
+        </div>
+
+
+        <br />
+        <div class="text-center">
+            <button class="btn btn-primary" type="submit">Aceptar</button>
+            <button class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+        </div>
+    </EditForm>
+</div>
 
 @code {
     [Parameter] public int avanceId { get; set; }
     private EditarAvanceDTO avance = new EditarAvanceDTO();
-
-    string mensaje = "";
+    private List<Recurso> listaRecursos = new();
 
     protected override async Task OnInitializedAsync()
     {
         avance.FechaFinalizacionReal = DateTime.Today;
+        avance.Fecha = DateTime.Today;
         await base.OnInitializedAsync();
         await Mostrar();
+        await CargarRecursos();
     }
 
     private async Task Mostrar()
     {
         var respuesta = await http.Get<EditarAvanceDTO>($"api/Avances/GetById/{avanceId}");
-
         if (!respuesta.Error)
         {
             avance = respuesta.Respuesta;
         }
         else
         {
-            nav.NavigateTo("/api/Avances");
+            nav.NavigateTo("api/Obras");
         }
     }
 
+    private async Task CargarRecursos()
+    {
+        var respuesta = await http.Get<List<Recurso>>("api/Recursos");
+        if (!respuesta.Error)
+        {
+            listaRecursos = respuesta.Respuesta;
+        }
+
+    }
 
     private async Task Grabar()
     {
-
         var httpRespuesta = await http.Put<EditarAvanceDTO>($"api/Avances/{avanceId}", avance);
-        if (httpRespuesta.Error)
+
+        if (!httpRespuesta.Error)
         {
-            var body = httpRespuesta.HttpResponseMessage;
+            // Se actualizó con éxito
+            mensajeService.Mensaje = "Se actualizó con éxito el avance.";
+
+            // Forzamos el renderizado (opcional, pero puede ser útil)
+            StateHasChanged();
+
+            // Redirigimos a la página de lista de Obras
+            nav.NavigateTo("/api/Obras");
         }
-        nav.NavigateTo("/api/Avances");
+        else
+        {
+            var errorContent = await httpRespuesta.HttpResponseMessage.Content.ReadAsStringAsync();
+            mensajeService.Mensaje = $"Error: {errorContent}";
+        }
     }
+
 
     private void Cancelar()
     {
-        nav.NavigateTo("/api/Avances");
+        nav.NavigateTo("/api/Obras");
     }
 }

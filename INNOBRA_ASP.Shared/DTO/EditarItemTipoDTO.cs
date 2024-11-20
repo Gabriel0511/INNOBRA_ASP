@@ -9,7 +9,7 @@ namespace INNOBRA_ASP.Shared.DTO
 {
     public class EditarItemTipoDTO
     {
-
+        public int Id { get; set; }
         [Required(ErrorMessage = "El Código es obligatorio.")]
         public string Codigo { get; set; }
 

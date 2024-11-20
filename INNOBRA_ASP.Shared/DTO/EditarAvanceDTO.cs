@@ -9,6 +9,7 @@ namespace INNOBRA_ASP.Shared.DTO
 {
     public class EditarAvanceDTO
     {
+        public int Id { get; set; }
 
         //PRUEBA PARA PABLO
         public DateTime Fecha { get; set; }

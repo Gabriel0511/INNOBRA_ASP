@@ -3,65 +3,116 @@
 @using INNOBRA_ASP.Shared.DTO
 @using System.Net.Http.Json
 @inject NavigationManager nav
+@inject MensajeService mensajeService
 
-<h3>Gestión de ItemTipo</h3>
+<div class="fondo"></div>
+<div class="overlay"></div>
+<div class="contenedor-formulario">
+    <h3>Gestión de ItemTipo</h3>
 
-<!-- Formulario para Crear/Editar Unidad -->
-<EditForm Model="@itemtipo" OnValidSubmit="Grabar">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+    @if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <div class="alert alert-danger" role="alert">
+            @mensajeError
+        </div>
+    }
 
-    <div>
-        <label>Codigo:</label>
-        <InputText @bind-Value="itemtipo.Codigo" />
-    </div>
+    <!-- Formulario para Crear/Editar Unidad -->
+    <EditForm Model="@itemtipo" OnValidSubmit="Grabar">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
-    <div>
-        <label>Nombre:</label>
-        <InputText @bind-Value="itemtipo.Nombre" />
-    </div>
-    <div>
-        <label>Unidad :</label>
-        <InputNumber @bind-Value="itemtipo.Unidad_Id" />
-    </div>
+        <div class="mb-3">
+            <label>Codigo:</label>
+            <InputText class="form-control" @bind-Value="itemtipo.Codigo" />
+            <ValidationMessage For="@(() => itemtipo.Codigo)" />
+        </div>
 
-    <button type="submit" class="btn btn-primary">Guardar</button>
-    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-</EditForm>
+        <div class="mb-3">
+            <label>Nombre:</label>
+            <InputText class="form-control" @bind-Value="itemtipo.Nombre" />
+            <ValidationMessage For="@(() => itemtipo.Nombre)" />
+        </div>
 
-<hr />
+        <div class="mb-3">
+            <label>Unidad:</label>
+            <div class="d-flex align-items-center" style="width: 100%;">
+                <select class="form-control" @bind="itemtipo.Unidad_Id" style="flex: 1;">
+                    <option value="">Seleccione la unidad</option>
+                    @foreach (var unidad in unidades)
+                    {
+                        <option value="@unidad.Id">@unidad.Nombre</option>
+                    }
+                </select>
+                <a class="btn btn-success btn-sm mb-3 ms-2 d-flex align-items-center justify-content-center"
+                   href="/api/Unidades/crear" title="Agregar item tipo" style="height: 100%;">
+                    <i class="bi bi-plus"></i>
+                </a>
+            </div>
+            <ValidationMessage For="@(() => itemtipo.Unidad_Id)" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+    </EditForm>
+</div>
 
 @code {
+    [Parameter] public int id { get; set; }
     private CrearItemTipoDTO itemtipo = new CrearItemTipoDTO();
-    private List<CrearItemTipo> listaItemTipo = new();
+    private List<Unidad> unidades = new List<Unidad>();  // Lista de unidades
+    private string mensajeError;
 
     protected override async Task OnInitializedAsync()
     {
-        await CargarItemTipo();
+        await CargarUnidades();
     }
 
-    private async Task CargarItemTipo()
+    // Cargar unidades de la API
+    private async Task CargarUnidades()
     {
-        // Llama al servicio para obtener la lista de unidades
-        var respuesta = await http.Get<List<CrearItemTipo>>("api/ItemTipos");
+        var respuesta = await http.Get<List<Unidad>>("api/Unidades");
         if (!respuesta.Error)
         {
-            listaItemTipo = respuesta.Respuesta;
+            unidades = respuesta.Respuesta;
+        }
+        else
+        {
+            mensajeError = "Error al cargar las unidades.";
         }
     }
 
+    // Guardar ItemTipo
     private async Task Grabar()
     {
         var httpRespuesta = await http.Post<CrearItemTipoDTO>("api/ItemTipos", itemtipo);
-        if (httpRespuesta.Error)
+
+        if (!httpRespuesta.Error)
         {
-            var body = httpRespuesta.HttpResponseMessage;
+            // Si el item tipo se crea correctamente, establecer el mensaje
+            mensajeService.Mensaje = "Item tipo agregado con éxito.";
+
+            // Redirigir a la página de lista después de un breve retraso
+            await Task.Delay(500);
+            nav.NavigateTo("/api/Obras");
         }
-        nav.NavigateTo("/api/ItemTipos");
+        else
+        {
+            // Si ocurre un error, establecer el mensaje de error
+            var errorContent = await httpRespuesta.HttpResponseMessage.Content.ReadAsStringAsync();
+            mensajeService.Mensaje = $"Error: {errorContent}";
+        }
+
+        // if (httpRespuesta.Error)
+        // {
+        //     var body = httpRespuesta.HttpResponseMessage;
+        // }
+        // nav.NavigateTo("/api/ItemTipos");
     }
 
+    // Cancelar y navegar a la lista de ItemTipos
     private void Cancelar()
     {
-        nav.NavigateTo("/api/ItemTipos");
+        nav.NavigateTo("/api/Obras");
     }
 }

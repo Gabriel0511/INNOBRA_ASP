@@ -102,18 +102,18 @@ namespace INNOBRA_ASP.Server.Controllers
         }
 
 
-        [HttpDelete("{id:int}")] //api/Presupuesto/2
+        [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var resp = await repositorio.Delete(id);
+            // Llamar al método de eliminación en cascada en el repositorio
+            var resp = await repositorio.EliminarPresupuestosYItems(id);
 
             if (!resp)
             {
-                return BadRequest("El presupuesto no se pudo borrar");
-
+                return BadRequest("El presupuesto no se pudo borrar.");
             }
             return Ok();
-
         }
+
     }
 }

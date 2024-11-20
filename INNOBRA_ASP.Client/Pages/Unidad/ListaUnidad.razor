@@ -1,82 +1,85 @@
 ﻿@page "/api/Unidades"
 @inject IHttpServicio http
+@inject IJSRuntime js
+@inject MensajeService mensajeService
 
-<div class="fondo">
-    <div class="contenido">
-        <h3>Lista de Unidades</h3>
-        <br />
-        <a class="btn btn-primary" href="/api/Unidades/crear">Nueva Unidad</a>
-        <br />
-        <table>
-            <tr>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Costo</th>
-            </tr>
-            @if (Mensaje == "")
-            {
-                @if (listaUnidades == null)
-                {
-                    <p>Buscando....</p>
-                }
-                else if (listaUnidades.Count == 0)
-                {
-                    <p>No existen unidades</p>
-                }
-                else
-                {
-                    @foreach (var item in listaUnidades)
-                    {
-                        <tr>
-                            <td>@item.Nombre</td>
-                            <td>@item.Descripcion</td>
-                            <td>@item.Costo</td>
-                            <td>
-                                <a class="btn btn-primary"
-                                   href="api/Unidades/editar/@item.Id">
-                                    Editar
-                                </a>
-                            </td>
-                            <td>
-                                <button class="btn btn-danger"
-                                        @onclick="() => Eliminar(item)">
-                                    Borrar
-                                </button>
-                            </td>
-                        </tr>
-                    }
-                }
-            }
-            else
-            {
-                <p> Error: @Mensaje</p>
-            }
-        </table>
+<div class="alert alert-info" style="display: @(!string.IsNullOrEmpty(mensajeService.Mensaje) ? "block" : "none")">
+    @mensajeService.Mensaje
+</div> @* Muestra el mensaje que se actualizò con exito. *@
 
-        <Confirmacion @ref="confirmacion"
-                      Titulo="CUIDADO"
-                      textCancelar="Salir"
-                      onCancel="Cancelar"
-                      onConfirm="Borrar">
-            <h5>Está por borrar la unidad</h5>
-            <br />
-            <p>¿Está seguro?</p>
-        </Confirmacion>
-    </div>
+
+<div class="fondo"></div>
+    <div class="overlay"></div>
+
+<div class="contenedor-formulario">
+
+    <h3>Unidades</h3>
+
+    @if (!string.IsNullOrEmpty(Mensaje))
+    {
+            <div class="alert alert-danger" role="alert">
+            @Mensaje
+            </div>
+    }
+
+    @if (cargando)
+    {
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+    }
+    else if (listaUnidades != null && listaUnidades.Any())
+    {
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var unidad in listaUnidades)
+                {
+                            <tr>
+                                <td>@unidad.Nombre</td>
+
+                                <td>
+                                    <a class="btn btn-warning btn-sm" href="/api/Unidades/editar/@unidad.Id"><i class="bi bi-pencil"></i></a>
+                                    <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(unidad.Id)"><i class="bi bi-trash3"></i></button>
+                                </td>
+                            </tr>
+                }
+                </tbody>
+            </table>
+    }
+    else
+    {
+            <div class="alert alert-warning" role="alert">
+                No hay unidades registradas.
+            </div>
+    }
+
+    <br/>
+
+    <a class="btn btn-success btn-sm" href="/api/Unidades/crear">
+        <i class="bi bi-plus-circle"></i> Agregar Unidad
+    </a>
+
 </div>
 
 @code {
-    Confirmacion confirmacion;
-
-    List<Unidad> listaUnidades;
-    Unidad unidad;
+    List<Unidad> listaUnidades = new List<Unidad>();
     string Mensaje = "";
-
-    Unidad? unidadBorrar = null;
+    bool cargando = true;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        if (!string.IsNullOrEmpty(mensajeService.Mensaje))
+        {
+            await Task.Delay(1500);  // Espera 3 segundos
+            mensajeService.Mensaje = string.Empty;  // Borra el mensaje
+        }
         await Leer();
     }
 
@@ -91,28 +94,35 @@
         {
             Mensaje = await resp.ObtenerError();
         }
+        cargando = false; // Cambiar cargando a false al finalizar la carga
     }
 
-    private async Task Eliminar(Unidad unidad)
-    {
-        unidadBorrar = unidad;
-        confirmacion.Ver();
-    }
 
-    private void Cancelar()
+    
+    private async Task Eliminar(int id)
     {
-        confirmacion.Ocultar();
-        unidadBorrar = null;
-    }
+        var resultado = await js.InvokeAsync<bool>("confirmSwal");
 
-    private async Task Borrar()
-    {
-        var respuesta = await http.Delete($"api/Unidades/{unidadBorrar.Id}");
-        if (respuesta.Error)
+        if (resultado)
         {
-            Mensaje = "No se pudo borrar la unidad";
+            try
+            {
+                var resp = await http.Delete($"api/Unidades/{id}");
+                if (!resp.Error)
+                {
+                    await Leer(); // Recarga la lista después de eliminar
+                }
+                else
+                {
+                    Mensaje = await resp.ObtenerError();
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensaje = $"Ocurrió un error al eliminar la unidad: {ex.Message}";
+            }
         }
-        Cancelar();
-        await Leer();
+
     }
+
 }

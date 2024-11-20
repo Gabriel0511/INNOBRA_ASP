@@ -1,16 +1,55 @@
 ﻿@inherits LayoutComponentBase
+@inject IJSRuntime js
+@inject NavigationManager NavigationManager
+
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+    @if (isAuthenticated && !isLoginPage)
+    {
+        <div class="sidebar">
+            <NavMenu />
+        </div>
+    }
 
     <main>
-@*         <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div> *@
-
         <article class="content px-4">
             @Body
         </article>
     </main>
 </div>
+
+@code {
+    private bool isAuthenticated;
+    private bool isLoginPage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Obtiene el valor de autenticación de localStorage
+        var authValue = await js.InvokeAsync<string>("localStorage.getItem", "isAuthenticated");
+
+        // Establece el estado de autenticación
+        isAuthenticated = authValue == "true";
+
+        // Verifica si la página actual es la de login
+        isLoginPage = NavigationManager.Uri.EndsWith("/");
+
+        StateHasChanged(); // Forzar un re-renderizado
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (!isAuthenticated && !isLoginPage)
+            {
+                // Si no está autenticado y no está en la página de login, redirige al login
+                NavigationManager.NavigateTo("/");
+            }
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        // Actualiza la variable `isLoginPage` cada vez que cambian los parámetros de la URL
+        isLoginPage = NavigationManager.Uri.EndsWith("/");
+    }
+}

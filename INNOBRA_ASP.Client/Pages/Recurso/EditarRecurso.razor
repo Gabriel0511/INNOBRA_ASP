@@ -1,62 +1,87 @@
 ﻿@page "/api/Recursos/editar/{recursoId:int}"
 @inject IHttpServicio http
 @inject NavigationManager nav
+@inject MensajeService mensajeService
 @using INNOBRA_ASP.Shared.DTO
 
-<h3>Editar Recurso</h3>
+<div class="fondo"></div>
+<div class="overlay"></div>
+<div class="contenedor-formulario">
+    <h3>Editar Recurso</h3>
 
-<EditForm Model="recurso" OnValidSubmit="Grabar">
-    <DataAnnotationsValidator />
-    <div class="form-group">
-        <label>Tipo de Recurso:</label>
-        <InputSelect @bind-Value="recurso.Tipo">
-            @foreach (var tipo in Enum.GetValues(typeof(CrearRecursoDTO.TipoRecursoDTO)))
-            {
-                <option value="@tipo">@tipo</option>
-            }
-        </InputSelect>
-    </div>
-    <div>
-        <label>Nombre</label>
-        <div>
-            <InputText class="form-control" @bind-Value="@recurso.Nombre" />
-            <ValidationMessage For="@(() => recurso.Nombre)" />
+    <EditForm Model="recurso" OnValidSubmit="Grabar">
+        <DataAnnotationsValidator />
+
+        <div class="form-group">
+            <label>Tipo de Recurso:</label>
+            <InputSelect @bind-Value="recurso.Tipo" class="form-control">
+                @foreach (var tipo in Enum.GetValues(typeof(CrearRecursoDTO.TipoRecursoDTO)))
+                {
+                    <option value="@tipo">@tipo</option>
+                }
+            </InputSelect>
         </div>
-    </div>
-    <div class="form-group">
-        <label>Cantidad</label>
-        <div>
-            <InputText class="form-control" @bind-Value="@recurso.Cantidad" />
-            <ValidationMessage For="@(() => recurso.Cantidad)" />
+
+        <div class="form-group">
+            <label>Nombre</label>
+            <div>
+                <InputText class="form-control" @bind-Value="@recurso.Nombre" />
+                <ValidationMessage For="@(() => recurso.Nombre)" />
+            </div>
         </div>
-    </div>
-    <div class="form-group">
-        <label>Unidad de medida</label>
-        <div>
-            <InputText class="form-control" @bind-Value="@recurso.UnidadMedida" />
-            <ValidationMessage For="@(() => recurso.Nombre)" />
+
+        <div class="form-group">
+            <label>Cantidad</label>
+            <div>
+                <InputText class="form-control" @bind-Value="@recurso.Cantidad" />
+                <ValidationMessage For="@(() => recurso.Cantidad)" />
+            </div>
         </div>
-    </div>
-    <div>
-        <label>Unidad ID:</label>
-        <InputNumber @bind-Value="recurso.UnidadId" />
-    </div>
-    
-    <br />
-    <button class="btn btn-primary" type="submit">Aceptar</button>
-    <button class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-</EditForm>
+
+        <div class="mb-3">
+            <label>Unidad de medida:</label>
+            <div class="d-flex align-items-center" style="width: 100%;">
+                <select class="form-control" @bind="recurso.Unidad_Id">
+                    style="flex: 1;">
+                    <option value="">Seleccione la unidad de medida</option>
+                    @foreach (var unidad in listaUnidad)
+                    {
+                        <option value="@unidad.Id">@unidad.Nombre</option>
+                    }
+                </select>
+                <a class="btn btn-success btn-sm mb-3 ms-2 d-flex align-items-center justify-content-center"
+                   href="/api/Unidades/crear" title="Agregar unidad de medida" style="height: 100%;">
+                    <i class="bi bi-plus"></i>
+                </a>
+                <a class="btn btn-info btn-sm mb-3 ms-2 d-flex align-items-center justify-content-center"
+                   href="/api/Unidades" title="Ver unidades de medida" style="height: 100%;">
+                    <i class="bi bi-list"></i>
+                </a>
+            </div>
+            <ValidationMessage For="@(() => recurso.Unidad_Id)" />
+        </div>
+
+        <br />
+        <div class="text-center">
+            <button class="btn btn-primary" type="submit">Aceptar</button>
+            <button class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+        </div>
+    </EditForm>
+</div>
 
 @code {
     [Parameter] public int recursoId { get; set; }
     private EditarRecursoDTO recurso = new EditarRecursoDTO();
+    private List<Unidad> listaUnidad = new List<Unidad>();
 
-    string mensaje = "";
+    private string mensaje = "";
+    private string mensajeError = "";
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
         await Mostrar();
+        await CargarUnidades();
     }
 
     private async Task Mostrar()
@@ -73,17 +98,34 @@
         }
     }
 
+    private async Task CargarUnidades()
+    {
+        var respuesta = await http.Get<List<Unidad>>("api/Unidades");
+        if (!respuesta.Error)
+        {
+            listaUnidad = respuesta.Respuesta;
+        }
+    }
 
     private async Task Grabar()
     {
+        Console.WriteLine($"Grabar recurso: {recurso.Nombre}, {recurso.Cantidad}, {recurso.Unidad_Id}"); // Debugging
+        var respuesta = await http.Put<EditarRecursoDTO>($"api/Recursos/{recursoId}", recurso);
 
-        var httpRespuesta = await http.Put<EditarRecursoDTO>($"api/Recursos/{recursoId}", recurso);
-        if (httpRespuesta.Error)
+        if (!respuesta.Error)
         {
-            var body = httpRespuesta.HttpResponseMessage;
+            mensajeService.Mensaje = "Se actualizó con éxito el Recurso.";
+            StateHasChanged();
+            await Task.Delay(500);
+            nav.NavigateTo("/api/Recursos");
         }
-        nav.NavigateTo("/api/Recursos");
+        else
+        {
+            var errorContent = await respuesta.HttpResponseMessage.Content.ReadAsStringAsync();
+            mensajeService.Mensaje = $"Error: {errorContent}";
+        }
     }
+
 
     private void Cancelar()
     {

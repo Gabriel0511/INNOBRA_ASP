@@ -18,13 +18,13 @@ namespace INNOBRA_ASP.Shared.DTO
 
         public TipoRecursoDTOEditar Tipo { get; set; }
 
+        public int Id { get; set; }
+
         public string Nombre { get; set; }
 
         public string Cantidad { get; set; }
 
-        public string UnidadMedida { get; set; }
-
         //CLAVE FORANEA
-        public int UnidadId { get; set; }
+        public int Unidad_Id { get; set; }
     }
 }

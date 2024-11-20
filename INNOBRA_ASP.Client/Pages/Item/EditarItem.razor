@@ -3,10 +3,12 @@
 @using INNOBRA_ASP.Shared.DTO
 @using System.Net.Http.Json
 @inject NavigationManager nav
+@inject MensajeService mensajeService
 
-<div class="fondo">
-    <div class="contenido">
+<div class="fondo"></div>
+<div class="overlay"></div>
 
+<div class="contenedor-formulario">
 <h3>Editar Item</h3>
 
 @if (!string.IsNullOrEmpty(mensaje))
@@ -51,7 +53,6 @@
 </EditForm>
 
     </div>
-</div>
 
 @code {
     [Parameter] public int id { get; set; }
@@ -74,7 +75,7 @@
         }
         else
         {
-            nav.NavigateTo("/Api/Items");
+            nav.NavigateTo("/api/Obras");
         }
     }
 
@@ -84,18 +85,36 @@
 
         if (!respuesta.Error)
         {
-            mensaje = "Se cargó con éxito el item.";
-            nav.NavigateTo("/Api/Items");
+            // Actualizamos el mensaje globalmente a través del servicio
+            mensajeService.Mensaje = "Se actualizó con éxito el item.";
+
+            // Forzamos el renderizado (opcional, pero puede ser útil)
+            StateHasChanged();
+
+            // Redirigimos a la página de lista de
+            await Task.Delay(500); // Espera para mostrar el mensaje
+            nav.NavigateTo("/api/Obras");
         }
         else
         {
             var errorContent = await respuesta.HttpResponseMessage.Content.ReadAsStringAsync();
-            mensaje = $"Error: {errorContent}"; // Muestra el error
+            mensajeService.Mensaje = $"Error: {errorContent}";
         }
+        
+        // if (!respuesta.Error)
+        // {
+        //     mensaje = "Se cargó con éxito el item.";
+        //     nav.NavigateTo("/Api/Items");
+        // }
+        // else
+        // {
+        //     var errorContent = await respuesta.HttpResponseMessage.Content.ReadAsStringAsync();
+        //     mensaje = $"Error: {errorContent}"; // Muestra el error
+        // }
     }
 
     private void Cancelar()
     {
-        nav.NavigateTo("/Api/Items");
+        nav.NavigateTo("/api/Obras");
     }
 }
