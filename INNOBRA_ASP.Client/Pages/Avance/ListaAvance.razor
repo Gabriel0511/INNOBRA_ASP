@@ -1,5 +1,6 @@
 ﻿@page "/api/Avances/{id:int}"
 @inject IHttpServicio http
+@inject HttpClient Http
 @inject IJSRuntime js
 @inject MensajeService mensajeService
 
@@ -12,7 +13,7 @@
 <div class="contenedor-formulario">
 
     <h3>Lista de Avances</h3>
-    
+
     @if (!string.IsNullOrEmpty(Mensaje))
     {
         <div class="alert alert-danger" role="alert">
@@ -71,7 +72,7 @@
 
 </div>
 
-    @*<a class="btn btn-primary" href="/api/Avances/crear">Nuevo Avance</a>
+@*<a class="btn btn-primary" href="/api/Avances/crear">Nuevo Avance</a>
     <table>
         <tr>
             <th>Fecha</th>
@@ -148,14 +149,14 @@
 
     private async Task Leer()
     {
-        var resp = await http.Get<List<Avance>>($"api/Avances");
-        if (!resp.Error)
+        var avances = await Http.GetFromJsonAsync<List<Avance>>($"api/Avances");
+        if (avances != null)
         {
-            listaAvances = resp.Respuesta;
+            listaAvances = avances.Where(a => a.Item_Id == id).ToList();
         }
         else
         {
-            Mensaje = await resp.ObtenerError();
+            Mensaje = "Error al cargar avances";
         }
         cargando = false;
     }
