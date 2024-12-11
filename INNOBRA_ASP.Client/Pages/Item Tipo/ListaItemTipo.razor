@@ -6,42 +6,10 @@
     @mensajeService.Mensaje
 </div> @* Muestra el mensaje que se actualizò con exito. *@
 
-
-<style>
-    body {
-        background-image: url('/images/InnObra.jpg');
-        background-size: cover;
-        background-attachment: fixed;
-        background-position: center;
-        filter: brightness(0.7); /* Oscurece la imagen de fondo */
-    }
-
-    h3, table, p, a, button {
-        color: white; /* Asegura que el texto resalte */
-    }
-
-    table {
-        background-color: rgba(0, 0, 0, 0.6); /* Fondo semitransparente para la tabla */
-        padding: 1rem;
-        border-radius: 8px;
-    }
-
-    th, td {
-        padding: 10px;
-    }
-
-    .btn-primary {
-        background-color: #007bff;
-        border-color: #007bff;
-    }
-
-    .btn-danger {
-        background-color: #dc3545;
-        border-color: #dc3545;
-    }
-</style>
-
-<h3>Lista de Tipos de Ítems</h3>
+<div class="fondo"></div>
+<div class="overlay"></div>
+<div class="contenedor-formulario">
+<h3>Items Tipo</h3>
 <br />
 <a class="btn btn-primary" href="/api/ItemTipos/crear">Nuevo Tipo de Ítem</a>
 <br />
@@ -50,6 +18,7 @@
         <th>Código</th>
         <th>Nombre</th>
         <th>Unidad de Medida</th>
+        <th>Acciones</th>
     </tr>
     @if (Mensaje == "")
     {
@@ -74,12 +43,10 @@
                            href="api/ItemTipos/editar/@item.Id">
                             Editar
                         </a>
-                    </td>
-                    <td>
-                        <button class="btn btn-danger"
-                                @onclick="() => Eliminar(item)">
-                            Borrar
-                        </button>
+                            <button class="btn btn-danger"
+                                    @onclick="() => Eliminar(item)">
+                                Borrar
+                            </button>
                     </td>
                 </tr>
             }
@@ -90,6 +57,7 @@
         <p> Error: @Mensaje</p>
     }
 </table>
+</div>
 
 <Confirmacion @ref="confirmacion"
               Titulo="CUIDADO"
