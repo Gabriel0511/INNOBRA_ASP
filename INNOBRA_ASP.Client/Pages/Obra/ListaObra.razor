@@ -224,6 +224,7 @@
     List<Presupuesto> presupuestos = new List<Presupuesto>();
     List<Item> items = new List<Item>();
     List<ItemTipo> itemTipos = new List<ItemTipo>();
+    List<Avance> listaAvances = new List<Avance>();
     Obra obraSeleccionada;
     Presupuesto presupuestoSeleccionado;
     bool showPresupuestos = false;
@@ -416,6 +417,20 @@
         {
             try
             {
+                var resp2 = await http.Get<List<Avance>>("api/Avances");
+                listaAvances = resp2.Respuesta;
+                foreach (var itemavance in listaAvances)
+                    {
+                      if (itemavance.Item_Id == itemId)
+                      {
+                          var resp3 = await http.Delete($"api/Avances/{itemavance.Id}");
+                          if (resp3.Error)
+                          {
+                             Mensaje = "No se pudo borrar el avance";
+                          }
+                      }
+                    }
+
                 var resp = await http.Delete($"Api/Items/{itemId}");
                 if (!resp.Error)
                 {
