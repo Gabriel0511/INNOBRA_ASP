@@ -9,61 +9,61 @@
 <div class="fondo"></div>
 <div class="overlay"></div>
 <div class="contenedor-formulario">
-<h3>Items Tipo</h3>
-<br />
-<a class="btn btn-primary" href="/api/ItemTipos/crear">Nuevo Tipo de Ítem</a>
-<br />
-<table>
-    <tr>
-        <th>Código</th>
-        <th>Nombre</th>
-        <th>Unidad de Medida</th>
-        <th>Acciones</th>
-    </tr>
-    @if (Mensaje == "")
-    {
-        @if (listaItemTipos == null)
+    <h3>Items Tipo</h3>
+    <br />
+    <a class="btn btn-primary" href="/api/ItemTipos/crear">Nuevo Tipo de Ítem</a>
+    <br />
+    <table>
+        <tr>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Unidad de Medida</th>
+            <th>Acciones</th>
+        </tr>
+        @if (Mensaje == "")
         {
-            <p>Buscando....</p>
-        }
-        else if (listaItemTipos.Count == 0)
-        {
-            <p>No existen tipos de ítems</p>
+            @if (listaItemTipos == null)
+            {
+                <p>Buscando....</p>
+            }
+            else if (listaItemTipos.Count == 0)
+            {
+                <p>No existen tipos de ítems</p>
+            }
+            else
+            {
+                @foreach (var item in listaItemTipos)
+                {
+                    <tr>
+                        <td>@item.Codigo</td>
+                        <td>@item.Nombre</td>
+                        <td>@unidadesNombres.GetValueOrDefault(item.Unidad_Id, "Sin Unidad")</td>
+                        <td>
+                            <a class="btn btn-primary"
+                            href="api/ItemTipos/editar/@item.Id">
+                                Editar
+                            </a>
+                            <button class="btn btn-danger"
+                            @onclick="() => Eliminar(item)">
+                                Borrar
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
         }
         else
         {
-            @foreach (var item in listaItemTipos)
-            {
-                <tr>
-                    <td>@item.Codigo</td>
-                    <td>@item.Nombre</td>
-                    <td>@item.Unidad_Id</td>
-                    <td>
-                        <a class="btn btn-primary"
-                           href="api/ItemTipos/editar/@item.Id">
-                            Editar
-                        </a>
-                            <button class="btn btn-danger"
-                                    @onclick="() => Eliminar(item)">
-                                Borrar
-                            </button>
-                    </td>
-                </tr>
-            }
+            <p> Error: @Mensaje</p>
         }
-    }
-    else
-    {
-        <p> Error: @Mensaje</p>
-    }
-</table>
+    </table>
 </div>
 
 <Confirmacion @ref="confirmacion"
-              Titulo="CUIDADO"
-              textCancelar="Salir"
-              onCancel="Cancelar"
-              onConfirm="Borrar">
+Titulo="CUIDADO"
+textCancelar="Salir"
+onCancel="Cancelar"
+onConfirm="Borrar">
     <h5>Está por borrar el tipo de ítem</h5>
     <br />
     <p>¿Está seguro?</p>
@@ -73,6 +73,9 @@
     Confirmacion confirmacion;
 
     List<ItemTipo> listaItemTipos;
+    private Dictionary<int, string> unidadesNombres = new Dictionary<int, string>();
+
+    Unidad unidad = new Unidad();
     ItemTipo itemTipo;
     string Mensaje = "";
 
@@ -87,6 +90,7 @@
             mensajeService.Mensaje = string.Empty;  // Borra el mensaje
         }
         await Leer();
+        await LeerUnidad();
     }
 
     private async Task Leer()
@@ -99,6 +103,15 @@
         else
         {
             Mensaje = await resp.ObtenerError();
+        }
+    }
+
+    private async Task LeerUnidad()
+    {
+        foreach (var item in listaItemTipos)
+        {
+            var resp = await http.Get<Unidad>($"api/Unidades/GetById/{item.Unidad_Id}");
+            unidadesNombres[item.Unidad_Id] = resp.Respuesta.Nombre;
         }
     }
 
