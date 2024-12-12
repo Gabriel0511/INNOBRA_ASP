@@ -74,6 +74,7 @@ onConfirm="Borrar">
 
     List<ItemTipo> listaItemTipos;
     List<Item> listaItems;
+    List<Avance> listaAvances;
     private Dictionary<int, string> unidadesNombres = new Dictionary<int, string>();
 
     Unidad unidad = new Unidad();
@@ -131,14 +132,27 @@ onConfirm="Borrar">
     private async Task Borrar()
     {
         
-
         var respuesta2 = await http.Get<List<Item>>("api/Items");
         listaItems = respuesta2.Respuesta;
         {
             foreach (var item in listaItems)
             {
                 if (item.Item_Tipos_Id == itemTipoBorrar.Id)
-                {
+                {   
+                    var respuesta4 = await http.Get<List<Avance>>("api/Avances");
+                    listaAvances = respuesta4.Respuesta;
+                    foreach (var itemavance in listaAvances)
+                    {
+                        if (itemavance.Item_Id == item.Id)
+                        {
+                            var respuesta5 = await http.Delete($"api/Avances/{itemavance.Id}");
+                            if (respuesta5.Error)
+                            {
+                                Mensaje = "No se pudo borrar el avance";
+                            }
+                        }
+                    }
+
                     var respuesta3 = await http.Delete($"api/Items/{item.Id}");
                     if (respuesta3.Error)
                     {
