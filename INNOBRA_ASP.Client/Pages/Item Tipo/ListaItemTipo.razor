@@ -73,6 +73,7 @@ onConfirm="Borrar">
     Confirmacion confirmacion;
 
     List<ItemTipo> listaItemTipos;
+    List<Item> listaItems;
     private Dictionary<int, string> unidadesNombres = new Dictionary<int, string>();
 
     Unidad unidad = new Unidad();
@@ -129,6 +130,24 @@ onConfirm="Borrar">
 
     private async Task Borrar()
     {
+        
+
+        var respuesta2 = await http.Get<List<Item>>("api/Items");
+        listaItems = respuesta2.Respuesta;
+        {
+            foreach (var item in listaItems)
+            {
+                if (item.Item_Tipos_Id == itemTipoBorrar.Id)
+                {
+                    var respuesta3 = await http.Delete($"api/Items/{item.Id}");
+                    if (respuesta3.Error)
+                    {
+                        Mensaje = "No se pudo borrar el item";
+                    }
+                }
+            }
+        }
+
         var respuesta = await http.Delete($"api/ItemTipos/{itemTipoBorrar.Id}");
         if (respuesta.Error)
         {
