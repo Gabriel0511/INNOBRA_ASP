@@ -11,6 +11,7 @@ namespace INNOBRA_ASP.Shared.DTO
     public class CrearUnidadDTO
     {
         [Required(ErrorMessage = "El nombre es obligatorio.")]
+        [RegularExpression(@"^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$", ErrorMessage = "Nombre invalido.")]
         public string Nombre { get; set; }
     }
 }

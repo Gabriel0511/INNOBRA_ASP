@@ -27,6 +27,7 @@
         <div>
             <label>Nombre:</label>
             <InputText @bind-Value="unidad.Nombre" class="form-control" />
+            <ValidationMessage For="@(() => unidad.Nombre)" />
         </div>
 
         <button type="submit" class="btn btn-primary">Guardar</button>
