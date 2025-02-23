@@ -12,9 +12,11 @@ namespace INNOBRA_ASP.Shared.DTO
     {
 
         [Required(ErrorMessage = "El nombre es obligatorio.")]
+        [RegularExpression(@"^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$", ErrorMessage = "Nombre invalido.")]
         public string Nombre { get; set; }
 
         [Required(ErrorMessage = "La cantidad es obligatoria.")]
+        [Range(1, int.MaxValue, ErrorMessage = "La cantidad debe ser un numerica.")]
         public string Cantidad { get; set; }
 
         //CLAVE FORANEA
