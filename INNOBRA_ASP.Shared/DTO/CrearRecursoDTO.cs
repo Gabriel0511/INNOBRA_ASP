@@ -10,14 +10,6 @@ namespace INNOBRA_ASP.Shared.DTO
 {
     public class CrearRecursoDTO
     {
-        public enum TipoRecursoDTO
-        {
-            Humano,
-            Maquinaria,
-            Material
-        }
-
-        public TipoRecursoDTO Tipo { get; set; }
 
         [Required(ErrorMessage = "El nombre es obligatorio.")]
         public string Nombre { get; set; }
@@ -27,7 +19,20 @@ namespace INNOBRA_ASP.Shared.DTO
 
         //CLAVE FORANEA
 
+        //[RegularExpression(@"^(?!-).*$", ErrorMessage = "Seleccione una opcion")]
+        [Range(1, int.MaxValue, ErrorMessage = "Seleccione una unidad valida")]
         public int Unidad_Id { get; set; }
+
+        public enum TipoRecursoDTO
+        {
+            Humano,
+            Maquinaria,
+            Material
+        }
+
+        [Required(ErrorMessage = "El tipo de recurso es obligatorio.")]
+        [EnumDataType(typeof(TipoRecursoDTO), ErrorMessage = "Seleccione un tipo válido.")]
+        public TipoRecursoDTO? Tipo { get; set; }
 
     }
 }
