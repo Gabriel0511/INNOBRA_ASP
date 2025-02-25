@@ -20,14 +20,16 @@
 
 <EditForm Model="@item" OnValidSubmit="Actualizar">
     <DataAnnotationsValidator />
-    <ValidationSummary />
 
-    <div>
+    <div class="form-group">
         <label>Tiempo Estimado:</label>
-        <InputNumber @bind-Value="item.Tiempo_estimado" />
+        <div>
+                <InputNumber class="form-control" @bind-Value="item.Tiempo_estimado" />
         <ValidationMessage For="@(() => item.Tiempo_estimado)" />
+        </div>
     </div>
 
+    
     <div>
         <label>Unidad de tiempo:</label>
         <div>
@@ -42,9 +44,9 @@
         </div>
     </div>
 
-    <div>
+    <div class="form-group">
         <label>Material Estimado:</label>
-        <InputNumber @bind-Value="item.Material_estimado" />
+        <InputNumber class="form-control" @bind-Value="item.Material_estimado" />
         <ValidationMessage For="@(() => item.Material_estimado)" />
     </div>
 
