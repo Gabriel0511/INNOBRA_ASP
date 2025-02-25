@@ -21,10 +21,15 @@
     <EditForm Model="@obra" OnValidSubmit="Actualizar">
         <DataAnnotationsValidator />
 
-        <div class="mb-3">
-            <label>Nombre:</label>
-            <InputText @bind-Value="obra.Nombre" />
-            <ValidationMessage For="@(() => obra.Nombre)" />
+        <div class="form-group">
+
+            <div style="display:flex">
+                <label>Nombre:</label>
+                <InputText class="form-control" style="max-width: 35%; max-height: 2.2rem; margin-left:0.5rem " @bind-Value="@obra.Nombre" />
+            </div>
+            <div>
+                <ValidationMessage For="@(() => obra.Nombre)" />
+            </div>
         </div>
 
         <div class="mb-3">
