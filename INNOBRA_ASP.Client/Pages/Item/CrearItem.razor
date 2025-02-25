@@ -22,13 +22,14 @@
 
 <EditForm Model="@item" OnValidSubmit="Grabar">
     <DataAnnotationsValidator />
-    <ValidationSummary />
+    
 
     <div class="mb-3">
         <label>Tiempo Estimado:</label>
         <InputNumber class="form-control" @bind-Value="item.Tiempo_estimado" />
-        <ValidationMessage For="@(() => item.Tiempo_estimado)" />
+                <ValidationMessage For="@(() => item.Tiempo_estimado)" />
     </div >
+      
 
     <div class="mb-3">
         <label>Unidad de tiempo:</label>
