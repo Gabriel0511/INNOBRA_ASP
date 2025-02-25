@@ -13,11 +13,7 @@ namespace INNOBRA_ASP.Shared.DTO
         public int Id { get; set; }
 
         [Required(ErrorMessage = "El nombre es obligatorio.")]
+        [RegularExpression(@"^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$", ErrorMessage = "Nombre invalido.")]
         public string Nombre { get; set; }
-
-        public string Descripcion { get; set; }
-
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal Costo { get; set; }
     }
 }

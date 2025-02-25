@@ -13,4 +13,3 @@ public class EditarPresupuestoDTO
     [Required(ErrorMessage = "La fecha de fin prevista es obligatoria.")]
     public DateTime FechaFinPrevista { get; set; }
 }
-

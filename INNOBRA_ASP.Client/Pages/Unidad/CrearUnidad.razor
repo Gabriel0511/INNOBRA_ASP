@@ -3,68 +3,81 @@
 @using INNOBRA_ASP.Shared.DTO
 @using System.Net.Http.Json
 @inject NavigationManager nav
+@inject MensajeService mensajeService
+@using Microsoft.AspNetCore.Components.Forms
 
-<h3>Gestión de Unidades</h3>
+<div class="fondo"></div>
+<div class="overlay"></div>
 
-<!-- Formulario para Crear/Editar Unidad -->
-<EditForm Model="@unidad" OnValidSubmit="Grabar">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+<div class="contenedor-formulario">
 
-    <div>
-        <label>Nombre:</label>
-        <InputText @bind-Value="unidad.Nombre" />
-    </div>
+    <h3>Agregar Unidad</h3>
 
-    <div>
-        <label>Descripcion:</label>
-        <InputText @bind-Value="unidad.Descripcion" />
-    </div>
+    <!-- Sección para mostrar mensajes -->
+    @if (!string.IsNullOrEmpty(mensajeService.Mensaje))
+    {
+        <div class="alert alert-info">
+            @mensajeService.Mensaje
+        </div>
+    }
 
-    <div>
-        <label>Costo:</label>
-        <InputNumber @bind-Value="unidad.Costo" />
-    </div>
+    <EditForm Model="@unidad" OnValidSubmit="Grabar">
+        <DataAnnotationsValidator />
 
-    <button type="submit" class="btn btn-primary">Guardar</button>
-    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-</EditForm>
+        <div>
+            <label>Nombre:</label>
+            <InputText @bind-Value="unidad.Nombre" class="form-control" />
+            <ValidationMessage For="@(() => unidad.Nombre)" />
+        </div>
 
-<hr />
-
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+    </EditForm>
+</div>
 
 @code {
     private CrearUnidadDTO unidad = new CrearUnidadDTO();
-    private List<CrearUnidadDTO> listaUnidades = new();
+    private List<Unidad> listaUnidad = new List<Unidad>();
 
     protected override async Task OnInitializedAsync()
     {
-        await CargarUnidades();
+        await CargarUnidad();
     }
 
-    private async Task CargarUnidades()
+    private async Task CargarUnidad()
     {
-        // Llama al servicio para obtener la lista de unidades
-        var respuesta = await http.Get<List<CrearUnidadDTO>>("api/Unidades");
+        var respuesta = await http.Get<List<Unidad>>("api/Unidades");
         if (!respuesta.Error)
         {
-            listaUnidades = respuesta.Respuesta;
+            listaUnidad = respuesta.Respuesta;
         }
     }
 
     private async Task Grabar()
     {
-        var httpRespuesta = await http.Post<CrearUnidadDTO>("api/Unidades", unidad);
-        if (httpRespuesta.Error)
+        // Verificar si la unidad ya existe en la lista
+        if (listaUnidad.Any(u => u.Nombre.Equals(unidad.Nombre, StringComparison.OrdinalIgnoreCase)))
         {
-            var body = httpRespuesta.HttpResponseMessage;
+            mensajeService.Mensaje = "Error: La unidad ya existe.";
+            return;
         }
-        nav.NavigateTo("/api/Unidades");
-    }
 
+        // Intentar crear la unidad si no existe
+        var httpRespuesta = await http.Post<CrearUnidadDTO>("api/Unidades", unidad);
+        if (!httpRespuesta.Error)
+        {
+            mensajeService.Mensaje = "Unidad agregada con éxito.";
+            nav.NavigateTo("/api/Unidades");
+        }
+        else
+        {
+            var errorContent = await httpRespuesta.HttpResponseMessage.Content.ReadAsStringAsync();
+            mensajeService.Mensaje = $"Error: {errorContent}";
+        }
+    }
 
     private void Cancelar()
     {
-
+        nav.NavigateTo("/api/Unidades");
     }
 }

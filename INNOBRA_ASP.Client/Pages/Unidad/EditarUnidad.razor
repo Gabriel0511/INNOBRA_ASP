@@ -1,49 +1,61 @@
-﻿@page "/api/Unidades/editar/{id:int}"
+﻿@page "/Api/Unidades/editar/{id:int}"
 @inject IHttpServicio http
 @using INNOBRA_ASP.Shared.DTO
 @using System.Net.Http.Json
 @inject NavigationManager nav
+@inject MensajeService mensajeService
+@using Microsoft.AspNetCore.Components.Forms
 
-<h3>Editar Unidad</h3>
+<div class="fondo"></div>
+<div class="overlay"></div>
+<div class="contenedor-formulario">
+    <h3>Editar Unidad</h3>
 
-@if (!string.IsNullOrEmpty(mensaje))
-{
-    <div class="alert alert-success">
-        @mensaje
-    </div>
-}
+    @if (!string.IsNullOrEmpty(mensaje))
+    {
+        <div class="alert alert-success">
+            @mensaje
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <div class="alert alert-danger">
+            @mensajeError
+        </div>
+    }
 
-<EditForm Model="@unidad" OnValidSubmit="Actualizar">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+    <EditForm Model="unidad" OnValidSubmit="Actualizar">
+        <DataAnnotationsValidator />
 
-    <div>
-        <label>Nombre:</label>
-        <InputText @bind-Value="unidad.Nombre" />
-        <ValidationMessage For="@(() => unidad.Nombre)" />
-    </div>
+@*         <div class="form-group">
+            <label>Unidad Medida:</label>
+            <InputSelect @bind-Value="unidad.Nombre" class="form-control">
+                @foreach (var tipo in Enum.GetValues(typeof(EditarUnidadDTO.UnidadMedidaDTO)))
+                {
+                    <option value="@tipo">@tipo</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => unidad.Nombre)" />
+        </div> *@
 
-    <div>
-        <label>Descripción:</label>
-        <InputText @bind-Value="unidad.Descripcion" />
-    </div>
+        <div class="form-group">
+            <label>Unidad Medida:</label>
+            <div>
+                <InputText class="form-control" @bind-Value="@unidad.Nombre" />
+                <ValidationMessage For="@(() => unidad.Nombre)" />
+            </div>
+        </div>
 
-    <div>
-        <label>Costo:</label>
-        <InputNumber @bind-Value="unidad.Costo" />
-        <ValidationMessage For="@(() => unidad.Costo)" />
-    </div>
-
-    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-</EditForm>
-
-<hr />
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+    </EditForm>
+</div>
 
 @code {
     [Parameter] public int id { get; set; }
     private EditarUnidadDTO unidad = new EditarUnidadDTO();
     private string mensaje = "";
+    private string mensajeError = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -52,7 +64,7 @@
 
     private async Task CargarUnidad()
     {
-        var respuesta = await http.Get<EditarUnidadDTO>($"api/Unidades/{id}");
+        var respuesta = await http.Get<EditarUnidadDTO>($"api/Unidades/GetById/{id}");
         if (!respuesta.Error)
         {
             unidad = respuesta.Respuesta;
@@ -69,13 +81,13 @@
 
         if (!respuesta.Error)
         {
-            mensaje = "Se cargó con éxito la unidad.";
-            nav.NavigateTo("/api/Unidades");
+            mensajeService.Mensaje = "Se actualizó con éxito la unidad.";
+            await Task.Delay(500);
+            nav.NavigateTo("/api/unidades");
         }
         else
         {
-            var errorContent = await respuesta.HttpResponseMessage.Content.ReadAsStringAsync();
-            mensaje = $"Error: {errorContent}"; // Muestra el error
+            mensajeError = $"Error: {await respuesta.HttpResponseMessage.Content.ReadAsStringAsync()}";
         }
     }
 

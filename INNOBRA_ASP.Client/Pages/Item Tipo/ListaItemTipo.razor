@@ -1,61 +1,69 @@
 ﻿@page "/api/ItemTipos"
 @inject IHttpServicio http
+@inject MensajeService mensajeService
 
-<h3>Lista de Tipos de Ítems</h3>
-<br />
-<a class="btn btn-primary" href="/api/ItemTipos/crear">Nuevo Tipo de Ítem</a>
-<br />
-<table>
-    <tr>
-        <th>Código</th>
-        <th>Nombre</th>
-        <th>Unidad de Medida</th>
-    </tr>
-    @if (Mensaje == "")
-    {
-        @if (listaItemTipos == null)
+<div class="alert alert-info" style="display: @(!string.IsNullOrEmpty(mensajeService.Mensaje) ? "block" : "none")">
+    @mensajeService.Mensaje
+</div> @* Muestra el mensaje que se actualizò con exito. *@
+
+<div class="fondo"></div>
+<div class="overlay"></div>
+<div class="contenedor-formulario">
+    <h3>Items Tipo</h3>
+    <br />
+    <a class="btn btn-primary" href="/api/ItemTipos/crear">Nuevo Tipo de Ítem</a>
+    <br />
+    <table>
+        <tr>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Unidad de Medida</th>
+            <th>Acciones</th>
+        </tr>
+        @if (Mensaje == "")
         {
-            <p>Buscando....</p>
-        }
-        else if (listaItemTipos.Count == 0)
-        {
-            <p>No existen tipos de ítems</p>
+            @if (listaItemTipos == null)
+            {
+                <p>Buscando....</p>
+            }
+            else if (listaItemTipos.Count == 0)
+            {
+                <p>No existen tipos de ítems</p>
+            }
+            else
+            {
+                @foreach (var item in listaItemTipos)
+                {
+                    <tr>
+                        <td>@item.Codigo</td>
+                        <td>@item.Nombre</td>
+                        <td>@unidadesNombres.GetValueOrDefault(item.Unidad_Id, "Sin Unidad")</td>
+                        <td>
+                            <a class="btn btn-primary"
+                            href="api/ItemTipos/editar/@item.Id">
+                                Editar
+                            </a>
+                            <button class="btn btn-danger"
+                            @onclick="() => Eliminar(item)">
+                                Borrar
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
         }
         else
         {
-            @foreach (var item in listaItemTipos)
-            {
-                <tr>
-                    <td>@item.Codigo</td>
-                    <td>@item.Nombre</td>
-                    <td>@item.Unidad_Id</td>
-                    <td>
-                        <a class="btn btn-primary"
-                           href="api/ItemTipos/editar/@item.Id">
-                            Editar
-                        </a>
-                    </td>
-                    <td>
-                        <button class="btn btn-danger"
-                                @onclick="() => Eliminar(item)">
-                            Borrar
-                        </button>
-                    </td>
-                </tr>
-            }
+            <p> Error: @Mensaje</p>
         }
-    }
-    else
-    {
-        <p> Error: @Mensaje</p>
-    }
-</table>
+    </table>
+</div>
 
 <Confirmacion @ref="confirmacion"
-              Titulo="CUIDADO"
-              textCancelar="Salir"
-              onCancel="Cancelar"
-              onConfirm="Borrar">
+Titulo="CUIDADO"
+textCancelar="Salir"
+onCancel="Cancelar"
+onConfirm="Borrar">
     <h5>Está por borrar el tipo de ítem</h5>
     <br />
     <p>¿Está seguro?</p>
@@ -65,6 +73,11 @@
     Confirmacion confirmacion;
 
     List<ItemTipo> listaItemTipos;
+    List<Item> listaItems;
+    List<Avance> listaAvances;
+    private Dictionary<int, string> unidadesNombres = new Dictionary<int, string>();
+
+    Unidad unidad = new Unidad();
     ItemTipo itemTipo;
     string Mensaje = "";
 
@@ -73,7 +86,13 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        if (!string.IsNullOrEmpty(mensajeService.Mensaje))
+        {
+            await Task.Delay(1500);  // Espera 3 segundos
+            mensajeService.Mensaje = string.Empty;  // Borra el mensaje
+        }
         await Leer();
+        await LeerUnidad();
     }
 
     private async Task Leer()
@@ -86,6 +105,15 @@
         else
         {
             Mensaje = await resp.ObtenerError();
+        }
+    }
+
+    private async Task LeerUnidad()
+    {
+        foreach (var item in listaItemTipos)
+        {
+            var resp = await http.Get<Unidad>($"api/Unidades/GetById/{item.Unidad_Id}");
+            unidadesNombres[item.Unidad_Id] = resp.Respuesta.Nombre;
         }
     }
 
@@ -103,6 +131,37 @@
 
     private async Task Borrar()
     {
+        
+        var respuesta2 = await http.Get<List<Item>>("api/Items");
+        listaItems = respuesta2.Respuesta;
+        {
+            foreach (var item in listaItems)
+            {
+                if (item.Item_Tipos_Id == itemTipoBorrar.Id)
+                {   
+                    var respuesta4 = await http.Get<List<Avance>>("api/Avances");
+                    listaAvances = respuesta4.Respuesta;
+                    foreach (var itemavance in listaAvances)
+                    {
+                        if (itemavance.Item_Id == item.Id)
+                        {
+                            var respuesta5 = await http.Delete($"api/Avances/{itemavance.Id}");
+                            if (respuesta5.Error)
+                            {
+                                Mensaje = "No se pudo borrar el avance";
+                            }
+                        }
+                    }
+
+                    var respuesta3 = await http.Delete($"api/Items/{item.Id}");
+                    if (respuesta3.Error)
+                    {
+                        Mensaje = "No se pudo borrar el item";
+                    }
+                }
+            }
+        }
+
         var respuesta = await http.Delete($"api/ItemTipos/{itemTipoBorrar.Id}");
         if (respuesta.Error)
         {

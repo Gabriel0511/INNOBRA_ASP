@@ -3,45 +3,59 @@
 @using INNOBRA_ASP.Shared.DTO
 @using System.Net.Http.Json
 @inject NavigationManager nav
+@inject MensajeService mensajeService
+@using Microsoft.AspNetCore.Components.Forms
 
-<div class="fondo">
-    <div class="contenido">
+<div class="fondo"></div>
+<div class="overlay"></div>
+<div class="contenedor-formulario">
+    <h3>Editar Obra</h3>
 
-<h3>Editar Obra</h3>
+    @if (!string.IsNullOrEmpty(mensaje))
+    {
+        <div class="alert alert-success">
+            @mensaje
+        </div>
+    }
 
-@if (!string.IsNullOrEmpty(mensaje))
-{
-    <div class="alert alert-success">
-        @mensaje
-    </div>
-}
+    <EditForm Model="@obra" OnValidSubmit="Actualizar">
+        <DataAnnotationsValidator />
 
-<EditForm Model="@obra" OnValidSubmit="Actualizar">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+        <div class="form-group">
 
-            <div class ="mb-3">
-        <label>Nombre:</label>
-        <InputText @bind-Value="obra.Nombre" />
-        <ValidationMessage For="@(() => obra.Nombre)" />
-    </div>
+            <div style="display:flex">
+                <label>Nombre:</label>
+                <InputText class="form-control" style="max-width: 35%; max-height: 2.2rem; margin-left:0.5rem " @bind-Value="@obra.Nombre" />
+            </div>
+            <div>
+                <ValidationMessage For="@(() => obra.Nombre)" />
+            </div>
+        </div>
 
-            <div class="mb-3">
-        <label>Fecha Inicio</label>
-        <InputDate @bind-Value="obra.FechaInicio" />
-        <ValidationMessage For="@(() => obra.FechaInicio)" />
-    </div>
+        <div class="mb-3">
+            <label>Fecha Inicio</label>
+            <InputDate @bind-Value="obra.FechaInicio" />
+            <ValidationMessage For="@(() => obra.FechaInicio)" />
+        </div>
 
-            <div class="mb-3">
-        <label>Fecha fin</label>
-        <InputDate @bind-Value="obra.FechaFin" />
-        <ValidationMessage For="@(() => obra.FechaFin)" />
-    </div>
+        <div class="mb-3">
+            <label>Fecha fin</label>
+            <InputDate @bind-Value="obra.FechaFin" />
+            <ValidationMessage For="@(() => obra.FechaFin)" />
+        </div>
 
-    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-</EditForm>
-    </div>
+        <div class="mb-3">
+            <label>Imagen:</label>
+            <InputFile OnChange="OnInputFileChange" />
+            @if (obra.Imagen != null)
+            {
+                <img src="data:image;base64,@Convert.ToBase64String(obra.Imagen)" alt="Imagen actual" style="width: 200px; height: auto; margin-top: 10px;" />
+            }
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+    </EditForm>
 </div>
 
 @code {
@@ -69,17 +83,34 @@
 
     private async Task Actualizar()
     {
-        var respuesta = await http.Put($"Api/Obras/{id}", obra);
+        var respuesta = await http.Put($"Api/obras/{id}", obra);
 
         if (!respuesta.Error)
         {
-            mensaje = "Se cargó con éxito la obra.";
+            // Actualizamos el mensaje globalmente a través del servicio
+            mensajeService.Mensaje = "Se actualizó con éxito la obra.";
+
+            // Forzamos el renderizado (opcional, pero puede ser útil)
+            StateHasChanged();
+
+            // Redirigimos a la página de lista de unidades
+            await Task.Delay(1500); // Espera para mostrar el mensaje
             nav.NavigateTo("/api/Obras");
         }
         else
         {
             var errorContent = await respuesta.HttpResponseMessage.Content.ReadAsStringAsync();
-            mensaje = $"Error: {errorContent}"; // Muestra el error
+            mensajeService.Mensaje = $"Error: {errorContent}";
+        }
+    }
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        var imageFile = e.File;
+        using (var stream = new MemoryStream())
+        {
+            await imageFile.OpenReadStream().CopyToAsync(stream);
+            obra.Imagen = stream.ToArray(); // Asigna la imagen a obra.Imagen
         }
     }
 

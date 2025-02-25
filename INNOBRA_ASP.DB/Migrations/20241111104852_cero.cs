@@ -19,7 +19,8 @@ namespace INNOBRA_ASP.DB.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FechaInicio = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    FechaFin = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    FechaFin = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Imagen = table.Column<byte[]>(type: "varbinary(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -32,9 +33,7 @@ namespace INNOBRA_ASP.DB.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Costo = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -93,7 +92,6 @@ namespace INNOBRA_ASP.DB.Migrations
                     Tipo = table.Column<int>(type: "int", nullable: false),
                     Nombre = table.Column<string>(type: "nvarchar(45)", maxLength: 45, nullable: false),
                     Cantidad = table.Column<string>(type: "nvarchar(12)", maxLength: 12, nullable: false),
-                    UnidadMedida = table.Column<string>(type: "nvarchar(45)", maxLength: 45, nullable: false),
                     Unidad_Id = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>

@@ -1,118 +1,315 @@
 ﻿@page "/api/Recursos"
 @inject IHttpServicio http
+@inject IJSRuntime js
+@inject MensajeService mensajeService
 
-<h3>Lista de Recursos</h3>
-<br />
-<a class="btn btn-primary" href="/api/Recursos/crear">Nuevo Recurso</a>
-<br />
-<table>
-    <tr>
-        <th>Tipo</th>
-        <th>Nombre</th>
-        <th>Cantidad</th>
-        <th>Unidad de Medida</th>
-    </tr>
-    @if (Mensaje == "")
+<div class="alert alert-info" style="display: @(!string.IsNullOrEmpty(mensajeService.Mensaje) ? "block" : "none")">
+    @mensajeService.Mensaje
+</div> @* Muestra el mensaje que se actualizò con exito. *@
+
+
+<div class="fondo"></div>
+    <div class="overlay"></div>
+
+<div class="contenedor-formulario">
+
+    <h3>Recursos</h3>
+
+    @if (!string.IsNullOrEmpty(Mensaje))
     {
-        @if (listaRecursos == null)
-        {
-            <p>Buscando....</p>
-        }
-        else if (listaRecursos.Count == 0)
-        {
-            <p>No existen recursos</p>
-        }
-        else
-        {
-            @foreach (var item in listaRecursos)
-            {
-                <tr>
-                    <td>@item.Tipo</td>
-                    <td>@item.Nombre</td>
-                    <td>@item.Cantidad</td>
-                    <td>@item.UnidadMedida</td>
-                    <td>
-                        <a class="btn btn-primary"
-                           href="api/Recursos/editar/@item.Id">
-                            Editar
-                        </a>
-                    </td>
-                    <td>
-                        <button class="btn btn-danger"
-                           @onclick = "()=>Eliminar(item)">
-                            Borrar
-                        </button>
-                    </td>
-                </tr>
-            }
-        }
+            <div class="alert alert-danger" role="alert">
+            @Mensaje
+            </div>
+    }
+
+    @if (cargando)
+    {
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+    }
+    else if (listaRecursos != null && listaRecursos.Any())
+    {
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Tipo de Recurso</th>
+                        <th scope="col">Cantidad</th>
+                        <th scope="col">Unidad de Medida</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var recurso in listaRecursos)
+                {
+                            <tr>
+                                <td>@recurso.Nombre</td>
+                                <td>@recurso.Tipo</td>
+                                <td>@recurso.Cantidad</td>
+                                <td>@MostrarNombreUnidad(recurso.Unidad_Id)</td>
+
+                                <td>
+                                    <a class="btn btn-warning btn-sm" href="/api/Recursos/editar/@recurso.Id"><i class="bi bi-pencil"></i></a>
+                                    <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(recurso.Id)"><i class="bi bi-trash3"></i></button>
+                                </td>
+                            </tr>
+                }
+                </tbody>
+            </table>
     }
     else
     {
-        <p> Error: @Mensaje</p>
+            <div class="alert alert-warning" role="alert">
+                No hay recursos registrados.
+            </div>
     }
-</table>
 
-<Confirmacion @ref="confirmacion"
-              Titulo="CUIDADO"
-              textCancelar="Salir"
-              onCancel="Cancelar"
-              onConfirm="Borrar">
-              <h5>Está por borrar el recurso</h5>
-              <br />
-              <p>Está seguro?</p>
-</Confirmacion>
+    <br/>
 
+    <a class="btn btn-success btn-sm" href="/api/Recursos/crear">
+        <i class="bi bi-plus-circle"></i> Agregar Recurso
+    </a>
+</div>
+
+
+
+@* @page "/api/Recursos"
+@inject IHttpServicio http
+@inject MensajeService mensajeService
+
+<div class="alert alert-info" style="display: @(!string.IsNullOrEmpty(mensajeService.Mensaje) ? "block" : "none")">
+    @mensajeService.Mensaje
+</div>
+
+<div class="fondo"></div>
+    <div class="overlay"></div>
+        <div class="contenedor-formulario">
+            <h3>Lista de Recursos</h3>
+            <br />
+            <a class="btn btn-primary" href="/api/Recursos/crear">Nuevo Recurso</a>
+            <br /><br />
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Nombre</th>
+                        <th>Cantidad</th>
+                        <th>Unidad de Medida</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (string.IsNullOrEmpty(Mensaje))
+                    {
+                        @if (listaRecursos == null)
+                        {
+                            <tr><td colspan="5">Buscando....</td></tr>
+                        }
+                        else if (listaRecursos.Count == 0)
+                        {
+                            <tr><td colspan="5">No existen recursos</td></tr>
+                        }
+                        else
+                        {
+                            @foreach (var item in listaRecursos)
+                            {
+                                <tr>
+                                    <td>@item.Tipo</td>
+                                    <td>@item.Nombre</td>
+                                    <td>@item.Cantidad</td>
+                                    <td>
+                                        @if (unitNames.TryGetValue(item.Unidad_Id, out var unidadNombre))
+                                        {
+                                            @unidadNombre
+                                        }
+                                        else
+                                        {
+                                            <span>Unidad no disponible</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-primary" href="api/Recursos/editar/@item.Id">Editar</a>
+                                        <button class="btn btn-danger" @onclick="() => Eliminar(item)">Borrar</button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="5">Error: @Mensaje</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+<Confirmacion @ref="confirmacion" Titulo="CUIDADO" textCancelar="Salir" onCancel="Cancelar" onConfirm="Borrar">
+    <h5>Está por borrar el recurso</h5>
+    <br />
+    <p>Está seguro?</p>
+</Confirmacion> *@
 
 @code {
-    Confirmacion confirmacion;
-
-    List<Recurso> listaRecursos;
-    Recurso recurso;
+    List<Recurso> listaRecursos = new List<Recurso>();
+    List<Unidad> listaUnidades = new List<Unidad>();
     string Mensaje = "";
+    bool cargando = true;
 
-    Recurso? recursoBorrar = null;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-        await Leer();
-    }
-
-    private async Task Leer()
-    {
-        var resp = await http.Get<List<Recurso>>("api/Recursos");
-        if (!resp.Error)
+        protected override async Task OnInitializedAsync()
         {
-            listaRecursos = resp.Respuesta;
+            await base.OnInitializedAsync();
+            if (!string.IsNullOrEmpty(mensajeService.Mensaje))
+            {
+                await Task.Delay(1500);  // Espera 3 segundos
+                mensajeService.Mensaje = string.Empty;  // Borra el mensaje
+            }
+            await Leer();
+            await CargarUnidad();
         }
-        else
+
+        private async Task Leer()
         {
-            Mensaje = await resp.ObtenerError();
+        var resp = await http.Get<List<Recurso>>("/api/Recursos");
+            if (!resp.Error)
+            {
+                listaRecursos = resp.Respuesta;
+            }
+            else
+            {
+                Mensaje = await resp.ObtenerError();
+            }
+            cargando = false; // Cambiar cargando a false al finalizar la carga
         }
-    }
 
-    private async Task Eliminar(Recurso recurso)
-    {
-        recursoBorrar = recurso;
-        confirmacion.Ver();
-    }
-
-    private void Cancelar()
-    {
-        confirmacion.Ocultar();
-        recursoBorrar = null;
-    }
-
-    private async Task Borrar()
-    {
-        var respuesta = await http.Delete($"api/Recursos/{recursoBorrar.Id}");
-        if (respuesta.Error)
+        private async Task CargarUnidad()
         {
-            var body = "No se pudo borrar";
+            var respuesta = await http.Get<List<Unidad>>("api/Unidades");
+            if (!respuesta.Error)
+            {
+                listaUnidades = respuesta.Respuesta;
+            }
         }
-        Cancelar();
-        await Leer();
-    }
 
+        private string MostrarNombreUnidad(int unidadId)
+        {
+            var unidad = listaUnidades?.FirstOrDefault(r => r.Id == unidadId);
+            return unidad?.Nombre ?? "Sin asignar";
+        }
+
+        private async Task Eliminar(int id)
+        {
+            var resultado = await js.InvokeAsync<bool>("confirmSwal");
+
+            if (resultado)
+            {
+                try
+                {
+                    var resp = await http.Delete($"api/Recursos/{id}");
+                    if (!resp.Error)
+                    {
+                        await Leer(); // Recarga la lista después de eliminar
+                    }
+                    else
+                    {
+                        Mensaje = await resp.ObtenerError();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Mensaje = $"Ocurrió un error al eliminar el recurso: {ex.Message}";
+                }
+            }
+
+        }
+
+
+    // Confirmacion confirmacion;
+    // List<Recurso> listaRecursos;
+    // Recurso recurso;
+    // string Mensaje = "";
+    // Recurso? recursoBorrar = null;
+
+    // // Diccionario para almacenar los nombres de unidades basados en el ID
+    // private Dictionary<int, string> unitNames = new Dictionary<int, string>();
+
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     await base.OnInitializedAsync();
+
+    //     // Borra el mensaje después de 3 segundos
+    //     if (!string.IsNullOrEmpty(mensajeService.Mensaje))
+    //     {
+    //         await Task.Delay(1500);
+    //         mensajeService.Mensaje = string.Empty;
+    //     }
+
+    //     // Cargar recursos e unidades
+    //     await Leer();
+    // }
+
+    // private async Task Leer()
+    // {
+    //     // Llamada para obtener la lista de recursos
+    //     var resp = await http.Get<List<Recurso>>("api/Recursos");
+
+    //     if (!resp.Error)
+    //     {
+    //         listaRecursos = resp.Respuesta;
+
+    //         // Una vez que tenemos los recursos, cargamos los nombres de las unidades
+    //         await CargarNombresUnidades();
+    //     }
+    //     else
+    //     {
+    //         Mensaje = await resp.ObtenerError();
+    //     }
+    // }
+
+    // private async Task CargarNombresUnidades()
+    // {
+    //     // Obtenemos los IDs de las unidades asociadas a los recursos
+    //     var unidadIds = listaRecursos.Select(r => r.Unidad_Id).Distinct().ToList();
+
+    //     foreach (var unidadId in unidadIds)
+    //     {
+    //         var respuestaUnidad = await http.Get<Unidad>($"api/Unidades/GetById/{unidadId}");
+    //         if (!respuestaUnidad.Error)
+    //         {
+    //             var unidad = respuestaUnidad.Respuesta;
+    //             unitNames[unidadId] = unidad.Nombre;  // Guardamos el nombre de la unidad en el diccionario
+    //         }
+    //     }
+    // }
+
+    // private async Task Eliminar(Recurso recurso)
+    // {
+    //     recursoBorrar = recurso;
+    //     confirmacion.Ver();
+    // }
+
+    // private void Cancelar()
+    // {
+    //     confirmacion.Ocultar();
+    //     recursoBorrar = null;
+    // }
+
+    // private async Task Borrar()
+    // {
+    //     if (recursoBorrar != null)
+    //     {
+    //         var respuesta = await http.Delete($"api/Recursos/{recursoBorrar.Id}");
+    //         if (respuesta.Error)
+    //         {
+    //             Mensaje = "No se pudo borrar el recurso.";
+    //         }
+    //         else
+    //         {
+    //             // Recargar los recursos después de eliminar
+    //             await Leer();
+    //         }
+    //     }
+
+    //     Cancelar();
+    // }
 }

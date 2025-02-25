@@ -1,97 +1,179 @@
-﻿@page "/api/Avances"
+﻿@page "/api/Avances/{id:int}"
 @inject IHttpServicio http
+@inject HttpClient Http
+@inject IJSRuntime js
+@inject MensajeService mensajeService
 
-<h3>Lista de Avances</h3>
-<br />
-<a class="btn btn-primary" href="/api/Avances/crear">Nuevo Recurso</a>
-<br />
-<table>
-    <tr>
-        <th>Fecha</th>
-        <th>Material Ejecutado</th>
-        <th>Fecha de Finalizacion Real</th>
-        <th>Item Id</th>
-        <th>Recurso Id</th>
-    </tr>
-    @if (Mensaje == "")
+<div class="alert alert-info" style="display: @(!string.IsNullOrEmpty(mensajeService.Mensaje) ? "block" : "none")">
+    @mensajeService.Mensaje
+</div> @* Muestra el mensaje que se actualizò con exito. *@
+
+<div class="fondo"></div>
+<div class="overlay"></div>
+<div class="contenedor-formulario">
+
+    <h3>Lista de Avances</h3>
+
+    @if (!string.IsNullOrEmpty(Mensaje))
     {
-        @if (listaAvances == null)
-        {
-            <p>Buscando....</p>
-        }
-        else if (listaAvances.Count == 0)
-        {
-            <p>No existen recursos</p>
-        }
-        else
-        {
-            @foreach (var item in listaAvances)
-            {
+        <div class="alert alert-danger" role="alert">
+            @Mensaje
+        </div>
+    }
+    @if (cargando)
+    {
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+    }
+    else if (listaAvances != null && listaAvances.Any())
+    {
+        <table>
+            <thead>
                 <tr>
-                    <td>@item.Fecha</td>
-                    <td>@item.MaterialEjecutado</td>
-                    <td>@item.FechaFinalizacionReal</td>
-                    <td>@item.Item_Id</td>
-                    <td>@item.Recurso_Id</td>
-                    <td>
-                        <a class="btn btn-primary"
-                           href="api/Avances/editar/@item.Id">
-                            Editar
-                        </a>
-                    </td>
-                    <td>
-                        <button class="btn btn-danger"
-                                @onclick="()=>Eliminar(item)">
-                            Borrar
-                        </button>
-                    </td>
+                    <th>Fecha de Finalización Prevista</th>
+                    <th>Fecha de Finalización Real</th>
+                    <th>Recurso</th>
+                    <th>Material Ejecutado</th>
+                    <th>Acciones</th>
                 </tr>
-            }
-        }
+            </thead>
+            <tbody>
+                @foreach (var item in listaAvances)
+                {
+                    <tr>
+                        <td>@item.Fecha.ToString("dd-MM-yyyy")</td>
+                        <td>@item.FechaFinalizacionReal.ToString("dd-MM-yyyy")</td>
+                        <td>@MostrarRecurso(item.Recurso_Id)</td>
+                        <td>@item.MaterialEjecutado</td>
+
+                        <td>
+                            <a class="btn btn-warning btn-sm" href="api/Avances/editar/@item.Id"><i class="bi bi-pencil"></i></a>
+                            <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(item.Id)"><i class="bi bi-trash3"></i></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     }
     else
     {
-        <p> Error: @Mensaje</p>
+        <div class="alert alert-warning" role="alert">
+            No hay avances registrados para este item.
+        </div>
     }
-</table>
 
-<Confirmacion @ref="confirmacion"
-              Titulo="CUIDADO"
-              textCancelar="Salir"
-              onCancel="Cancelar"
-              onConfirm="Borrar">
+    <br />
+
+@*     <a class="btn btn-success btn-sm" href="/api/Avances/crear/@id">
+        <i class="bi bi-plus-circle"></i> Agregar Avance
+    </a> *@
+
+
+</div>
+
+@*<a class="btn btn-primary" href="/api/Avances/crear">Nuevo Avance</a>
+    <table>
+        <tr>
+            <th>Fecha</th>
+            <th>Material Ejecutado</th>
+            <th>Fecha de Finalización Real</th>
+            <th>Item Id</th>
+            <th>Recurso Id</th>
+            <th>Acciones</th>
+        </tr>
+        @if (Mensaje == "")
+        {
+            @if (listaAvances == null)
+            {
+                <p>Buscando....</p>
+            }
+            else if (listaAvances.Count == 0)
+            {
+                <p>No existen avances</p>
+            }
+            else
+            {
+                @foreach (var item in listaAvances)
+                {
+                    <tr>
+                        <td>@item.Fecha</td>
+                        <td>@item.MaterialEjecutado</td>
+                        <td>@item.FechaFinalizacionReal</td>
+                        <td>@item.Item_Id</td>
+                        <td>@item.Recurso_Id</td>
+                        <td>
+                            <a class="btn btn-primary" href="api/Avances/editar/@item.Id">Editar</a>
+                        </td>
+                        <td>
+                            <button class="btn btn-danger" @onclick="() => Eliminar(item)">Borrar</button>
+                        </td>
+                    </tr>
+                }
+            }
+        }
+        else
+        {
+            <p>Error: @Mensaje</p>
+        }
+    </table> 
+
+
+<Confirmacion @ref="confirmacion" Titulo="CUIDADO" textCancelar="Salir" onCancel="Cancelar" onConfirm="Borrar">
     <h5>Está por borrar el avance</h5>
     <br />
     <p>Está seguro?</p>
-</Confirmacion>
-
+</Confirmacion>*@
 
 @code {
+    [Parameter] public int id { get; set; }
     Confirmacion confirmacion;
-
     List<Avance> listaAvances;
+    List<Recurso> listaRecursos = new List<Recurso>();
     Avance avance;
     string Mensaje = "";
-
+    bool cargando = true;
     Avance? avanceBorrar = null;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        if (!string.IsNullOrEmpty(mensajeService.Mensaje))
+        {
+            await Task.Delay(1500);  // Espera 3 segundos
+            mensajeService.Mensaje = string.Empty;  // Borra el mensaje
+        }
         await Leer();
+        await CargarRecurso();
     }
 
     private async Task Leer()
     {
-        var resp = await http.Get<List<Avance>>("api/Avances");
-        if (!resp.Error)
+        var avances = await Http.GetFromJsonAsync<List<Avance>>($"api/Avances");
+        if (avances != null)
         {
-            listaAvances = resp.Respuesta;
+            listaAvances = avances.Where(a => a.Item_Id == id).ToList();
         }
         else
         {
-            Mensaje = await resp.ObtenerError();
+            Mensaje = "Error al cargar avances";
         }
+        cargando = false;
+    }
+
+    private async Task CargarRecurso()
+    {
+        var respuesta = await http.Get<List<Recurso>>("/api/Recursos");
+        if (!respuesta.Error)
+        {
+            listaRecursos = respuesta.Respuesta;
+        }
+    }
+
+    private string MostrarRecurso(int recursoId)
+    {
+        var recurso = listaRecursos?.FirstOrDefault(r => r.Id == recursoId);
+        return recurso?.Nombre ?? "Sin asignar";
     }
 
     private async Task Eliminar(Avance avance)
@@ -106,15 +188,39 @@
         avanceBorrar = null;
     }
 
-    private async Task Borrar()
+    // private async Task Borrar()
+    // {
+    //     var respuesta = await http.Delete($"api/Avances/{avanceBorrar.Id}");
+    //     if (respuesta.Error)
+    //     {
+    //         var body = "No se pudo borrar";
+    //     }
+    //     Cancelar();
+    //     await Leer();
+    // }
+    private async Task Eliminar(int id)
     {
-        var respuesta = await http.Delete($"api/Avances/{avanceBorrar.Id}");
-        if (respuesta.Error)
-        {
-            var body = "No se pudo borrar";
-        }
-        Cancelar();
-        await Leer();
-    }
+        var resultado = await js.InvokeAsync<bool>("confirmSwal");
 
+        if (resultado)
+        {
+            try
+            {
+                var resp = await http.Delete($"api/Avances/{id}");
+                if (!resp.Error)
+                {
+                    await Leer(); // Recarga la lista después de eliminar
+                }
+                else
+                {
+                    Mensaje = await resp.ObtenerError();
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensaje = $"Ocurrió un error al eliminar el avance: {ex.Message}";
+            }
+        }
+
+    }
 }

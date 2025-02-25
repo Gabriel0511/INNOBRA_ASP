@@ -1,78 +1,149 @@
-﻿@page "/api/Avances/crear"
+﻿@page "/api/Avances/crear/{id:int}"
 @inject IHttpServicio http
 @using INNOBRA_ASP.Shared.DTO
 @using System.Net.Http.Json
 @inject NavigationManager nav
+@inject MensajeService mensajeService
 
-<h3>Gestión de Avances</h3>
+<div class="fondo"></div>
+<div class="overlay"></div>
+<div class="contenedor-formulario">
+    <h3>Crear Avance</h3>
 
-<!-- Formulario para Crear/Editar Avance -->
-<EditForm Model="@avance" OnValidSubmit="Grabar">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+    @if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <div class="alert alert-danger" role="alert">
+            @mensajeError
+        </div>
+    }
 
-    <div>
-        <label>Fecha:</label>
-        <InputDate @bind-Value="avance.Fecha" />
-    </div>
+    <!-- Formulario para Crear/Editar Avance -->
+    <EditForm Model="@avance" OnValidSubmit="Grabar">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
-    <div>
-        <label>Material Ejecutado: (numero)</label>
-        <InputText @bind-Value="avance.MaterialEjecutado" />
-    </div>
+        <div class="mb-3">
+            <label>Fecha de Finalización Prevista:</label>
+            <InputDate @bind-Value="avance.Fecha" class="form-control" />
+        </div>
 
-    <!-- FECHA FINALIZACION REAL -->
+        <div class="mb-3">
+            <label>Fecha de Finalización Real:</label>
+            <InputDate @bind-Value="avance.FechaFinalizacionReal" class="form-control" />
+        </div>
 
-    <div>
-        <label>Item ID:</label>
-        <InputNumber @bind-Value="avance.Item_Id" />
-    </div>
+        <!-- Selección del Recurso por Nombre -->
+        <div class="mb-3">
+            <label>Recurso:</label>
+            <div class="d-flex align-items-center" style="width: 100%;">
+                <select class="form-control" @bind="avance.Recurso_Id" style="flex: 1;">
+                <option value="">Seleccione un recurso</option>
+                @foreach (var recurso in listaRecursos)
+                {
+                    <option value="@recurso.Id">@recurso.Nombre</option>
+                }
+            </select>
+            <a class="btn btn-success btn-sm mb-3 ms-2 d-flex align-items-center justify-content-center"
+               href="/api/Recursos/crear" title="Agregar Recurso" style="height: 100%;">
+                <i class="bi bi-plus"></i>
+            </a>
+            <a class="btn btn-info btn-sm mb-3 ms-2 d-flex align-items-center justify-content-center"
+               href="/api/Recursos" title="Ver Recurso" style="height: 100%;">
+                <i class="bi bi-list"></i>
+            </a>
+            </div>
+            <ValidationMessage For="@(() => avance.Recurso_Id)" />
+        </div>
 
-    <div>
-        <label>Recurso ID:</label>
-        <InputNumber @bind-Value="avance.Recurso_Id" />
-    </div>
+        <div class="mb-3">
+            <label>Material Ejecutado: (numero)</label>
+            <InputText @bind-Value="avance.MaterialEjecutado" class="form-control" />
+        </div>
 
-    <button type="submit" class="btn btn-primary">Guardar</button>
-    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-</EditForm>
-
-<hr />
-
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+    </EditForm>
+</div>
 
 @code {
+    [Parameter] public int id { get; set; }
     private CrearAvanceDTO avance = new CrearAvanceDTO();
-    private List<Avance> listaAvances = new();
+    private List<Item> items = new List<Item>();
+    private Item itemSeleccionado;
+    private List<Recurso> listaRecursos = new(); // Lista para almacenar recursos
+
+    private string mensajeError;
 
     protected override async Task OnInitializedAsync()
     {
         avance.Fecha = DateTime.Today;
-        await CargarAvances();
+        avance.FechaFinalizacionReal = DateTime.Today;
+
+        // Cargar recursos
+        await CargarRecursos();
+
+        // Cargar Items (esto debería ser parte de tu lógica para obtener los items)
+        await CargarItems();
+
+        if (itemSeleccionado != null)
+        {
+            avance.Item_Id = itemSeleccionado.Id; // Asigna el ID del item al avance
+        }
+        else
+        {
+            mensajeError = "Item no encontrado.";
+        }
     }
 
-    private async Task CargarAvances()
+    private async Task CargarItems()
     {
-        // Llama al servicio para obtener la lista de recursos
-        var respuesta = await http.Get<List<Avance>>("api/Avances");
+        var respuesta = await http.Get<List<Item>>("api/Items");
         if (!respuesta.Error)
         {
-            listaAvances = respuesta.Respuesta;
+            items = respuesta.Respuesta;
+            itemSeleccionado = items.FirstOrDefault(p => p.Id == id);
+        }
+    }
+
+    private async Task CargarRecursos()
+    {
+        // Llama al servicio para obtener la lista de recursos
+        var respuesta = await http.Get<List<Recurso>>("api/Recursos");
+        if (!respuesta.Error)
+        {
+            listaRecursos = respuesta.Respuesta;
         }
     }
 
     private async Task Grabar()
     {
         var httpRespuesta = await http.Post<CrearAvanceDTO>("api/Avances", avance);
-        if (httpRespuesta.Error)
+        if (!httpRespuesta.Error)
         {
-            var body = httpRespuesta.HttpResponseMessage;
-        }
-        nav.NavigateTo("/api/Avances");
-    }
+            // Si el avance se crea correctamente, establecer el mensaje
+            mensajeService.Mensaje = "Avance agregado con éxito.";
 
+            // Redirigir a la página de lista después de un breve retraso
+            await Task.Delay(1500);
+            nav.NavigateTo("api/Obras");
+        }
+        else
+        {
+            // Si ocurre un error, establecer el mensaje de error
+            var errorContent = await httpRespuesta.HttpResponseMessage.Content.ReadAsStringAsync();
+            mensajeService.Mensaje = $"Error: {errorContent}";
+        }
+        
+        // var httpRespuesta = await http.Post<CrearAvanceDTO>("api/Avances", avance);
+        // if (httpRespuesta.Error)
+        // {
+        //     var body = httpRespuesta.HttpResponseMessage;
+        // }
+        // nav.NavigateTo("/api/Avances");
+    }
 
     private void Cancelar()
     {
-        nav.NavigateTo("/api/Recursos");
+        nav.NavigateTo("api/Obras");
     }
 }

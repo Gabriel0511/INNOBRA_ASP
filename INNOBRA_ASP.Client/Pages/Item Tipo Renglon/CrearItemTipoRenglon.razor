@@ -3,6 +3,7 @@
 @using INNOBRA_ASP.Shared.DTO
 @using System.Net.Http.Json
 @inject NavigationManager nav
+@inject MensajeService mensajeService
 
 <h3>Gestión de Item Tipo Renglon</h3>
 
@@ -12,13 +13,25 @@
     <ValidationSummary />
 
     <div>
-        <label>Item Tipo ID:</label>
-        <InputNumber @bind-Value="itemRenglonTipo.Item_Tipos_Id" />
+        <label>Item Tipo:</label>
+        <select @bind="itemRenglonTipo.Item_Tipos_Id" class="form-select">
+            <option value="">Seleccione un Item Tipo</option>
+            @foreach (var item in itemTipos)
+            {
+                <option value="@item.Id">@item.Nombre</option>
+            }
+        </select>
     </div>
 
     <div>
-        <label>Recurso ID:</label>
-        <InputNumber @bind-Value="itemRenglonTipo.Recurso_Id" />
+        <label>Recurso:</label>
+        <select @bind="itemRenglonTipo.Recurso_Id" class="form-select">
+            <option value="">Seleccione un Recurso</option>
+            @foreach (var recurso in recursos)
+            {
+                <option value="@recurso.Id">@recurso.Nombre</option>
+            }
+        </select>
     </div>
 
     <button type="submit" class="btn btn-primary">Guardar</button>
@@ -29,22 +42,58 @@
 
 @code {
     private CrearItemRenglonTipoDTO itemRenglonTipo = new CrearItemRenglonTipoDTO();
+    private List<ItemTipo> itemTipos = new List<ItemTipo>();
+    private List<Recurso> recursos = new List<Recurso>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Llama a la API para obtener los ItemTipos
+        var respuestaItemTipos = await http.Get<List<ItemTipo>>("api/ItemTipos");
+        if (!respuestaItemTipos.Error)
+        {
+            itemTipos = respuestaItemTipos.Respuesta;
+        }
+
+        // Llama a la API para obtener los Recursos
+        var respuestaRecursos = await http.Get<List<Recurso>>("api/Recursos");
+        if (!respuestaRecursos.Error)
+        {
+            recursos = respuestaRecursos.Respuesta;
+        }
+    }
 
     private async Task Grabar()
     {
         var httpRespuesta = await http.Post<CrearItemRenglonTipoDTO>("api/ItemTipoRenglon", itemRenglonTipo);
-        if (httpRespuesta.Error)
+
+        if (!httpRespuesta.Error)
         {
-            // Maneja el error si es necesario
+            // Si se crea correctamente, establecer el mensaje
+            mensajeService.Mensaje = "Item tipo renglon agregado con éxito.";
+
+            // Redirigir a la página de lista después de un breve retraso
+            await Task.Delay(1500);
+            nav.NavigateTo("/api/Obras");
         }
         else
         {
-            nav.NavigateTo("/api/ItemTipoRenglon");
+            // Si ocurre un error, establecer el mensaje de error
+            var errorContent = await httpRespuesta.HttpResponseMessage.Content.ReadAsStringAsync();
+            mensajeService.Mensaje = $"Error: {errorContent}";
         }
+
+        // if (httpRespuesta.Error)
+        // {
+        //     // Maneja el error si es necesario
+        // }
+        // else
+        // {
+        //     nav.NavigateTo("/api/ItemTipoRenglon");
+        // }
     }
 
     private void Cancelar()
     {
-        nav.NavigateTo("/api/ItemTipoRenglon");
+        nav.NavigateTo("/api/Obras");
     }
 }

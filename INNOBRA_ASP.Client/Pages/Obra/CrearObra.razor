@@ -3,92 +3,65 @@
 @using INNOBRA_ASP.Shared.DTO
 @using System.Net.Http.Json
 @inject NavigationManager nav
+@inject MensajeService mensajeService
+@using Microsoft.AspNetCore.Components.Forms
 
-<div class="fondo">
-    <div class="contenido">
-<h3>Crear Obra</h3>
+<div class="fondo"></div>
+<div class="overlay"></div>
+<div class="contenedor-formulario">
+    <h3>Agregar Obra</h3>
 
-<EditForm Model="@obra" OnValidSubmit="Grabar">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+    <EditForm Model="@obra" OnValidSubmit="Grabar">
+        <DataAnnotationsValidator />
 
-    <div class="mb-3">
-        <label>Nombre:</label>
-        <InputText @bind-Value="obra.Nombre" />
-        <ValidationMessage For="@(() => obra.Nombre)" />
-    </div>
+        <div class="form-group" >
+            
+            <div style="display:flex">
+                <label>Nombre:</label>
+                <InputText class="form-control" style="max-width: 35%; max-height: 2.2rem; margin-left:0.5rem " @bind-Value="@obra.Nombre" />
+            </div>
+            <div>
+                <ValidationMessage For="@(() => obra.Nombre)" />
+            </div>
+        </div>
 
-    <div class="mb-3">
-        <label>Fecha de Inicio:</label>
-        <InputDate @bind-Value="obra.FechaInicio" />
-        <ValidationMessage For="@(() => obra.FechaInicio)" />
-    </div>
 
-    <div class="mb-3">
-        <label>Fecha de Fin:</label>
-        <InputDate @bind-Value="obra.FechaFin" />
-        <ValidationMessage For="@(() => obra.FechaFin)" />
-    </div>
+        <div class="mb-3">
+            <label>Fecha de Inicio:</label>
+            <InputDate @bind-Value="obra.FechaInicio" />
+            <ValidationMessage For="@(() => obra.FechaInicio)" />
+        </div>
 
-@*     <div class="mb-3">
-        <label>Fecha de Inicio:</label>
-        <InputText @bind-Value="FechaInicioTexto" placeholder="yyyy-MM-ddTHH:mm" />
-        <ValidationMessage For="@(() => obra.FechaInicio)" />
-    </div>
+        <div class="mb-3">
+            <label>Fecha de Fin:</label>
+            <InputDate @bind-Value="obra.FechaFin" />
+            <ValidationMessage For="@(() => obra.FechaFin)" />
+        </div>
 
-    <div class="mb-3">
-        <label>Fecha de Fin:</label>
-        <InputText @bind-Value="FechaFinTexto" placeholder="yyyy-MM-ddTHH:mm" />
-        <ValidationMessage For="@(() => obra.FechaFin)" />
-    </div> *@
+        <div class="mb-3">
+            <label>Imagen:</label>
+            <InputFile OnChange="OnInputFileChange" />
+        </div>
 
-    <button type="submit" class="btn btn-primary">Guardar</button>
-    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-</EditForm>
-    </div>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+    </EditForm>
 </div>
 
 @code {
     private Obra obra = new Obra();
-    private List<Obra> listaObra = new();
-
-    // // Propiedad para enlazar con InputText en lugar de obra.FechaInicio directamente
-    // private string FechaInicioTexto
-    // {
-    //     get => obra.FechaInicio.ToString("yyyy-MM-ddTHH:mm");
-    //     set
-    //     {
-    //         if (DateTime.TryParse(value, out var fecha))
-    //         {
-    //             obra.FechaInicio = fecha;
-    //         }
-    //     }
-    // }
-
-    // private string FechaFinTexto
-    // {
-    //     get => obra.FechaFin.ToString("yyyy-MM-ddTHH:mm");
-    //     set
-    //     {
-    //         if (DateTime.TryParse(value, out var fecha))
-    //         {
-    //             obra.FechaFin = fecha;
-    //         }
-    //     }
-    // }
+    private List<Obra> listaObra = new List<Obra>();
 
     protected override async Task OnInitializedAsync()
     {
         obra.FechaInicio = DateTime.Now.Date;
-        // obra.FechaInicio = DateTime.Now;
         obra.FechaFin = DateTime.Now.Date;
-        // obra.FechaFin = DateTime.Now;
+
         await CargarObra();
     }
 
     private async Task CargarObra()
     {
-        // Llama al servicio para obtener la lista de obras
         var respuesta = await http.Get<List<Obra>>("api/Obras");
         if (!respuesta.Error)
         {
@@ -99,15 +72,35 @@
     private async Task Grabar()
     {
         var httpRespuesta = await http.Post<Obra>("api/Obras", obra);
-        if (httpRespuesta.Error)
+        if (!httpRespuesta.Error)
         {
-            var body = httpRespuesta.HttpResponseMessage;
+            // Si la obra se crea correctamente, establecer el mensaje
+            mensajeService.Mensaje = "Obra agregada con éxito.";
+
+            // Redirigir a la página de lista después de un breve retraso
+            await Task.Delay(1500);
+            nav.NavigateTo("/api/Obras");
         }
-        nav.NavigateTo("/api/Obras");
+        else
+        {
+            // Si ocurre un error, establecer el mensaje de error
+            var errorContent = await httpRespuesta.HttpResponseMessage.Content.ReadAsStringAsync();
+            mensajeService.Mensaje = $"Error: {errorContent}";
+        }
     }
 
     private void Cancelar()
     {
         nav.NavigateTo("/api/Obras");
+    }
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        var imageFile = e.File;
+        using (var stream = new MemoryStream())
+        {
+            await imageFile.OpenReadStream().CopyToAsync(stream);
+            obra.Imagen = stream.ToArray(); // Guarda la imagen en byte[]
+        }
     }
 }
