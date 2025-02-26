@@ -19,23 +19,23 @@
 
 <EditForm Model="@presupuesto" OnValidSubmit="Actualizar">
     <DataAnnotationsValidator />
-    <ValidationSummary />
+  
 
     <div class="mb-3">
         <label>Nombre:</label>
-        <InputText @bind-Value="presupuesto.Nombre" />
+        <InputText class="form-control" @bind-Value="presupuesto.Nombre" />
         <ValidationMessage For="@(() => presupuesto.Nombre)" />
     </div>
 
     <div class="mb-3">
         <label>Fecha Inicio</label>
-        <InputDate @bind-Value="presupuesto.FechaInicioPrevista" />
+        <InputDate class="form-control" @bind-Value="presupuesto.FechaInicioPrevista" />
         <ValidationMessage For="@(() => presupuesto.FechaInicioPrevista)" />
     </div>
 
     <div class="mb-3">
         <label>Fecha fin</label>
-        <InputDate @bind-Value="presupuesto.FechaFinPrevista" />
+        <InputDate class="form-control" @bind-Value="presupuesto.FechaFinPrevista" />
         <ValidationMessage For="@(() => presupuesto.FechaFinPrevista)" />
     </div>
 
