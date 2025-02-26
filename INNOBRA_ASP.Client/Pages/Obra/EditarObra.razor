@@ -32,21 +32,21 @@
             </div>
         </div>
 
-        <div class="mb-3">
+        <div class="mb-3" style="display:flex">
             <label>Fecha Inicio</label>
-            <InputDate @bind-Value="obra.FechaInicio" />
+            <InputDate class="form-control" style="max-width: 35%; max-height: 2.2rem; margin-left:0.5rem " @bind-Value="obra.FechaInicio" />
             <ValidationMessage For="@(() => obra.FechaInicio)" />
         </div>
 
-        <div class="mb-3">
+        <div class="mb-3" style="display:flex">
             <label>Fecha fin</label>
-            <InputDate @bind-Value="obra.FechaFin" />
+            <InputDate class="form-control" style="max-width: 35%; max-height: 2.2rem; margin-left:0.5rem " @bind-Value="obra.FechaFin" />
             <ValidationMessage For="@(() => obra.FechaFin)" />
         </div>
 
-        <div class="mb-3">
+        <div class="mb-3" style="display:flex">
             <label>Imagen:</label>
-            <InputFile OnChange="OnInputFileChange" />
+            <InputFile class="form-control" style="max-width: 65%; max-height: 3rem; margin-left:0.5rem "  OnChange="OnInputFileChange" />
             @if (obra.Imagen != null)
             {
                 <img src="data:image;base64,@Convert.ToBase64String(obra.Imagen)" alt="Imagen actual" style="width: 200px; height: auto; margin-top: 10px;" />
