@@ -1,4 +1,4 @@
-﻿@page "/Api/Presupuestos/editar/{id:int}"
+﻿@page "/api/Presupuestos/editar/{idPresupuesto:int}/{idObra:int}"
 @inject IHttpServicio http
 @using INNOBRA_ASP.Shared.DTO
 @using System.Net.Http.Json
@@ -45,7 +45,12 @@
     </div>
 
 @code {
-    [Parameter] public int id { get; set; }
+    [Parameter]
+    public int idPresupuesto { get; set; }
+
+    [Parameter]
+    public int idObra { get; set; }
+
     private EditarPresupuestoDTO presupuesto = new EditarPresupuestoDTO();
     private string mensaje = "";
 
@@ -56,7 +61,7 @@
 
     private async Task CargarPresupuesto()
     {
-        var respuesta = await http.Get<EditarPresupuestoDTO>($"Api/Presupuestos/GetById/{id}");
+        var respuesta = await http.Get<EditarPresupuestoDTO>($"Api/Presupuestos/GetById/{idPresupuesto}");
 
         if (!respuesta.Error)
         {
@@ -74,7 +79,7 @@
 
     private async Task Actualizar()
     {
-        var respuesta = await http.Put($"Api/Presupuestos/{id}", presupuesto);
+        var respuesta = await http.Put($"Api/Presupuestos/{idPresupuesto}", presupuesto);
 
         if (!respuesta.Error)
         {
@@ -86,28 +91,18 @@
 
             // Redirigimos a la página de lista de
             await Task.Delay(500); // Espera para mostrar el mensaje
-            nav.NavigateTo("/api/Obras");
+            nav.NavigateTo($"/api/Presupuestos/lista/{idObra}");
         }
         else
         {
             var errorContent = await respuesta.HttpResponseMessage.Content.ReadAsStringAsync();
             mensajeService.Mensaje = $"Error: {errorContent}";
         }
-
-        // if (!respuesta.Error)
-        // {
-        //     mensaje = "Se cargó con éxito el presupuesto.";
-        //     nav.NavigateTo("/api/Obras");
-        // }
-        // else
-        // {
-        //     var errorContent = await respuesta.HttpResponseMessage.Content.ReadAsStringAsync();
-        //     mensaje = $"Error: {errorContent}"; // Muestra el error
-        // }
     }
 
     private void Cancelar()
     {
-        nav.NavigateTo("/api/Obras");
+
+        nav.NavigateTo($"/api/Presupuestos/lista/{idObra}");
     }
 }

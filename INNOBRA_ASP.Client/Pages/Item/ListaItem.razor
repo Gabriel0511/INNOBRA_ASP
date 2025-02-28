@@ -1,17 +1,34 @@
-﻿@page "/Api/Items"
+﻿@page "/api/Items/lista/{idPresupuesto:int}"
 @inject IHttpServicio http
 @inject MensajeService mensajeService
+@inject NavigationManager nav
 
 <div class="alert alert-info" style="display: @(!string.IsNullOrEmpty(mensajeService.Mensaje) ? "block" : "none")">
     @mensajeService.Mensaje
 </div> @* Muestra el mensaje que se actualizò con exito. *@
 
 <div class="fondo"></div>
-    <div class="overlay"></div>
-
+<div class="overlay"></div>
 <div class="contenedor-formulario">
 
+
+    <button type="button" class="btn btn-secondary" @onclick="Volver">Volver</button>
+
     <h3>Items</h3>
+
+    @if (!string.IsNullOrEmpty(Mensaje))
+    {
+        <div class="alert alert-danger" role="alert">
+            No hay items disponibles para este presupuesto.
+        </div>
+    }
+
+    @if (cargando)
+    {
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+    }
 
     @if (listaItems != null && listaItems.Any())
     {
@@ -53,18 +70,23 @@
 
     <br/>
 
-    <a class="btn btn-primary" href="/api/Items/crear">
+    <a class="btn btn-primary" href="/api/Items/crear/@idPresupuesto">
         <i class="bi bi-plus-circle"></i> Crear Item
     </a>
     
 </div>
 
 @code {
+    [Parameter] public int idObra { get; set; }
+    [Parameter] public int idPresupuesto { get; set; }
+
     List<Item> listaItems = new List<Item>();
     List<ItemTipo> listaItemsTipos = new List<ItemTipo>();
     List<Presupuesto> listaPresupuestos = new List<Presupuesto>();
 
     string Mensaje = "";
+
+    bool cargando = true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -81,14 +103,28 @@
 
     private async Task Leer()
     {
-        var resp = await http.Get<List<Item>>("Api/Items");
-        if (!resp.Error)
+        try
         {
-            listaItems = resp.Respuesta;
+            cargando = true;
+            Mensaje = ""; // Limpiar cualquier mensaje de error previo
+
+            var resp = await http.Get<List<Item>>("Api/Items");
+            if (!resp.Error)
+            {
+                listaItems = resp.Respuesta;
+            }
+            else
+            {
+                Mensaje = await resp.ObtenerError();
+            }
         }
-        else
+        catch (Exception ex)
         {
-            Mensaje = await resp.ObtenerError();
+            Mensaje = $"Ocurrió un error al cargar los items: {ex.Message}";
+        }
+        finally
+        {
+            cargando = false;
         }
     }
 
@@ -134,5 +170,11 @@
         {
             Mensaje = await resp.ObtenerError();
         }
+    }
+
+    private void Volver()
+    {
+
+        nav.NavigateTo($"api/Presupuestos/lista/{idObra}");
     }
 }

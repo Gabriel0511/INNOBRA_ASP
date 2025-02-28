@@ -46,9 +46,7 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="flex-grow-1">@obra.Nombre</span>
                                 <div style="flex-shrink: 0;">
-                                    <button class="btn btn-info btn-sm" @onclick="() => TogglePresupuestos(obra)" title="Ver Presupuestos">
-                                        <i class="bi bi-chevron-down"></i>
-                                    </button>
+                                    
                                 </div>
                             </div>
                         </td>
@@ -65,7 +63,7 @@
                             }
                         </td>
                         <td>
-                            <a class="btn btn-success btn-sm" href="/api/Presupuestos/crear/@obra.Id" title="Agregar Presupuesto"><i class="bi bi-plus"></i></a>
+                            <a class="btn btn-violet btn-sm" href="/api/Presupuestos/lista/@obra.Id" title="Ver Presupuestos"><i class="bi bi-eye" style="color: black;"></i></a>
                             <a class="btn btn-warning btn-sm" href="/api/Obras/editar/@obra.Id" title="Editar"><i class="bi bi-pencil"></i></a>
                             <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(obra.Id)" title="Eliminar"><i class="bi bi-trash3"></i></button>
                         </td>
@@ -104,7 +102,7 @@
                                                         <td>@presupuesto.FechaInicioPrevista.ToString("dd-MM-yyyy")</td>
                                                         <td>@presupuesto.FechaFinPrevista.ToString("dd-MM-yyyy")</td>
                                                         <td>
-                                                            <a class="btn btn-success btn-sm" href="/Api/Items/crear/@presupuesto.Id" title="Agregar Item"><i class="bi bi-plus"></i></a>
+                                                            <a class="btn btn-success btn-sm" href="/api/Items/crear/@presupuesto.Id" title="Agregar Item"><i class="bi bi-plus"></i></a>
                                                             <a class="btn btn-warning btn-sm" href="/api/Presupuestos/editar/@presupuesto.Id"><i class="bi bi-pencil"></i></a>
                                                             <button class="btn btn-danger btn-sm" @onclick="() => EliminarPresupuesto(presupuesto.Id)"><i class="bi bi-trash3"></i></button>
                                                         </td>
@@ -217,6 +215,18 @@
         background-color: #3c573c;
         color: white;
     }
+
+    .btn-violet {
+        background-color: violet !important;
+        color: white !important;
+        border: none;
+    }
+
+        .btn-violet:hover {
+            background-color: purple !important;
+        }
+
+
 </style>
 
 @code {

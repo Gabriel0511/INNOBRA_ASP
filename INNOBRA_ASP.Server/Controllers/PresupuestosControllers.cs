@@ -86,6 +86,7 @@ namespace INNOBRA_ASP.Server.Controllers
             presupuesto.Nombre = entidadDTO.Nombre;
             presupuesto.FechaInicioPrevista = entidadDTO.FechaInicioPrevista;
             presupuesto.FechaFinPrevista = entidadDTO.FechaFinPrevista;
+            
 
             // Aquí no modificamos la relación con 'Obra' ni 'Items', solo los campos mencionados.
 

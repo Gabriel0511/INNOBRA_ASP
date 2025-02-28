@@ -1,71 +1,111 @@
-﻿@page "/api/Presupuestos"
+﻿@page "/api/Presupuestos/lista/{idObra:int}"
 @inject IHttpServicio http
 @inject IJSRuntime js
 @inject MensajeService mensajeService
 
 <div class="alert alert-info" style="display: @(!string.IsNullOrEmpty(mensajeService.Mensaje) ? "block" : "none")">
     @mensajeService.Mensaje
-</div> @* Muestra el mensaje que se actualizò con exito. *@
+</div> @* Muestra el mensaje que se actualizó con éxito. *@
 
 <div class="fondo"></div>
 <div class="overlay"></div>
 <div class="contenedor-formulario">
-        <h3>Presupuestos</h3>
 
-        @if (!string.IsNullOrEmpty(Mensaje))
-        {
-            <div class="alert alert-danger" role="alert">
-                @Mensaje
-            </div>
-        }
+    <a class="btn btn-primary" href="/api/Obras">
+        <i class="bi bi-arrow-left"></i> Volver
+    </a>
+    <h3>Presupuestos</h3>
 
-        @if (cargando)
-        {
-            <div class="spinner-border" role="status">
-                <span class="visually-hidden">Cargando...</span>
-            </div>
-        }
-        else if (listaPresupuestos != null && listaPresupuestos.Any())
-        {
-            <table>
-                <thead>
+    @if (!string.IsNullOrEmpty(Mensaje))
+    {
+        <div class="alert alert-danger" role="alert">
+            @Mensaje
+        </div>
+    }
+
+    @if (cargando)
+    {
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+
+    }
+    @if (listaPresupuestos != null && listaPresupuestos.Any(p => p.Obra_Id == idObra))
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Fecha Inicio</th>
+                    <th scope="col">Fecha Fin</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var presupuesto in listaPresupuestos.Where(p => p.Obra_Id == idObra))
+                {
                     <tr>
-                        <th scope="col">Nombre</th>
-                        <th scope="col">Fecha Inicio</th>
-                        <th scope="col">Fecha Fin</th>
-                        <th scope="col">Acciones</th>
+                        <td>@presupuesto.Nombre</td>
+                        <td>@presupuesto.FechaInicioPrevista.ToString("dd-MM-yyyy")</td>
+                        <td>@presupuesto.FechaFinPrevista.ToString("dd-MM-yyyy")</td>
+                        <td>
+                            <a class="btn btn-violet btn-sm" href="/api/Items/lista/@presupuesto.Id" title="Ver Items"><i class="bi bi-eye" style="color: black;"></i></a>
+
+                            <a class="btn btn-warning btn-sm" href="/api/Presupuestos/editar/@presupuesto.Id/@idObra">
+                                <i class="bi bi-pencil"></i> 
+                            </a>
+                            
+                            <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(presupuesto.Id)">
+                                <i class="bi bi-trash3"></i> 
+                            </button>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @foreach (var presupuesto in listaPresupuestos)
-                    {
-                        <tr>
-                            <td>@presupuesto.Nombre</td>
-                            <td>@presupuesto.FechaInicioPrevista.ToString("dd-MM-yyyy")</td>
-                            <td>@presupuesto.FechaFinPrevista.ToString("dd-MM-yyyy")</td>
-                            <td>
-                                <a class="btn btn-warning btn-sm" href="/api/Presupuestos/editar/@presupuesto.Id"><i class="bi bi-pencil"></i></a>
-                                <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(presupuesto.Id)"><i class="bi bi-trash3"></i></button>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        if (cargando)
+        {
+            
         }
         else
         {
             <div class="alert alert-warning" role="alert">
-                No hay presupuestos disponibles.
+                No hay presupuestos disponibles para esta obra.
             </div>
         }
-        <br />
-        <a class="btn btn-primary" href="/api/Presupuestos/crear">
-            <i class="bi bi-plus-circle"></i> Crear Presupuesto
-        </a>
-    </div>
+        
+    }
+
+
+    <br />
+    <a class="btn btn-primary" href="/api/Presupuestos/crear/@idObra">
+        <i class="bi bi-plus-circle"></i> Crear Presupuesto
+    </a>
+</div>
+
+<style>
+    .btn-violet {
+        background-color: violet !important;
+        color: white !important;
+        border: none;
+    }
+
+        .btn-violet:hover {
+            background-color: purple !important;
+        }
+</style>
+
 
 @code {
+    [Parameter] public int idObra { get; set; }
+
     List<Presupuesto> listaPresupuestos = new List<Presupuesto>();
+    List<Item> items = new List<Item>();
+    List<ItemTipo> itemTipos = new List<ItemTipo>();
+    List<Avance> listaAvances = new List<Avance>();
     string Mensaje = "";
     bool cargando = true;
 
@@ -74,7 +114,7 @@
         await base.OnInitializedAsync();
         if (!string.IsNullOrEmpty(mensajeService.Mensaje))
         {
-            await Task.Delay(1500);  // Espera 3 segundos
+            await Task.Delay(1500);  // Espera 1.5 segundos
             mensajeService.Mensaje = string.Empty;  // Borra el mensaje
         }
         await Leer(); // Llamar a Leer al inicializar el componente
@@ -87,6 +127,7 @@
             cargando = true;
             Mensaje = ""; // Limpiar cualquier mensaje de error previo
 
+            // Obtener los presupuestos para una obra específica
             var resp = await http.Get<List<Presupuesto>>("api/Presupuestos");
             if (!resp.Error)
             {
@@ -109,8 +150,9 @@
 
     private async Task Eliminar(int id)
     {
-        bool confirmado = await js.InvokeAsync<bool>("confirm", "¿Estás seguro de que deseas eliminar este presupuesto?");
-        if (confirmado)
+        var resultado = await js.InvokeAsync<bool>("confirmSwal");
+
+        if (resultado)
         {
             try
             {
