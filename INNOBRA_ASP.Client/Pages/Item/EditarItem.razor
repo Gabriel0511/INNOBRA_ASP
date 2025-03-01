@@ -1,4 +1,4 @@
-﻿@page "/Api/Items/editar/{id:int}"
+﻿@page "/Api/Items/editar/{idObra:int}/{idPresupuesto:int}/{idItem:int}"
 @inject IHttpServicio http
 @using INNOBRA_ASP.Shared.DTO
 @using System.Net.Http.Json
@@ -50,14 +50,17 @@
         <ValidationMessage For="@(() => item.Material_estimado)" />
     </div>
 
-    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
     <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
 </EditForm>
 
     </div>
 
 @code {
-    [Parameter] public int id { get; set; }
+    [Parameter] public int idItem { get; set; }
+    [Parameter] public int idObra { get; set; }
+    [Parameter] public int idPresupuesto { get; set; }
+
     private EditarItemDTO item = new EditarItemDTO();
     private List<string> undTiempo = new List<string> { "Horas", "Dias", "Meses", "Años" };
 
@@ -70,20 +73,20 @@
 
     private async Task CargarItem()
     {
-        var respuesta = await http.Get<EditarItemDTO>($"Api/Items/GetById/{id}");
+        var respuesta = await http.Get<EditarItemDTO>($"Api/Items/GetById/{idItem}");
         if (!respuesta.Error)
         {
             item = respuesta.Respuesta;
         }
         else
         {
-            nav.NavigateTo("/api/Obras");
+            nav.NavigateTo($"/api/Items/lista/{idObra}/{idPresupuesto}");
         }
     }
 
     private async Task Actualizar()
     {
-        var respuesta = await http.Put($"Api/Items/{id}", item);
+        var respuesta = await http.Put($"Api/Items/{idItem}", item);
 
         if (!respuesta.Error)
         {
@@ -95,7 +98,7 @@
 
             // Redirigimos a la página de lista de
             await Task.Delay(500); // Espera para mostrar el mensaje
-            nav.NavigateTo("/api/Obras");
+            nav.NavigateTo($"/api/Items/lista/{idObra}/{idPresupuesto}");
         }
         else
         {
@@ -117,6 +120,6 @@
 
     private void Cancelar()
     {
-        nav.NavigateTo("/api/Obras");
+        nav.NavigateTo($"/api/Items/lista/{idObra}/{idPresupuesto}");
     }
 }
