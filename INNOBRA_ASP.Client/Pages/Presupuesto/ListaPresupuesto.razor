@@ -14,8 +14,7 @@
     <a class="btn btn-primary" href="/api/Obras">
         <i class="bi bi-arrow-left"></i> Volver
     </a>
-    <h3>Presupuestos</h3>
-
+    <h3>Presupuestos - Obra: @nombreObra</h3> <!-- Mostrar el nombre de la obra aquí -->
     @if (!string.IsNullOrEmpty(Mensaje))
     {
         <div class="alert alert-danger" role="alert">
@@ -52,11 +51,11 @@
                             <a class="btn btn-violet btn-sm" href="/api/Items/lista/@idObra/@presupuesto.Id" title="Ver Items"><i class="bi bi-eye" style="color: black;"></i></a>
 
                             <a class="btn btn-warning btn-sm" href="/api/Presupuestos/editar/@idObra/@presupuesto.Id">
-                                <i class="bi bi-pencil"></i> 
+                                <i class="bi bi-pencil"></i>
                             </a>
-                            
+
                             <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(presupuesto.Id)">
-                                <i class="bi bi-trash3"></i> 
+                                <i class="bi bi-trash3"></i>
                             </button>
                         </td>
                     </tr>
@@ -68,7 +67,7 @@
     {
         if (cargando)
         {
-            
+
         }
         else
         {
@@ -76,7 +75,7 @@
                 No hay presupuestos disponibles para esta obra.
             </div>
         }
-        
+
     }
 
 
@@ -106,11 +105,15 @@
     List<Item> items = new List<Item>();
     List<ItemTipo> itemTipos = new List<ItemTipo>();
     List<Avance> listaAvances = new List<Avance>();
+    private List<Obra> obras = new List<Obra>();
+    private Obra obraSeleccionada;
     string Mensaje = "";
     bool cargando = true;
+    string nombreObra = ""; // Propiedad para almacenar el nombre de la obra
 
     protected override async Task OnInitializedAsync()
     {
+        await CargarObras();
         await base.OnInitializedAsync();
         if (!string.IsNullOrEmpty(mensajeService.Mensaje))
         {
@@ -145,6 +148,30 @@
         finally
         {
             cargando = false;
+        }
+    }
+
+    private async Task CargarObras()
+    {
+        var respuesta = await http.Get<List<Obra>>("api/Obras");
+        if (!respuesta.Error)
+        {
+            obras = respuesta.Respuesta; // Poblamos la lista de obras
+
+            // Buscar la obra correspondiente al idObra
+            obraSeleccionada = obras.FirstOrDefault(obra => obra.Id == idObra);
+            if (obraSeleccionada != null)
+            {
+                nombreObra = obraSeleccionada.Nombre; // Asignar el nombre de la obra
+            }
+            else
+            {
+                Mensaje = "Obra no encontrada.";
+            }
+        }
+        else
+        {
+            Mensaje = "Error al cargar las obras.";
         }
     }
 

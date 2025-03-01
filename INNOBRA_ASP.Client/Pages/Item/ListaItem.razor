@@ -14,7 +14,7 @@
 
     <button type="button" class="btn btn-primary" @onclick="Volver"><i class="bi bi-arrow-left"></i> Volver</button>
 
-    <h3>Items</h3>
+    <h3>Items - Presupuesto: @nombrePresupuesto</h3>
 
     @if (!string.IsNullOrEmpty(Mensaje))
     {
@@ -82,12 +82,16 @@
     List<ItemTipo> listaItemsTipos = new List<ItemTipo>();
     List<Presupuesto> listaPresupuestos = new List<Presupuesto>();
 
+    private Presupuesto presupuestoSeleccionado;
+    string nombrePresupuesto = ""; 
+
     string Mensaje = "";
 
     bool cargando = true;
 
     protected override async Task OnInitializedAsync()
     {
+        await CargarPresupuesto();
         await base.OnInitializedAsync();
         if (!string.IsNullOrEmpty(mensajeService.Mensaje))
         {
@@ -122,6 +126,30 @@
         finally
         {
             cargando = false;
+        }
+    }
+
+    private async Task CargarPresupuesto()
+    {
+        var respuesta = await http.Get<List<Presupuesto>>("api/Presupuestos");
+        if (!respuesta.Error)
+        {
+            listaPresupuestos = respuesta.Respuesta; // Poblamos la lista de obras
+
+            // Buscar la obra correspondiente al idObra
+            presupuestoSeleccionado = listaPresupuestos.FirstOrDefault(presupuesto => presupuesto.Id == idPresupuesto);
+            if (presupuestoSeleccionado != null)
+            {
+                nombrePresupuesto = presupuestoSeleccionado.Nombre; // Asignar el nombre de la obra
+            }
+            else
+            {
+                Mensaje = "Presupuesto no encontrado.";
+            }
+        }
+        else
+        {
+            Mensaje = "Error al cargar los presupuestos.";
         }
     }
 
