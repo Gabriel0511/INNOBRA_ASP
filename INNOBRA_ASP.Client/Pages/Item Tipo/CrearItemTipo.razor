@@ -94,7 +94,7 @@
 
             // Redirigir a la página de lista después de un breve retraso
             await Task.Delay(500);
-            nav.NavigateTo("/api/Obras");
+            nav.NavigateTo("/api/ItemTipos");
         }
         else
         {
@@ -113,6 +113,6 @@
     // Cancelar y navegar a la lista de ItemTipos
     private void Cancelar()
     {
-        nav.NavigateTo("/api/Obras");
+        nav.NavigateTo("/api/ItemTipos");
     }
 }

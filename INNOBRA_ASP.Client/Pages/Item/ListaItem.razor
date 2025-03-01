@@ -12,7 +12,7 @@
 <div class="contenedor-formulario">
 
 
-    <button type="button" class="btn btn-secondary" @onclick="Volver">Volver</button>
+    <button type="button" class="btn btn-primary" @onclick="Volver"><i class="bi bi-arrow-left"></i> Volver</button>
 
     <h3>Items</h3>
 
@@ -39,7 +39,6 @@
                     <th scope="col">Unidad de Tiempo</th>
                     <th scope="col">Material Estimado</th>
                     <th scope="col">Item Tipo</th>
-                    <th scope="col">Presupuesto</th>
                     <th scope="col">Acciones</th>
                 </tr>
             </thead>
@@ -51,7 +50,6 @@
                         <td>@item.Unidad_Tiempo</td>
                         <td>@item.Material_estimado</td>
                         <td>@MostrarNombreItemTipo(item.Item_Tipos_Id)</td>
-                        <td>@MostrarPresupuesto(item.Presupuesto_Id)</td>
                         <td>
                             <a class="btn btn-warning btn-sm" href="Api/Items/editar/@item.Id"><i class="bi bi-pencil"></i> </a>
                             <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(item.Id)"><i class="bi bi-trash3"></i></button>
