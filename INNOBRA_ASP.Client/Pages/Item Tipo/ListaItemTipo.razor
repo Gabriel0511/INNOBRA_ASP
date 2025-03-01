@@ -10,9 +10,8 @@
 <div class="overlay"></div>
 <div class="contenedor-formulario">
     <h3>Items Tipo</h3>
-    <br />
-    <a class="btn btn-primary" href="/api/ItemTipos/crear">Nuevo Tipo de Ítem</a>
-    <br />
+
+    
     <table>
         <tr>
             <th>Código</th>
@@ -39,14 +38,8 @@
                         <td>@item.Nombre</td>
                         <td>@unidadesNombres.GetValueOrDefault(item.Unidad_Id, "Sin Unidad")</td>
                         <td>
-                            <a class="btn btn-primary"
-                            href="api/ItemTipos/editar/@item.Id">
-                                Editar
-                            </a>
-                            <button class="btn btn-danger"
-                            @onclick="() => Eliminar(item)">
-                                Borrar
-                            </button>
+                            <a class="btn btn-warning btn-sm" href="api/ItemTipos/editar/@item.Id"><i class="bi bi-pencil"></i></a>
+                            <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(item)"><i class="bi bi-trash3"></i></button>
                         </td>
                     </tr>
                 }
@@ -57,6 +50,10 @@
             <p> Error: @Mensaje</p>
         }
     </table>
+    <br />
+    <a class="btn btn-success btn-sm" href="/api/ItemTipos/crear">
+        <i class="bi bi-plus-circle"></i> Nuevo Tipo de Ítem
+    </a>
 </div>
 
 <Confirmacion @ref="confirmacion"
