@@ -98,7 +98,6 @@
         }
         await Leer();
         await CargarItemTipo();
-        await CargarPresupuesto();
     }
 
     private async Task Leer()
@@ -141,15 +140,6 @@
     {
         var itemTipo = listaItemsTipos?.FirstOrDefault(r => r.Id == itemTipoId);
         return itemTipo?.Nombre ?? "Sin asignar";
-    }
-
-    private async Task CargarPresupuesto()
-    {
-        var respuesta = await http.Get<List<Presupuesto>>("Api/Presupuestos");
-        if (!respuesta.Error)
-        {
-            listaPresupuestos = respuesta.Respuesta;
-        }
     }
 
     private string MostrarPresupuesto(int presupuestoid)
