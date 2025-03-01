@@ -1,5 +1,6 @@
 ﻿@page "/api/Items/lista/{idObra:int}/{idPresupuesto:int}"
 @inject IHttpServicio http
+@inject IJSRuntime js
 @inject MensajeService mensajeService
 @inject NavigationManager nav
 
@@ -68,7 +69,7 @@
 
     <br/>
 
-    <a class="btn btn-primary" href="/api/Items/crear/@idPresupuesto">
+    <a class="btn btn-primary" href="/api/Items/crear/@idObra/@idPresupuesto">
         <i class="bi bi-plus-circle"></i> Crear Item
     </a>
     
@@ -81,6 +82,7 @@
     List<Item> listaItems = new List<Item>();
     List<ItemTipo> listaItemsTipos = new List<ItemTipo>();
     List<Presupuesto> listaPresupuestos = new List<Presupuesto>();
+    List<Avance> listaAvances = new List<Avance>();
 
     private Presupuesto presupuestoSeleccionado;
     string nombrePresupuesto = ""; 
@@ -175,16 +177,41 @@
     }
 
 
-    private async Task Eliminar(int id)
+    private async Task Eliminar(int itemId)
     {
-        var resp = await http.Delete($"Api/Items/{id}");
-        if (!resp.Error)
+        var resultado = await js.InvokeAsync<bool>("confirmSwal");
+        if (resultado)
         {
-            await Leer(); // Recarga la lista después de eliminar
-        }
-        else
-        {
-            Mensaje = await resp.ObtenerError();
+            try
+            {
+                var resp2 = await http.Get<List<Avance>>("api/Avances");
+                listaAvances = resp2.Respuesta;
+                foreach (var itemavance in listaAvances)
+                {
+                    if (itemavance.Item_Id == itemId)
+                    {
+                        var resp3 = await http.Delete($"api/Avances/{itemavance.Id}");
+                        if (resp3.Error)
+                        {
+                            Mensaje = "No se pudo borrar el avance";
+                        }
+                    }
+                }
+
+                var resp = await http.Delete($"Api/Items/{itemId}");
+                if (!resp.Error)
+                {
+                    await Leer();
+                }
+                else
+                {
+                    Mensaje = await resp.ObtenerError();
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensaje = $"Ocurrió un error al eliminar el presupuesto: {ex.Message}";
+            }
         }
     }
 

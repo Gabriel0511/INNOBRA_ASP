@@ -1,4 +1,4 @@
-﻿@page "/Api/Items/crear/{id:int}"
+﻿@page "/Api/Items/crear/{idObra:int}/{idPresupuesto:int}"
 @inject IHttpServicio http
 @using INNOBRA_ASP.Shared.DTO
 @using System.Net.Http.Json
@@ -90,6 +90,8 @@
 
 @code {
     [Parameter] public int id { get; set; }
+    [Parameter] public int idObra { get; set; }
+    [Parameter] public int idPresupuesto { get; set; }
     private CrearItemDTO item = new CrearItemDTO();
     private Presupuesto presupuestoSeleccionado;
     private List<Item> listaItems = new();
@@ -106,7 +108,7 @@
         await CargarPresupuesto();
 
         // Asignar la obra seleccionada a la propiedad presupuesto.Obra_Id
-        presupuestoSeleccionado = presupuestos.FirstOrDefault(p => p.Id == id);
+        presupuestoSeleccionado = presupuestos.FirstOrDefault(p => p.Id == idPresupuesto);
 
         if (presupuestoSeleccionado != null)
         {
@@ -184,7 +186,7 @@
         {
             mensajeService.Mensaje = "Item agregado con éxito.";
             await Task.Delay(1500);
-            nav.NavigateTo("/api/Obras");
+            nav.NavigateTo($"/api/Items/lista/{idObra}/{idPresupuesto}");
         }
         else
         {
@@ -201,6 +203,6 @@
 
     private void Cancelar()
     {
-        nav.NavigateTo("/api/Obras");
+        nav.NavigateTo($"/api/Items/lista/{idObra}/{idPresupuesto}");
     }
 }

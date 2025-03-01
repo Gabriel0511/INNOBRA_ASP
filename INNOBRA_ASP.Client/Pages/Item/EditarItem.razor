@@ -105,17 +105,6 @@
             var errorContent = await respuesta.HttpResponseMessage.Content.ReadAsStringAsync();
             mensajeService.Mensaje = $"Error: {errorContent}";
         }
-        
-        // if (!respuesta.Error)
-        // {
-        //     mensaje = "Se cargó con éxito el item.";
-        //     nav.NavigateTo("/Api/Items");
-        // }
-        // else
-        // {
-        //     var errorContent = await respuesta.HttpResponseMessage.Content.ReadAsStringAsync();
-        //     mensaje = $"Error: {errorContent}"; // Muestra el error
-        // }
     }
 
     private void Cancelar()
