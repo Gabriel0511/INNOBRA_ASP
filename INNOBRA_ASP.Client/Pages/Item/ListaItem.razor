@@ -1,4 +1,4 @@
-﻿@page "/api/Items/lista/{idPresupuesto:int}"
+﻿@page "/api/Items/lista/{idObra:int}/{idPresupuesto:int}"
 @inject IHttpServicio http
 @inject MensajeService mensajeService
 @inject NavigationManager nav
@@ -165,6 +165,6 @@
     private void Volver()
     {
 
-        nav.NavigateTo($"api/Presupuestos/lista/{idObra}");
+        nav.NavigateTo($"/api/Presupuestos/lista/{idObra}");
     }
 }

@@ -49,9 +49,9 @@
                         <td>@presupuesto.FechaInicioPrevista.ToString("dd-MM-yyyy")</td>
                         <td>@presupuesto.FechaFinPrevista.ToString("dd-MM-yyyy")</td>
                         <td>
-                            <a class="btn btn-violet btn-sm" href="/api/Items/lista/@presupuesto.Id" title="Ver Items"><i class="bi bi-eye" style="color: black;"></i></a>
+                            <a class="btn btn-violet btn-sm" href="/api/Items/lista/@idObra/@presupuesto.Id" title="Ver Items"><i class="bi bi-eye" style="color: black;"></i></a>
 
-                            <a class="btn btn-warning btn-sm" href="/api/Presupuestos/editar/@presupuesto.Id/@idObra">
+                            <a class="btn btn-warning btn-sm" href="/api/Presupuestos/editar/@idObra/@presupuesto.Id">
                                 <i class="bi bi-pencil"></i> 
                             </a>
                             
