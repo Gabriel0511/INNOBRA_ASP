@@ -30,7 +30,7 @@
         </div>
     }
 
-    @if (listaItems != null && listaItems.Any())
+    @if (listaItems != null && listaItems.Any(p => p.Presupuesto_Id == idPresupuesto))
     {
         <table>
             <thead>
@@ -44,7 +44,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in listaItems)
+                @foreach (var item in listaItems.Where(p => p.Presupuesto_Id == idPresupuesto))
                 {
                     <tr>
                         <td>@item.Tiempo_estimado</td>
@@ -53,8 +53,8 @@
                         <td>@MostrarNombreItemTipo(item.Item_Tipos_Id)</td>
                         <td>@MostrarPresupuesto(item.Presupuesto_Id)</td>
                         <td>
-                            <a class="btn btn-warning btn-sm" href="Api/Items/editar/@item.Id">Editar</a>
-                            <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(item.Id)">Eliminar</button>
+                            <a class="btn btn-warning btn-sm" href="Api/Items/editar/@item.Id"><i class="bi bi-pencil"></i> </a>
+                            <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(item.Id)"><i class="bi bi-trash3"></i></button>
                         </td>
                     </tr>
                 }
