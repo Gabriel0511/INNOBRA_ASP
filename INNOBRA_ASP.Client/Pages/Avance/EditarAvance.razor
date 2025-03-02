@@ -1,4 +1,4 @@
-﻿@page "/api/Avances/editar/{avanceId:int}"
+﻿@page "/api/Avances/editar/{idObra:int}/{idPresupuesto:int}/{idItem:int}/{idAvance:int}"
 @inject IHttpServicio http
 @inject NavigationManager nav
 @inject MensajeService mensajeService
@@ -9,7 +9,7 @@
 <div class="contenedor-formulario">
     <h3>Editar Avance</h3>
 
-    <EditForm Model="avance" OnValidSubmit="Grabar">
+    <EditForm Model="avance" OnValidSubmit="Actualizar">
         <DataAnnotationsValidator />
 
         <div class="mb-3">
@@ -40,24 +40,24 @@
         </div>
 
         <div class="mb-3">
-            <label>Material Ejecutado</label>
+            <label>Material Empleado</label>
             <div>
                 <InputText class="form-control" @bind-Value="@avance.MaterialEjecutado" />
                 <ValidationMessage For="@(() => avance.MaterialEjecutado)" />
             </div>
         </div>
 
-
-        <br />
-        <div class="text-center">
             <button class="btn btn-primary" type="submit">Aceptar</button>
             <button class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-        </div>
     </EditForm>
 </div>
 
 @code {
-    [Parameter] public int avanceId { get; set; }
+    [Parameter] public int idAvance { get; set; }
+    [Parameter] public int idObra { get; set; }
+    [Parameter] public int idPresupuesto { get; set; }
+    [Parameter] public int idItem { get; set; }
+
     private EditarAvanceDTO avance = new EditarAvanceDTO();
     private List<Recurso> listaRecursos = new();
 
@@ -72,7 +72,7 @@
 
     private async Task Mostrar()
     {
-        var respuesta = await http.Get<EditarAvanceDTO>($"api/Avances/GetById/{avanceId}");
+        var respuesta = await http.Get<EditarAvanceDTO>($"api/Avances/GetById/{idAvance}");
         if (!respuesta.Error)
         {
             avance = respuesta.Respuesta;
@@ -93,9 +93,9 @@
 
     }
 
-    private async Task Grabar()
+    private async Task Actualizar()
     {
-        var httpRespuesta = await http.Put<EditarAvanceDTO>($"api/Avances/{avanceId}", avance);
+        var httpRespuesta = await http.Put<EditarAvanceDTO>($"api/Avances/{idAvance}", avance);
 
         if (!httpRespuesta.Error)
         {
@@ -106,7 +106,7 @@
             StateHasChanged();
 
             // Redirigimos a la página de lista de Obras
-            nav.NavigateTo("/api/Obras");
+            nav.NavigateTo($"/api/Avances/{idObra}/{idPresupuesto}/{idItem}");
         }
         else
         {
@@ -118,6 +118,6 @@
 
     private void Cancelar()
     {
-        nav.NavigateTo("/api/Obras");
+        nav.NavigateTo($"/api/Avances/{idObra}/{idPresupuesto}/{idItem}");
     }
 }

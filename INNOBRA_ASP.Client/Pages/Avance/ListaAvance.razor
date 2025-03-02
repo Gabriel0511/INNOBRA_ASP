@@ -39,17 +39,17 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in listaAvances)
+                @foreach (var avances in listaAvances.Where(predicate => predicate.Item_Id == idItem))
                 {
                     <tr>
-                        <td>@item.Fecha.ToString("dd-MM-yyyy")</td>
-                        <td>@item.FechaFinalizacionReal.ToString("dd-MM-yyyy")</td>
-                        <td>@MostrarRecurso(item.Recurso_Id)</td>
-                        <td>@item.MaterialEjecutado</td>
+                        <td>@avances.Fecha.ToString("dd-MM-yyyy")</td>
+                        <td>@avances.FechaFinalizacionReal.ToString("dd-MM-yyyy")</td>
+                        <td>@MostrarRecurso(avances.Recurso_Id)</td>
+                        <td>@avances.MaterialEjecutado</td>
 
                         <td>
-                            <a class="btn btn-warning btn-sm" href="api/Avances/editar/@item.Id"><i class="bi bi-pencil"></i></a>
-                            <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(item.Id)"><i class="bi bi-trash3"></i></button>
+                            <a class="btn btn-warning btn-sm" href="api/Avances/editar/@idObra/@idPresupuesto/@idItem/@avances.Id"><i class="bi bi-pencil"></i></a>
+                            <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(avances.Id)"><i class="bi bi-trash3"></i></button>
                         </td>
                     </tr>
                 }
@@ -71,12 +71,6 @@
 
 
 </div>
-
-<Confirmacion @ref="confirmacion" Titulo="CUIDADO" textCancelar="Salir" onCancel="Cancelar" onConfirm="Borrar">
-    <h5>Está por borrar el avance</h5>
-    <br />
-    <p>Está seguro?</p>
-</Confirmacion>
 
 @code {
     [Parameter] public int idObra { get; set; }
@@ -132,29 +126,13 @@
         return recurso?.Nombre ?? "Sin asignar";
     }
 
-    private async Task Eliminar(Avance avance)
-    {
-        avanceBorrar = avance;
-        confirmacion.Ver();
-    }
-
     private void Cancelar()
     {
         confirmacion.Ocultar();
         avanceBorrar = null;
     }
 
-    private async Task Borrar()
-    {
-        var respuesta = await http.Delete($"api/Avances/{avanceBorrar.Id}");
-        if (respuesta.Error)
-        {
-            var body = "No se pudo borrar";
-        }
-        Cancelar();
-        await Leer();
-    }
-    private async Task Eliminar(int id)
+    private async Task Eliminar(int idAvance)
     {
         var resultado = await js.InvokeAsync<bool>("confirmSwal");
 
@@ -162,7 +140,7 @@
         {
             try
             {
-                var resp = await http.Delete($"api/Avances/{id}");
+                var resp = await http.Delete($"api/Avances/{idAvance}");
                 if (!resp.Error)
                 {
                     await Leer(); // Recarga la lista después de eliminar
