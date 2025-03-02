@@ -9,7 +9,6 @@ namespace INNOBRA_ASP.DB.Data.Entity
 {
     public class Item : EntityBase
     {
-
         [Required(ErrorMessage = "El tiempo estimado es obligatorio.")]
         public int Tiempo_estimado { get; set; }
 
