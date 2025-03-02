@@ -1,4 +1,4 @@
-﻿@page "/api/Avances/{id:int}"
+﻿@page "/api/Avances/{idObra:int}/{idPresupuesto:int}/{idItem:int}"
 @inject IHttpServicio http
 @inject HttpClient Http
 @inject IJSRuntime js
@@ -65,68 +65,24 @@
 
     <br />
 
-@*     <a class="btn btn-success btn-sm" href="/api/Avances/crear/@id">
+     <a class="btn btn-primary" href="/api/Avances/crear/@idItem">
         <i class="bi bi-plus-circle"></i> Agregar Avance
-    </a> *@
+    </a> 
 
 
 </div>
-
-@*<a class="btn btn-primary" href="/api/Avances/crear">Nuevo Avance</a>
-    <table>
-        <tr>
-            <th>Fecha</th>
-            <th>Material Ejecutado</th>
-            <th>Fecha de Finalización Real</th>
-            <th>Item Id</th>
-            <th>Recurso Id</th>
-            <th>Acciones</th>
-        </tr>
-        @if (Mensaje == "")
-        {
-            @if (listaAvances == null)
-            {
-                <p>Buscando....</p>
-            }
-            else if (listaAvances.Count == 0)
-            {
-                <p>No existen avances</p>
-            }
-            else
-            {
-                @foreach (var item in listaAvances)
-                {
-                    <tr>
-                        <td>@item.Fecha</td>
-                        <td>@item.MaterialEjecutado</td>
-                        <td>@item.FechaFinalizacionReal</td>
-                        <td>@item.Item_Id</td>
-                        <td>@item.Recurso_Id</td>
-                        <td>
-                            <a class="btn btn-primary" href="api/Avances/editar/@item.Id">Editar</a>
-                        </td>
-                        <td>
-                            <button class="btn btn-danger" @onclick="() => Eliminar(item)">Borrar</button>
-                        </td>
-                    </tr>
-                }
-            }
-        }
-        else
-        {
-            <p>Error: @Mensaje</p>
-        }
-    </table> 
-
 
 <Confirmacion @ref="confirmacion" Titulo="CUIDADO" textCancelar="Salir" onCancel="Cancelar" onConfirm="Borrar">
     <h5>Está por borrar el avance</h5>
     <br />
     <p>Está seguro?</p>
-</Confirmacion>*@
+</Confirmacion>
 
 @code {
-    [Parameter] public int id { get; set; }
+    [Parameter] public int idObra { get; set; }
+    [Parameter] public int idPresupuesto { get; set; }
+    [Parameter] public int idItem { get; set; }
+
     Confirmacion confirmacion;
     List<Avance> listaAvances;
     List<Recurso> listaRecursos = new List<Recurso>();
@@ -152,7 +108,7 @@
         var avances = await Http.GetFromJsonAsync<List<Avance>>($"api/Avances");
         if (avances != null)
         {
-            listaAvances = avances.Where(a => a.Item_Id == id).ToList();
+            listaAvances = avances.Where(a => a.Item_Id == idItem).ToList();
         }
         else
         {
@@ -188,16 +144,16 @@
         avanceBorrar = null;
     }
 
-    // private async Task Borrar()
-    // {
-    //     var respuesta = await http.Delete($"api/Avances/{avanceBorrar.Id}");
-    //     if (respuesta.Error)
-    //     {
-    //         var body = "No se pudo borrar";
-    //     }
-    //     Cancelar();
-    //     await Leer();
-    // }
+    private async Task Borrar()
+    {
+        var respuesta = await http.Delete($"api/Avances/{avanceBorrar.Id}");
+        if (respuesta.Error)
+        {
+            var body = "No se pudo borrar";
+        }
+        Cancelar();
+        await Leer();
+    }
     private async Task Eliminar(int id)
     {
         var resultado = await js.InvokeAsync<bool>("confirmSwal");
