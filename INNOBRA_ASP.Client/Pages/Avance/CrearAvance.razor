@@ -120,30 +120,47 @@
 
     private async Task Grabar()
     {
+        if (!ValidarFormulario())
+        {
+            return;
+        }
+
         var httpRespuesta = await http.Post<CrearAvanceDTO>("api/Avances", avance);
         if (!httpRespuesta.Error)
         {
-            // Si el avance se crea correctamente, establecer el mensaje
             mensajeService.Mensaje = "Avance agregado con éxito.";
-
-            // Redirigir a la página de lista después de un breve retraso
             await Task.Delay(1500);
             nav.NavigateTo($"/api/Avances/{idObra}/{idPresupuesto}/{idItem}");
         }
         else
         {
-            // Si ocurre un error, establecer el mensaje de error
             var errorContent = await httpRespuesta.HttpResponseMessage.Content.ReadAsStringAsync();
             mensajeService.Mensaje = $"Error: {errorContent}";
         }
-        
-        // var httpRespuesta = await http.Post<CrearAvanceDTO>("api/Avances", avance);
-        // if (httpRespuesta.Error)
-        // {
-        //     var body = httpRespuesta.HttpResponseMessage;
-        // }
-        // nav.NavigateTo("/api/Avances");
     }
+
+    private bool ValidarFormulario()
+    {
+        mensajeError = "";
+
+        if (avance.Recurso_Id == null || avance.Recurso_Id == 0)
+        {
+            mensajeError += "Debe seleccionar un recurso.\n";
+        }
+
+        if (string.IsNullOrWhiteSpace(avance.MaterialEjecutado))
+        {
+            mensajeError += "Debe ingresar un material ejecutado.\n";
+        }
+
+        if (!string.IsNullOrEmpty(mensajeError))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
 
     private void Cancelar()
     {
