@@ -2,6 +2,28 @@ html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
+/*-------------NAVMENU---------------------*/
+
+.top-row.navbar {
+    background-color: #343a40; /* Gris oscuro */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Sombra */
+}
+
+.nav-scrollable {
+    background-color: #3a3f44; /* Gris oscuro */
+    box-shadow: 2px 0 6px rgba(0, 0, 0, 0.2); /* Sombra lateral */
+}
+
+.nav-link {
+    color: #ffffff !important; /* Color de texto blanco */
+}
+
+    .nav-link:hover {
+        background-color: #495057; /* Gris más claro al pasar el mouse */
+    }
+
+/*--------------------------------------------------------------------*/
+
 h1:focus {
     outline: none;
 }
