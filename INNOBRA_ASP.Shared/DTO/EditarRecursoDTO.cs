@@ -30,6 +30,8 @@ namespace INNOBRA_ASP.Shared.DTO
         public string Cantidad { get; set; }
 
         //CLAVE FORANEA
+
+        [Range(1, int.MaxValue, ErrorMessage = "Seleccione una unidad valida")]
         public int Unidad_Id { get; set; }
     }
 }
