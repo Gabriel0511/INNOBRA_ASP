@@ -50,6 +50,24 @@
         <ValidationMessage For="@(() => item.Material_estimado)" />
     </div>
 
+     <div class="mb-3">
+            <label>Item Tipo</label>
+            <div class="d-flex align-items-center" style="width: 100%;">
+                <select class="form-control" @bind="item.Item_Tipos_Id" style="flex: 1;">
+                    <option value="">Seleccione un item tipo</option>
+                    @foreach (var itemTipo in itemTipos)
+                    {
+                        <option value="@itemTipo.Id">@itemTipo.Nombre</option>
+                    }
+                </select>
+                <a class="btn btn-success btn-sm mb-3 ms-2 d-flex align-items-center justify-content-center"
+                   href="/api/ItemTipos/crear" title="Agregar item tipo" style="height: 100%;">
+                    <i class="bi bi-plus"></i>
+                </a>
+            </div>
+            <ValidationMessage For="@(() => item.Item_Tipos_Id)" />
+        </div>
+
         <button type="submit" class="btn btn-primary">Guardar Cambios</button>
     <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
 </EditForm>
@@ -62,13 +80,17 @@
     [Parameter] public int idPresupuesto { get; set; }
 
     private EditarItemDTO item = new EditarItemDTO();
+
+    private List<ItemTipo> itemTipos = new List<ItemTipo>();
     private List<string> undTiempo = new List<string> { "Horas", "Dias", "Meses", "Años" };
 
     private string mensaje = "";
+    private string mensajeError;
 
     protected override async Task OnInitializedAsync()
     {
         await CargarItem();
+        await CargarItemsTipos();
     }
 
     private async Task CargarItem()
@@ -81,6 +103,20 @@
         else
         {
             nav.NavigateTo($"/api/Items/lista/{idObra}/{idPresupuesto}");
+        }
+    }
+
+    private async Task CargarItemsTipos()
+    {
+        // Llama al servicio para obtener la lista de obras
+        var respuesta = await http.Get<List<ItemTipo>>("api/ItemTipos");
+        if (!respuesta.Error)
+        {
+            itemTipos = respuesta.Respuesta;  // Poblamos la lista de obras, no la de presupuestos
+        }
+        else
+        {
+            mensajeError = "Error al cargar los items tipo.";
         }
     }
 

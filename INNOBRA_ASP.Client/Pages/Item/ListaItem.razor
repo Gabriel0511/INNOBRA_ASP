@@ -62,9 +62,16 @@
     }
     else
     {
-        <div class="alert alert-warning" role="alert">
-            No hay items registrados.
-        </div>
+        if (cargando)
+        {
+
+        }
+        else
+        {
+            <div class="alert alert-warning" role="alert">
+                No hay items disponibles para este presupuesto.
+            </div>
+        }
     }
 
     <br/>

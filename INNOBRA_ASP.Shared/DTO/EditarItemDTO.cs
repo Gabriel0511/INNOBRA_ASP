@@ -22,5 +22,8 @@ namespace INNOBRA_ASP.Shared.DTO
         [Required(ErrorMessage = "El material estimado es obligatorio.")]
         [Range(1, int.MaxValue, ErrorMessage = "El material estimado debe ser mayor a 0")]
         public int Material_estimado { get; set; }
+
+        [Required(ErrorMessage = "El item tipo es obligatorio.")]
+        public int Item_Tipos_Id { get; set; }
     }
 }

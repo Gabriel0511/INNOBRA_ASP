@@ -14,8 +14,7 @@
     <EditForm Model="@obra" OnValidSubmit="Grabar">
         <DataAnnotationsValidator />
 
-        <div class="form-group" >
-            
+        <div class="form-group">
             <div style="display:flex">
                 <label>Nombre:</label>
                 <InputText class="form-control" style="max-width: 35%; max-height: 2.2rem; margin-left:0.5rem " @bind-Value="@obra.Nombre" />
@@ -24,7 +23,6 @@
                 <ValidationMessage For="@(() => obra.Nombre)" />
             </div>
         </div>
-
 
         <div class="mb-3" style="display:flex">
             <label>Fecha de Inicio:</label>
@@ -43,12 +41,18 @@
             <InputFile class="form-control" style="max-width: 65%; max-height: 3rem; margin-left:0.5rem " OnChange="OnInputFileChange" />
         </div>
 
+        <!-- Aquí se muestra el mensaje de error -->
+        <div class="text-danger">@mensajeError</div>
+
         <button type="submit" class="btn btn-primary">Guardar</button>
         <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
     </EditForm>
+
 </div>
 
 @code {
+    private string mensajeError = "";
+
     private Obra obra = new Obra();
     private List<Obra> listaObra = new List<Obra>();
 
@@ -71,21 +75,23 @@
 
     private async Task Grabar()
     {
+        if (obra.FechaInicio > obra.FechaFin)
+        {
+            mensajeError = "La fecha de inicio no puede ser mayor que la fecha de fin.";
+            return;
+        }
+
+        mensajeError = ""; // Limpiar error si es válido
+
         var httpRespuesta = await http.Post<Obra>("api/Obras", obra);
         if (!httpRespuesta.Error)
         {
-            // Si la obra se crea correctamente, establecer el mensaje
             mensajeService.Mensaje = "Obra agregada con éxito.";
-
-            // Redirigir a la página de lista después de un breve retraso
-            await Task.Delay(1500);
             nav.NavigateTo("/api/Obras");
         }
         else
         {
-            // Si ocurre un error, establecer el mensaje de error
-            var errorContent = await httpRespuesta.HttpResponseMessage.Content.ReadAsStringAsync();
-            mensajeService.Mensaje = $"Error: {errorContent}";
+            mensajeService.Mensaje = "Error al guardar la obra.";
         }
     }
 

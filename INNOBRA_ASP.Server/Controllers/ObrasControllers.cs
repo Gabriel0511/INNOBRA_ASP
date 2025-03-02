@@ -51,17 +51,17 @@ namespace INNOBRA_ASP.Server.Controllers
         {
             try
             {
-                // Mapear el DTO a la entidad de base de datos
+                if (entidadDTO.FechaInicio > entidadDTO.FechaFin)
+                {
+                    return BadRequest("La fecha de inicio no puede ser mayor que la fecha de fin.");
+                }
+
                 var entidad = mapper.Map<Obra>(entidadDTO);
-
-                // Insertar la entidad en la base de datos
                 var id = await repositorio.Insert(entidad);
-
                 return CreatedAtAction(nameof(Post), new { id }, id);
             }
             catch (Exception e)
             {
-                // Manejo de excepciones más limpio
                 var errorMessage = e.InnerException != null
                     ? $"Error: {e.Message}. Inner Exception: {e.InnerException.Message}"
                     : e.Message;
@@ -71,13 +71,18 @@ namespace INNOBRA_ASP.Server.Controllers
         }
 
 
+
         [HttpPut("{id:int}")]
         public async Task<ActionResult> Put(int id, [FromBody] EditarObraDTO entidadDTO)
         {
-
             if (id != entidadDTO.Id)
             {
                 return BadRequest("Datos incorrectos.");
+            }
+
+            if (entidadDTO.FechaInicio > entidadDTO.FechaFin)
+            {
+                return BadRequest("La fecha de inicio no puede ser mayor que la fecha de fin.");
             }
 
             var obra = await repositorio.SelectById(id);
@@ -87,17 +92,13 @@ namespace INNOBRA_ASP.Server.Controllers
                 return NotFound("No existe la obra buscada.");
             }
 
-            // Actualizar los campos del presupuesto
             obra.Nombre = entidadDTO.Nombre;
             obra.FechaInicio = entidadDTO.FechaInicio;
             obra.FechaFin = entidadDTO.FechaFin;
             obra.Imagen = entidadDTO.Imagen;
 
-            // Aquí no modificamos la relación con 'Obra' ni 'Items', solo los campos mencionados.
-
             try
             {
-                // Guardar los cambios
                 await repositorio.Update(id, obra);
                 return Ok();
             }
@@ -106,6 +107,7 @@ namespace INNOBRA_ASP.Server.Controllers
                 return BadRequest($"Error al actualizar la obra: {ex.Message}");
             }
         }
+
 
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)

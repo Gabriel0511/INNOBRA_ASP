@@ -85,11 +85,13 @@ namespace INNOBRA_ASP.Server.Controllers
 
 			// Actualizar los campos del presupuesto
 			item.Tiempo_estimado = entidadDTO.Tiempo_estimado;
-			item.Material_estimado = entidadDTO.Material_estimado;
+            item.Unidad_Tiempo = entidadDTO.Unidad_Tiempo;
+            item.Material_estimado = entidadDTO.Material_estimado;
+            item.Item_Tipos_Id = entidadDTO.Item_Tipos_Id;
 
-			// Aquí no modificamos la relación con 'Obra' ni 'Items', solo los campos mencionados.
+            // Aquí no modificamos la relación con 'Obra' ni 'Items', solo los campos mencionados.
 
-			try
+            try
 			{
 				// Guardar los cambios
 				await repositorio.Update(id, item);

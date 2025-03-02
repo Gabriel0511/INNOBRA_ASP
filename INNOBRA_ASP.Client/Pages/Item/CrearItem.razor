@@ -92,8 +92,10 @@
     [Parameter] public int id { get; set; }
     [Parameter] public int idObra { get; set; }
     [Parameter] public int idPresupuesto { get; set; }
+
     private CrearItemDTO item = new CrearItemDTO();
     private Presupuesto presupuestoSeleccionado;
+
     private List<Item> listaItems = new();
     private List<ItemTipo> itemTipos = new List<ItemTipo>();
     private List<Presupuesto> presupuestos = new List<Presupuesto>();
@@ -163,9 +165,9 @@
 
     private async Task Grabar()
     {
-        if (item.Item_Tipos_Id == 0 || item.Presupuesto_Id == 0)
+        if (item.Item_Tipos_Id == 0 )
         {
-            mensajeError = "Los campos Item Tipo y Presupuesto son obligatorios.";
+            mensajeError = "El campo Item Tipo es obligatorio.";
             return;
         }
 

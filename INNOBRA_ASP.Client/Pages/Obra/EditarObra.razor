@@ -22,10 +22,9 @@
         <DataAnnotationsValidator />
 
         <div class="form-group">
-
             <div style="display:flex">
                 <label>Nombre:</label>
-                <InputText class="form-control" style="max-width: 35%; max-height: 2.2rem; margin-left:0.5rem " @bind-Value="@obra.Nombre" />
+                <InputText class="form-control" style="max-width: 35%; max-height: 2.2rem; margin-left:0.5rem" @bind-Value="@obra.Nombre" />
             </div>
             <div>
                 <ValidationMessage For="@(() => obra.Nombre)" />
@@ -34,24 +33,27 @@
 
         <div class="mb-3" style="display:flex">
             <label>Fecha Inicio</label>
-            <InputDate class="form-control" style="max-width: 35%; max-height: 2.2rem; margin-left:0.5rem " @bind-Value="obra.FechaInicio" />
+            <InputDate class="form-control" style="max-width: 35%; max-height: 2.2rem; margin-left:0.5rem" @bind-Value="obra.FechaInicio" />
             <ValidationMessage For="@(() => obra.FechaInicio)" />
         </div>
 
         <div class="mb-3" style="display:flex">
             <label>Fecha fin</label>
-            <InputDate class="form-control" style="max-width: 35%; max-height: 2.2rem; margin-left:0.5rem " @bind-Value="obra.FechaFin" />
+            <InputDate class="form-control" style="max-width: 35%; max-height: 2.2rem; margin-left:0.5rem" @bind-Value="obra.FechaFin" />
             <ValidationMessage For="@(() => obra.FechaFin)" />
         </div>
 
         <div class="mb-3" style="display:flex; align-items: center;">
             <label>Imagen:</label>
-            <InputFile class="form-control" style="max-width: 65%; max-height: 3rem; margin-left:0.5rem "  OnChange="OnInputFileChange" />
+            <InputFile class="form-control" style="max-width: 65%; max-height: 3rem; margin-left:0.5rem" OnChange="OnInputFileChange" />
             @if (obra.Imagen != null)
             {
                 <img src="data:image;base64,@Convert.ToBase64String(obra.Imagen)" alt="Imagen actual" style="width: 200px; height: auto; margin-top: 10px;" />
             }
         </div>
+
+        <!-- Mensaje de error en rojo -->
+        <div class="text-danger">@mensajeError</div>
 
         <button type="submit" class="btn btn-primary">Guardar Cambios</button>
         <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
@@ -62,6 +64,7 @@
     [Parameter] public int id { get; set; }
     private EditarObraDTO obra = new EditarObraDTO();
     private string mensaje = "";
+    private string mensajeError = ""; // Variable para el mensaje de error
 
     protected override async Task OnInitializedAsync()
     {
@@ -83,18 +86,21 @@
 
     private async Task Actualizar()
     {
+        if (obra.FechaInicio > obra.FechaFin)
+        {
+            mensajeError = "La fecha de inicio no puede ser mayor que la fecha de fin.";
+            return;
+        }
+
+        mensajeError = ""; // Limpiar mensaje de error si la validación pasa
+
         var respuesta = await http.Put($"Api/obras/{id}", obra);
 
         if (!respuesta.Error)
         {
-            // Actualizamos el mensaje globalmente a través del servicio
             mensajeService.Mensaje = "Se actualizó con éxito la obra.";
-
-            // Forzamos el renderizado (opcional, pero puede ser útil)
             StateHasChanged();
-
-            // Redirigimos a la página de lista de unidades
-            await Task.Delay(1500); // Espera para mostrar el mensaje
+            await Task.Delay(1500);
             nav.NavigateTo("/api/Obras");
         }
         else
@@ -110,7 +116,7 @@
         using (var stream = new MemoryStream())
         {
             await imageFile.OpenReadStream().CopyToAsync(stream);
-            obra.Imagen = stream.ToArray(); // Asigna la imagen a obra.Imagen
+            obra.Imagen = stream.ToArray();
         }
     }
 
