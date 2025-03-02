@@ -125,9 +125,47 @@
             return;
         }
 
+        // Guardar el avance
         var httpRespuesta = await http.Post<CrearAvanceDTO>("api/Avances", avance);
         if (!httpRespuesta.Error)
         {
+            // Obtener el recurso correspondiente
+            var recurso = listaRecursos.FirstOrDefault(r => r.Id == avance.Recurso_Id);
+            if (recurso != null)
+            {
+                // Validar que el campo Cantidad sea un número válido
+                if (decimal.TryParse(recurso.Cantidad, out decimal cantidadActual))
+                {
+                    // Convertir MaterialEjecutado a decimal
+                    if (decimal.TryParse(avance.MaterialEjecutado, out decimal materialEjecutado))
+                    {
+                        // Restar el material ejecutado del recurso
+                        cantidadActual -= materialEjecutado;
+
+                        // Convertir el resultado de vuelta a string
+                        recurso.Cantidad = cantidadActual.ToString();
+
+                        // Actualizar el recurso en la base de datos
+                        var respuestaActualizacion = await http.Put<Recurso>($"api/Recursos/{recurso.Id}", recurso);
+                        if (respuestaActualizacion.Error)
+                        {
+                            mensajeService.Mensaje = "Error al actualizar el recurso.";
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        mensajeService.Mensaje = "El valor de Material Ejecutado no es un número válido.";
+                        return;
+                    }
+                }
+                else
+                {
+                    mensajeService.Mensaje = "El valor de Cantidad en el recurso no es un número válido.";
+                    return;
+                }
+            }
+
             mensajeService.Mensaje = "Avance agregado con éxito.";
             await Task.Delay(1500);
             nav.NavigateTo($"/api/Avances/{idObra}/{idPresupuesto}/{idItem}");

@@ -9,23 +9,25 @@
 <div class="contenedor-formulario">
     <h3>Editar Avance</h3>
 
+    @if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <div class="alert alert-danger" role="alert">
+            @mensajeError
+        </div>
+    }
+
     <EditForm Model="avance" OnValidSubmit="Actualizar">
         <DataAnnotationsValidator />
+        <ValidationSummary />
 
         <div class="mb-3">
-            <label>Fecha de Finalizacion Prevista</label>
-            <div>
-                <InputDate class="form-control" @bind-Value="@avance.Fecha" />
-                <ValidationMessage For="@(() => avance.Fecha)" />
-            </div>
+            <label>Fecha de Finalización Prevista:</label>
+            <InputDate @bind-Value="avance.Fecha" class="form-control" />
         </div>
 
         <div class="mb-3">
-            <label>Fecha de Finalizacion Real</label>
-            <div>
-                <InputDate class="form-control" @bind-Value="@avance.FechaFinalizacionReal" />
-                <ValidationMessage For="@(() => avance.FechaFinalizacionReal)" />
-            </div>
+            <label>Fecha de Finalización Real:</label>
+            <InputDate @bind-Value="avance.FechaFinalizacionReal" class="form-control" />
         </div>
 
         <div class="mb-3">
@@ -37,18 +39,17 @@
                     <option value="@recurso.Id">@recurso.Nombre</option>
                 }
             </select>
+            <ValidationMessage For="@(() => avance.Recurso_Id)" />
         </div>
 
         <div class="mb-3">
-            <label>Material Empleado</label>
-            <div>
-                <InputText class="form-control" @bind-Value="@avance.MaterialEjecutado" />
-                <ValidationMessage For="@(() => avance.MaterialEjecutado)" />
-            </div>
+            <label>Material Empleado: (número)</label>
+            <InputText @bind-Value="avance.MaterialEjecutado" class="form-control" />
+            <ValidationMessage For="@(() => avance.MaterialEjecutado)" />
         </div>
 
-            <button class="btn btn-primary" type="submit">Aceptar</button>
-            <button class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Aceptar</button>
+        <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
     </EditForm>
 </div>
 
@@ -60,6 +61,7 @@
 
     private EditarAvanceDTO avance = new EditarAvanceDTO();
     private List<Recurso> listaRecursos = new();
+    private string mensajeError;
 
     protected override async Task OnInitializedAsync()
     {
@@ -90,7 +92,6 @@
         {
             listaRecursos = respuesta.Respuesta;
         }
-
     }
 
     private async Task Actualizar()
@@ -100,12 +101,60 @@
             return;
         }
 
-        var httpRespuesta = await http.Put<EditarAvanceDTO>($"api/Avances/{idAvance}", avance);
+        // Obtener el avance original para comparar el material ejecutado
+        var avanceOriginal = await http.Get<EditarAvanceDTO>($"api/Avances/GetById/{idAvance}");
+        if (avanceOriginal.Error)
+        {
+            mensajeError = "Error al obtener el avance original.";
+            return;
+        }
 
+        // Calcular la diferencia en el material ejecutado
+        if (decimal.TryParse(avanceOriginal.Respuesta.MaterialEjecutado, out decimal materialOriginal) &&
+            decimal.TryParse(avance.MaterialEjecutado, out decimal materialNuevo))
+        {
+            decimal diferenciaMaterial = materialNuevo - materialOriginal;
+
+            // Obtener el recurso correspondiente
+            var recurso = listaRecursos.FirstOrDefault(r => r.Id == avance.Recurso_Id);
+            if (recurso != null)
+            {
+                // Validar que el campo Cantidad sea un número válido
+                if (decimal.TryParse(recurso.Cantidad, out decimal cantidadActual))
+                {
+                    // Ajustar la cantidad de material en el recurso
+                    cantidadActual -= diferenciaMaterial;
+
+                    // Convertir el resultado de vuelta a string
+                    recurso.Cantidad = cantidadActual.ToString();
+
+                    // Actualizar el recurso en la base de datos
+                    var respuestaActualizacion = await http.Put<Recurso>($"api/Recursos/{recurso.Id}", recurso);
+                    if (respuestaActualizacion.Error)
+                    {
+                        mensajeError = "Error al actualizar el recurso.";
+                        return;
+                    }
+                }
+                else
+                {
+                    mensajeError = "El valor de Cantidad en el recurso no es un número válido.";
+                    return;
+                }
+            }
+        }
+        else
+        {
+            mensajeError = "El valor de Material Ejecutado no es un número válido.";
+            return;
+        }
+
+        // Actualizar el avance
+        var httpRespuesta = await http.Put<EditarAvanceDTO>($"api/Avances/{idAvance}", avance);
         if (!httpRespuesta.Error)
         {
             mensajeService.Mensaje = "Se actualizó con éxito el avance.";
-            StateHasChanged();
+            await Task.Delay(1500);
             nav.NavigateTo($"/api/Avances/{idObra}/{idPresupuesto}/{idItem}");
         }
         else
@@ -117,27 +166,29 @@
 
     private bool ValidarFormulario()
     {
-        mensajeService.Mensaje = ""; // Limpiar mensajes anteriores
+        mensajeError = "";
 
         if (avance.Recurso_Id == null || avance.Recurso_Id == 0)
         {
-            mensajeService.Mensaje += "Debe seleccionar un recurso.\n";
+            mensajeError += "Debe seleccionar un recurso.\n";
         }
 
         if (string.IsNullOrWhiteSpace(avance.MaterialEjecutado))
         {
-            mensajeService.Mensaje += "Debe ingresar un material ejecutado.\n";
+            mensajeError += "Debe ingresar un material ejecutado.\n";
+        }
+        else if (!decimal.TryParse(avance.MaterialEjecutado, out decimal materialEjecutado) || materialEjecutado <= 0)
+        {
+            mensajeError += "El material ejecutado debe ser un número mayor que 0.\n";
         }
 
-        if (!string.IsNullOrEmpty(mensajeService.Mensaje))
+        if (!string.IsNullOrEmpty(mensajeError))
         {
             return false;
         }
 
         return true;
     }
-
-
 
     private void Cancelar()
     {
