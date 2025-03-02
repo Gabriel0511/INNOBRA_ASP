@@ -1,4 +1,4 @@
-﻿@page "/api/Avances/crear/{id:int}"
+﻿@page "/api/Avances/crear/{idObra:int}/{idPresupuesto:int}/{idItem:int}"
 @inject IHttpServicio http
 @using INNOBRA_ASP.Shared.DTO
 @using System.Net.Http.Json
@@ -66,7 +66,10 @@
 </div>
 
 @code {
-    [Parameter] public int id { get; set; }
+    [Parameter] public int idObra { get; set; }
+    [Parameter] public int idPresupuesto { get; set; }
+    [Parameter] public int idItem { get; set; }
+
     private CrearAvanceDTO avance = new CrearAvanceDTO();
     private List<Item> items = new List<Item>();
     private Item itemSeleccionado;
@@ -101,7 +104,7 @@
         if (!respuesta.Error)
         {
             items = respuesta.Respuesta;
-            itemSeleccionado = items.FirstOrDefault(p => p.Id == id);
+            itemSeleccionado = items.FirstOrDefault(p => p.Id == idItem);
         }
     }
 
@@ -125,7 +128,7 @@
 
             // Redirigir a la página de lista después de un breve retraso
             await Task.Delay(1500);
-            nav.NavigateTo("api/Obras");
+            nav.NavigateTo($"/api/Avances/{idObra}/{idPresupuesto}/{idItem}");
         }
         else
         {
@@ -144,6 +147,6 @@
 
     private void Cancelar()
     {
-        nav.NavigateTo("api/Obras");
+        nav.NavigateTo($"/api/Avances/{idObra}/{idPresupuesto}/{idItem}");
     }
 }

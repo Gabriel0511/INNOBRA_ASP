@@ -3,6 +3,7 @@
 @inject HttpClient Http
 @inject IJSRuntime js
 @inject MensajeService mensajeService
+@inject NavigationManager nav
 
 <div class="alert alert-info" style="display: @(!string.IsNullOrEmpty(mensajeService.Mensaje) ? "block" : "none")">
     @mensajeService.Mensaje
@@ -12,7 +13,9 @@
 <div class="overlay"></div>
 <div class="contenedor-formulario">
 
-    <h3>Lista de Avances</h3>
+    <button type="button" class="btn btn-primary" @onclick="Volver"><i class="bi bi-arrow-left"></i> Volver</button>
+
+    <h3>Lista de Avances @nombrePresupuesto</h3>
 
     @if (!string.IsNullOrEmpty(Mensaje))
     {
@@ -65,7 +68,7 @@
 
     <br />
 
-     <a class="btn btn-primary" href="/api/Avances/crear/@idItem">
+    <a class="btn btn-primary" href="/api/Avances/crear/@idObra/@idPresupuesto/@idItem">
         <i class="bi bi-plus-circle"></i> Agregar Avance
     </a> 
 
@@ -78,8 +81,15 @@
     [Parameter] public int idItem { get; set; }
 
     Confirmacion confirmacion;
-    List<Avance> listaAvances;
+
+    List<Avance> listaAvances = new List<Avance>();
+    List<Presupuesto> listaPresupuestos = new List<Presupuesto>();
     List<Recurso> listaRecursos = new List<Recurso>();
+    List<Item> listaItems = new List<Item>();
+
+    private Presupuesto presupuestoSeleccionado;
+    string nombrePresupuesto = "";
+
     Avance avance;
     string Mensaje = "";
     bool cargando = true;
@@ -157,4 +167,36 @@
         }
 
     }
+
+    private async Task CargarPresupuesto()
+    {
+        var respuesta = await http.Get<List<Presupuesto>>("api/Presupuestos");
+        if (!respuesta.Error)
+        {
+            listaPresupuestos = respuesta.Respuesta; // Poblamos la lista de obras
+
+            // Buscar la obra correspondiente al idObra
+            presupuestoSeleccionado = listaPresupuestos.FirstOrDefault(presupuesto => presupuesto.Id == idPresupuesto);
+            if (presupuestoSeleccionado != null)
+            {
+                nombrePresupuesto = presupuestoSeleccionado.Nombre; // Asignar el nombre de la obra
+            }
+            else
+            {
+                Mensaje = "Presupuesto no encontrado.";
+            }
+        }
+        else
+        {
+            Mensaje = "Error al cargar los presupuestos.";
+        }
+    }
+
+    private void Volver()
+    {
+
+        nav.NavigateTo($"/api/Items/lista/{idObra}/{idPresupuesto}");
+    }
+}
+
 }
