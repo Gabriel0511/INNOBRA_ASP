@@ -95,17 +95,17 @@
 
     private async Task Actualizar()
     {
+        if (!ValidarFormulario())
+        {
+            return;
+        }
+
         var httpRespuesta = await http.Put<EditarAvanceDTO>($"api/Avances/{idAvance}", avance);
 
         if (!httpRespuesta.Error)
         {
-            // Se actualizó con éxito
             mensajeService.Mensaje = "Se actualizó con éxito el avance.";
-
-            // Forzamos el renderizado (opcional, pero puede ser útil)
             StateHasChanged();
-
-            // Redirigimos a la página de lista de Obras
             nav.NavigateTo($"/api/Avances/{idObra}/{idPresupuesto}/{idItem}");
         }
         else
@@ -114,6 +114,29 @@
             mensajeService.Mensaje = $"Error: {errorContent}";
         }
     }
+
+    private bool ValidarFormulario()
+    {
+        mensajeService.Mensaje = ""; // Limpiar mensajes anteriores
+
+        if (avance.Recurso_Id == null || avance.Recurso_Id == 0)
+        {
+            mensajeService.Mensaje += "Debe seleccionar un recurso.\n";
+        }
+
+        if (string.IsNullOrWhiteSpace(avance.MaterialEjecutado))
+        {
+            mensajeService.Mensaje += "Debe ingresar un material ejecutado.\n";
+        }
+
+        if (!string.IsNullOrEmpty(mensajeService.Mensaje))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
 
 
     private void Cancelar()
