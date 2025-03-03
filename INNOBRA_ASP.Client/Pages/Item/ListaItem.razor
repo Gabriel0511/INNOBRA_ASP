@@ -276,15 +276,19 @@
         {
             var comparacionMaterial = CompararMaterial(item.Material_estimado, materialEjecutado);
 
-            // Mostrar el informe en un cuadro de diálogo
-            var mensaje = $"Informe del Ítem {itemId}:\n\n" +
-                          $"Tiempo Estimado: {item.Tiempo_estimado} {item.Unidad_Tiempo}\n" +
-                          $"{tiempoReal}\n\n" +
-                          $"Material Estimado: {item.Material_estimado}\n" +
-                          $"Material Empleado: {materialEjecutado}\n\n" +
-                          $"Comparación de Material: {comparacionMaterial}";
+            // Crear el contenido del informe
+            var contenido = $"Informe del Ítem {itemId}:\n\n" +
+                            $"Tiempo Estimado: {item.Tiempo_estimado} {item.Unidad_Tiempo}\n" +
+                            $"{tiempoReal}\n\n" +
+                            $"Material Estimado: {item.Material_estimado}\n" +
+                            $"Material Empleado: {materialEjecutado}\n\n" +
+                            $"Comparación de Material: {comparacionMaterial}";
 
-            await js.InvokeVoidAsync("alert", mensaje);
+            // Mostrar el informe en un cuadro de diálogo
+            await js.InvokeVoidAsync("alert", contenido);
+
+            // Generar el PDF
+            await GenerarPDF(contenido);
         }
         else
         {
@@ -378,6 +382,12 @@
         {
             return $"Se utilizó más material del estimado. Diferencia: {materialEmpleado - materialEstimado}.";
         }
+    }
+
+    private async Task GenerarPDF(string contenido)
+    {
+        // Invocar la función JavaScript para generar el PDF
+        await js.InvokeVoidAsync("generarPDF", contenido);
     }
 
     private void Volver()
