@@ -55,6 +55,7 @@
                             <a class="btn btn-violet btn-sm" href="/api/Avances/@idObra/@idPresupuesto/@item.Id" title="Ver Avances"><i class="bi bi-eye" style="color: black;"></i></a>
                             <a class="btn btn-warning btn-sm" href="Api/Items/editar/@idObra/@idPresupuesto/@item.Id"><i class="bi bi-pencil"></i> </a>
                             <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(item.Id)"><i class="bi bi-trash3"></i></button>
+                            <button class="btn btn-success btn-sm" @onclick="() => FinalizarItem(item.Id)"><i class="bi bi-check-circle"></i> Finalizar</button>
                         </td>
                     </tr>
                 }
@@ -232,6 +233,150 @@
             {
                 Mensaje = $"Ocurrió un error al eliminar el presupuesto: {ex.Message}";
             }
+        }
+    }
+
+    private async Task FinalizarItem(int itemId)
+    {
+        // Obtener el ítem seleccionado
+        var item = listaItems.FirstOrDefault(i => i.Id == itemId);
+        if (item == null)
+        {
+            await js.InvokeVoidAsync("alert", "Ítem no encontrado.");
+            return;
+        }
+
+        // Obtener los avances desde la API
+        var avancesResp = await http.Get<List<Avance>>("api/Avances");
+        if (avancesResp.Error)
+        {
+            await js.InvokeVoidAsync("alert", "Error al cargar los avances.");
+            return;
+        }
+
+        // Filtrar los avances para el ítem actual
+        var avancesItem = avancesResp.Respuesta
+            .Where(a => a.Item_Id == itemId)
+            .OrderByDescending(a => a.FechaFinalizacionReal)
+            .ToList();
+
+        if (!avancesItem.Any())
+        {
+            await js.InvokeVoidAsync("alert", "No hay avances registrados para este ítem.");
+            return;
+        }
+
+        var ultimoAvance = avancesItem.First();
+
+        // Calcular el tiempo real
+        var tiempoReal = CalcularTiempoReal(item, ultimoAvance);
+
+        // Verifica si MaterialEjecutado es un número válido
+        if (int.TryParse(ultimoAvance.MaterialEjecutado, out int materialEjecutado))
+        {
+            var comparacionMaterial = CompararMaterial(item.Material_estimado, materialEjecutado);
+
+            // Mostrar el informe en un cuadro de diálogo
+            var mensaje = $"Informe del Ítem {itemId}:\n\n" +
+                          $"Tiempo Estimado: {item.Tiempo_estimado} {item.Unidad_Tiempo}\n" +
+                          $"{tiempoReal}\n\n" +
+                          $"Material Estimado: {item.Material_estimado}\n" +
+                          $"Material Empleado: {materialEjecutado}\n\n" +
+                          $"Comparación de Material: {comparacionMaterial}";
+
+            await js.InvokeVoidAsync("alert", mensaje);
+        }
+        else
+        {
+            await js.InvokeVoidAsync("alert", "El material ejecutado no es un valor numérico válido.");
+        }
+    }
+
+    private string CalcularTiempoReal(Item item, Avance ultimoAvance)
+    {
+        // Obtener la fecha actual
+        var fechaActual = DateTime.Now;
+
+        // Convertir el tiempo estimado a días
+        double tiempoEstimadoEnDias;
+        switch (item.Unidad_Tiempo.ToLower().Trim())
+        {
+            case "dias":
+                tiempoEstimadoEnDias = item.Tiempo_estimado;
+                break;
+            case "meses":
+                tiempoEstimadoEnDias = item.Tiempo_estimado * 30; // 1 mes = 30 días
+                break;
+            case "años":
+                tiempoEstimadoEnDias = item.Tiempo_estimado * 365; // 1 año = 365 días
+                break;
+            default:
+                return "Unidad de tiempo no válida. Use días, meses o años.";
+        }
+
+        // Calcular la fecha estimada de finalización
+        var fechaEstimadaFinalizacion = fechaActual.AddDays(tiempoEstimadoEnDias);
+
+        // Obtener la fecha de finalización real del último avance
+        var fechaFinalizacionReal = ultimoAvance.FechaFinalizacionReal;
+
+        // Calcular la diferencia en días entre la fecha estimada y la fecha real
+        var diferenciaDias = (fechaFinalizacionReal - fechaEstimadaFinalizacion).TotalDays;
+
+        // Redondear la diferencia a un número entero
+        int diferenciaDiasEntero = (int)Math.Round(diferenciaDias);
+
+        // Determinar si el avance se completó antes o después de lo estimado
+        string comparacionTiempo;
+        if (diferenciaDiasEntero == 0)
+        {
+            comparacionTiempo = "El avance se completó exactamente en la fecha estimada.";
+        }
+        else if (diferenciaDiasEntero < 0)
+        {
+            comparacionTiempo = $"El avance se completó {Math.Abs(diferenciaDiasEntero)} días antes de lo estimado.";
+        }
+        else
+        {
+            comparacionTiempo = $"El avance se completó {diferenciaDiasEntero} días después de lo estimado.";
+        }
+
+        return $"Fecha Estimada de Finalización: {fechaEstimadaFinalizacion.ToShortDateString()}\n" +
+               $"Fecha Real de Finalización: {fechaFinalizacionReal.ToShortDateString()}\n" +
+               $"Comparación: {comparacionTiempo}";
+    }
+
+    // Método para comparar el tiempo estimado con el tiempo real
+    private string CompararTiempo(int tiempoEstimado, double tiempoReal, string unidadTiempo)
+    {
+        if (tiempoReal == tiempoEstimado)
+        {
+            return "El tiempo real coincide con el estimado.";
+        }
+        else if (tiempoReal < tiempoEstimado)
+        {
+            return $"El tiempo real fue menor que el estimado. Diferencia: {tiempoEstimado - tiempoReal:F2} {unidadTiempo}.";
+        }
+        else
+        {
+            return $"El tiempo real fue mayor que el estimado. Diferencia: {tiempoReal - tiempoEstimado:F2} {unidadTiempo}.";
+        }
+    }
+
+    // Método para comparar el material estimado con el material empleado
+    private string CompararMaterial(int materialEstimado, int materialEmpleado)
+    {
+        if (materialEmpleado == materialEstimado)
+        {
+            return "El material empleado coincide con el estimado.";
+        }
+        else if (materialEmpleado < materialEstimado)
+        {
+            return $"Se utilizó menos material del estimado. Diferencia: {materialEstimado - materialEmpleado}.";
+        }
+        else
+        {
+            return $"Se utilizó más material del estimado. Diferencia: {materialEmpleado - materialEstimado}.";
         }
     }
 
