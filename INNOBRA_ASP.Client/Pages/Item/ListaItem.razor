@@ -284,10 +284,7 @@
                             $"Material Empleado: {materialEjecutado}\n\n" +
                             $"Comparación de Material: {comparacionMaterial}";
 
-            // Mostrar el informe en un cuadro de diálogo
-            await js.InvokeVoidAsync("alert", contenido);
-
-            // Generar el PDF
+            // Generar el PDF (sin mostrar el cuadro de diálogo)
             await GenerarPDF(contenido);
         }
         else
