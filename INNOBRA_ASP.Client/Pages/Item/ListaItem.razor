@@ -298,25 +298,22 @@
         // Obtener la fecha actual
         var fechaActual = DateTime.Now;
 
-        // Convertir el tiempo estimado a días
-        double tiempoEstimadoEnDias;
+        // Calcular la fecha estimada de finalización
+        DateTime fechaEstimadaFinalizacion;
         switch (item.Unidad_Tiempo.ToLower().Trim())
         {
             case "dias":
-                tiempoEstimadoEnDias = item.Tiempo_estimado;
+                fechaEstimadaFinalizacion = fechaActual.AddDays(item.Tiempo_estimado);
                 break;
             case "meses":
-                tiempoEstimadoEnDias = item.Tiempo_estimado * 30; // 1 mes = 30 días
+                fechaEstimadaFinalizacion = fechaActual.AddMonths(item.Tiempo_estimado);
                 break;
             case "años":
-                tiempoEstimadoEnDias = item.Tiempo_estimado * 365; // 1 año = 365 días
+                fechaEstimadaFinalizacion = fechaActual.AddYears(item.Tiempo_estimado);
                 break;
             default:
                 return "Unidad de tiempo no válida. Use días, meses o años.";
         }
-
-        // Calcular la fecha estimada de finalización
-        var fechaEstimadaFinalizacion = fechaActual.AddDays(tiempoEstimadoEnDias);
 
         // Obtener la fecha de finalización real del último avance
         var fechaFinalizacionReal = ultimoAvance.FechaFinalizacionReal;
