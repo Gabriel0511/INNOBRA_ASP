@@ -325,7 +325,7 @@
         var diferenciaDias = (fechaFinalizacionReal - fechaEstimadaFinalizacion).TotalDays;
 
         // Redondear la diferencia a un número entero
-        int diferenciaDiasEntero = (int)Math.Round(diferenciaDias);
+        int diferenciaDiasEntero = (int)Math.Floor(diferenciaDias);
 
         // Determinar si el avance se completó antes o después de lo estimado
         string comparacionTiempo;
