@@ -3,17 +3,24 @@
 @inject IHttpServicio http
 @inject IJSRuntime js
 @inject MensajeService mensajeService
+
 <div class="alert alert-info" style="display: @(!string.IsNullOrEmpty(mensajeService.Mensaje) ? "block" : "none")">
     @mensajeService.Mensaje
-</div>
+</div> @* Muestra el mensaje que se actualizò con exito. *@
+
 <div class="fondo"></div>
 <div class="overlay"></div>
 <div class="contenedor-formulario">
+
     <h3>Obras</h3>
+
     @if (!string.IsNullOrEmpty(Mensaje))
     {
-        <div class="alert alert-danger" role="alert">@Mensaje</div>
+        <div class="alert alert-danger" role="alert">
+            @Mensaje
+        </div>
     }
+
     @if (cargando)
     {
         <div class="spinner-border" role="status">
@@ -39,7 +46,9 @@
                         <td>
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="flex-grow-1">@obra.Nombre</span>
-                                <div style="flex-shrink: 0;"></div>
+                                <div style="flex-shrink: 0;">
+                                    
+                                </div>
                             </div>
                         </td>
                         <td>@obra.FechaInicio.ToString("dd-MM-yyyy")</td>
@@ -47,7 +56,7 @@
                         <td>
                             @if (obra.Imagen != null && obra.Imagen.Length > 0)
                             {
-                                <img src="data:image/png;base64,@Convert.ToBase64String(obra.Imagen)" alt="Imagen de la obra" style="width: 100px; height: auto;"/>
+                                <img src="data:image/png;base64,@Convert.ToBase64String(obra.Imagen)" alt="Imagen de la obra" style="width: 100px; height: auto;" />
                             }
                             else
                             {
@@ -55,199 +64,575 @@
                             }
                         </td>
                         <td>
-                            <a class="btn btn-violet btn-sm" href="/api/Presupuestos/lista/@obra.Id" title="Ver Presupuestos">
-                                <i class="bi bi-eye" style="color: black;"></i>
-                            </a>
-                            <a class="btn btn-warning btn-sm" href="/api/Obras/editar/@obra.Id" title="Editar">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(obra.Id)" title="Eliminar">
-                                <i class="bi bi-trash3"></i>
-                            </button>
+                            <a class="btn btn-violet btn-sm" href="/api/Presupuestos/lista/@obra.Id" title="Ver Presupuestos"><i class="bi bi-eye" style="color: black;"></i></a>
+                            <a class="btn btn-warning btn-sm" href="/api/Obras/editar/@obra.Id" title="Editar"><i class="bi bi-pencil"></i></a>
+                            <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(obra.Id)" title="Eliminar"><i class="bi bi-trash3"></i></button>
                             <button class="btn btn-success btn-sm" @onclick="() => FinalizarObra(obra.Id)" title="Finalizar Obra">
                                 <i class="bi bi-house-check"></i>
                             </button>
                         </td>
                     </tr>
+
+                    @* @if (obraSeleccionada?.Id == obra.Id)
+                    {
+                        <tr>
+                            <td colspan="5">
+                                <div class="expandable @(showPresupuestos ? "" : "collapsed")">
+                                    @if (presupuestos.Where(p => p.Obra_Id == obra.Id).Any())
+                                    {
+                                        <table class="table-presupuestos">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Presupuesto</th>
+                                                    <th scope="col">Fecha Inicio Prevista</th>
+                                                    <th scope="col">Fecha Fin Prevista</th>
+                                                    <th scope="col">Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var presupuesto in presupuestos.Where(p => p.Obra_Id == obra.Id))
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            <div class="d-flex justify-content-between align-items-center">
+                                                                <span class="flex-grow-1">@presupuesto.Nombre</span>
+                                                                <div style="flex-shrink: 0;">
+                                                                    <button class="btn btn-info btn-sm" @onclick="() => ToggleItems(presupuesto)" title="Ver Nombre">
+                                                                        <i class="bi bi-chevron-down"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>@presupuesto.FechaInicioPrevista.ToString("dd-MM-yyyy")</td>
+                                                        <td>@presupuesto.FechaFinPrevista.ToString("dd-MM-yyyy")</td>
+                                                        <td>
+                                                            <a class="btn btn-success btn-sm" href="/api/Items/crear/@presupuesto.Id" title="Agregar Item"><i class="bi bi-plus"></i></a>
+                                                            <a class="btn btn-warning btn-sm" href="/api/Presupuestos/editar/@presupuesto.Id"><i class="bi bi-pencil"></i></a>
+                                                            <button class="btn btn-danger btn-sm" @onclick="() => EliminarPresupuesto(presupuesto.Id)"><i class="bi bi-trash3"></i></button>
+                                                        </td>
+                                                    </tr>
+
+                                                    @if (presupuestoSeleccionado?.Id == presupuesto.Id)
+                                                    {
+                                                        <tr>
+                                                            <td colspan="4">
+                                                                <div class="expandable @(showItems ? "" : "collapsed")">
+                                                                    @if (items.Where(i => i.Presupuesto_Id == presupuesto.Id).Any())
+                                                                    {
+                                                                        <table class="table-items">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th scope="col">Tipo de item</th>
+                                                                                    <th scope="col">Tiempo estimado</th>
+                                                                                    <th scope="col">Unidad Tiempo</th>
+                                                                                    <th scope="col">Material estimado</th>
+                                                                                    <th scope="col">Acciones</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                @foreach (var item in items.Where(i => i.Presupuesto_Id == presupuesto.Id))
+                                                                                {
+                                                                                    <tr>
+                                                                                        <td>@MostrarItemTipos(item.Item_Tipos_Id)</td>
+                                                                                        <td>@item.Tiempo_estimado</td>
+                                                                                        <td>@item.Unidad_Tiempo</td>
+                                                                                        <td>@item.Material_estimado</td>
+
+                                                                                        <td>
+                                                                                            <a class="btn btn-info btn-sm" href="/api/Avances/@item.Id" title="Ver Avance"><i class="bi bi-list"></i></a>
+                                                                                            <a class="btn btn-success btn-sm" href="/api/Avances/crear/@item.Id" title="Agregar Avance"><i class="bi bi-plus"></i></a>
+                                                                                            <a class="btn btn-warning btn-sm" href="/Api/Items/editar/@item.Id"><i class="bi bi-pencil"></i></a>
+                                                                                            <button class="btn btn-danger btn-sm" @onclick="() => EliminarItem(item.Id)"><i class="bi bi-trash3"></i></button>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                }
+                                                                            </tbody>
+                                                                        </table>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <div class="alert alert-info" role="alert">
+                                                                            Este presupuesto no tiene items disponibles.
+                                                                        </div>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    }
+                                    else
+                                    {
+                                        <div class="alert alert-info" role="alert">
+                                            Esta obra no tiene presupuestos disponibles.
+                                        </div>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    } *@
                 }
             </tbody>
         </table>
-        <br/>
+        <br />
         <a class="btn btn-primary" href="/api/Obras/crear">
             <i class="bi bi-plus-circle"></i> Agregar Obra
         </a>
     }
     else
     {
-        <div class="alert alert-warning" role="alert">No hay obras disponibles.</div>
+        <div class="alert alert-warning" role="alert">
+            No hay obras disponibles.
+        </div>
     }
 </div>
+
 <style>
-    .table-obras td, .table-presupuestos td {word-wrap: break-word; word-break: break-word; white-space: normal; max-width: 150px; overflow: hidden;}
-    .table-obras th, .table-presupuestos th {max-width: 150px;}
-    .table-obras thead tr th {background-color: #326dc7; color: white;}
-    .table-presupuestos thead tr th {background-color: #737544; color: white;}
-    .table-items thead tr th {background-color: #3c573c; color: white;}
-    .btn-violet {background-color: violet !important; color: white !important; border: none;}
-    .btn-violet:hover {background-color: purple !important;}
+/* Estilos para restringir datos largos en celdas de tabla */
+.table-obras td, .table-presupuestos td {
+    word-wrap: break-word;
+    word-break: break-word;
+    white-space: normal;
+    max-width: 150px; /* Ajusta este valor según el ancho máximo deseado */
+    overflow: hidden;
+}
+
+/* Opcional: ajustar también el ancho de las columnas de encabezado si es necesario */
+.table-obras th, .table-presupuestos th {
+    max-width: 150px;
+}
+
+    /* Cambiar color del encabezado de las tablas */
+    .table-obras thead tr th {
+        background-color: #326dc7;
+        color: white;
+    }
+
+    .table-presupuestos thead tr th {
+        background-color: #737544;
+        color: white;
+    }
+
+    .table-items thead tr th {
+        background-color: #3c573c;
+        color: white;
+    }
+
+    .btn-violet {
+        background-color: violet !important;
+        color: white !important;
+        border: none;
+    }
+
+        .btn-violet:hover {
+            background-color: purple !important;
+        }
+
+
 </style>
+
 <script>
     function generarPDF(contenido) {
+        // Crear una instancia de jsPDF
         const doc = new jspdf.jsPDF();
-        doc.setFont("helvetica", "bold");
+
+        // Configurar título
+        doc.setFont("helvetica", "bold"); // Fuente en negrita
         doc.setFontSize(16);
         doc.text("Informe INNOBRA", doc.internal.pageSize.width / 2, 20, { align: "center" });
+
+        // Configurar márgenes y posición inicial
         const margenIzquierdo = 15;
-        let posicionY = 35;
+        let posicionY = 35; // Posición vertical inicial
         const anchoMaximo = 180;
+
+        // Tamaño de fuente y espaciado
         const tamanoFuenteNormal = 12;
         const tamanoFuenteSubtitulo = 12;
-        const interlineado = 7;
+        const interlineado = 7; // Reducir el interlineado
+
+        // Dividir el contenido en líneas
         const lineas = contenido.split("\n");
+
+        // Recorrer cada línea del contenido
         lineas.forEach(linea => {
-            if (linea.startsWith("Informe de la Obra:") || linea.startsWith("Presupuesto:") || linea.startsWith("Ítems:")) {
+            // Verificar si la línea es un subtítulo
+            if (linea.startsWith("Informe de la Obra:") ||
+                linea.startsWith("Presupuesto:") ||
+                linea.startsWith("Ítems:")) {
+                // Cambiar a fuente en negrita para subtítulos
                 doc.setFont("helvetica", "bold");
                 doc.setFontSize(tamanoFuenteSubtitulo);
             } else {
+                // Cambiar a fuente normal para el resto del contenido
                 doc.setFont("helvetica", "normal");
                 doc.setFontSize(tamanoFuenteNormal);
             }
+
+            // Agregar la línea al PDF
             doc.text(linea, margenIzquierdo, posicionY, { maxWidth: anchoMaximo });
-            posicionY += interlineado;
+
+            // Aumentar la posición vertical para la siguiente línea
+            posicionY += interlineado; // Espaciado reducido entre líneas
+
+            // Si la posición Y supera el límite de la página, agregar una nueva página
             if (posicionY > doc.internal.pageSize.height - 20) {
                 doc.addPage();
-                posicionY = 20;
+                posicionY = 20; // Reiniciar la posición Y en la nueva página
             }
         });
+
+        // Guardar el PDF con un nombre de archivo
         doc.save("informe.pdf");
     }
 </script>
+
 @code {
-    List<Obra> listaObras = new();
-    List<Presupuesto> presupuestos = new();
-    List<Item> items = new();
-    List<ItemTipo> itemTipos = new();
-    List<Avance> listaAvances = new();
+    List<Obra> listaObras = new List<Obra>();
+    List<Presupuesto> presupuestos = new List<Presupuesto>();
+    List<Item> items = new List<Item>();
+    List<ItemTipo> itemTipos = new List<ItemTipo>();
+    List<Avance> listaAvances = new List<Avance>();
     Obra obraSeleccionada;
     Presupuesto presupuestoSeleccionado;
-    bool showPresupuestos;
-    bool showItems;
+    bool showPresupuestos = false;
+    bool showItems = false;
     string Mensaje = "";
     string mensajeError;
     bool cargando = true;
-    protected override async Task OnInitializedAsync() {
+
+    protected override async Task OnInitializedAsync()
+    {
         await base.OnInitializedAsync();
-        if (!string.IsNullOrEmpty(mensajeService.Mensaje)) {
-            await Task.Delay(1500);
-            mensajeService.Mensaje = string.Empty;
+        if (!string.IsNullOrEmpty(mensajeService.Mensaje))
+        {
+            await Task.Delay(1500);  // Espera 3 segundos
+            mensajeService.Mensaje = string.Empty;  // Borra el mensaje
         }
         await CargarItemTipos();
         await Leer();
         await LeerPresupuestos();
     }
-    private async Task Leer() {
-        try {
+
+    private async Task Leer()
+    {
+        try
+        {
             cargando = true;
-            Mensaje = "";
+            Mensaje = ""; // Limpiar el mensaje de error
+
             var resp = await http.Get<List<Obra>>("api/Obras");
-            if (!resp.Error) {
+            if (!resp.Error)
+            {
                 listaObras = resp.Respuesta;
-            } else {
+            }
+            else
+            {
                 Mensaje = await resp.ObtenerError();
             }
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             Mensaje = $"Ocurrió un error al cargar las obras: {ex.Message}";
-        } finally {
+        }
+        finally
+        {
             cargando = false;
         }
     }
-    private async Task LeerPresupuestos() {
-        try {
+
+    private async Task LeerPresupuestos()
+    {
+        try
+        {
             var resp = await http.Get<List<Presupuesto>>("api/Presupuestos");
-            if (!resp.Error) {
+            if (!resp.Error)
+            {
                 presupuestos = resp.Respuesta;
-            } else {
+            }
+            else
+            {
                 Mensaje = await resp.ObtenerError();
             }
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             Mensaje = $"Ocurrió un error al cargar los presupuestos: {ex.Message}";
         }
     }
-    private async Task LeerItems() {
-        try {
+
+    private async Task LeerItems()
+    {
+        try
+        {
             var resp = await http.Get<List<Item>>("Api/Items");
-            if (!resp.Error) {
+            if (!resp.Error)
+            {
                 items = resp.Respuesta;
-            } else {
+            }
+            else
+            {
                 Mensaje = await resp.ObtenerError();
             }
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             Mensaje = $"Ocurrió un error al cargar los items: {ex.Message}";
         }
     }
-    private async Task CargarItemTipos() {
+
+    private async Task CargarItemTipos()
+    {
         var respuesta = await http.Get<List<ItemTipo>>("api/ItemTipos");
-        if (!respuesta.Error) {
+        if (!respuesta.Error)
+        {
             itemTipos = respuesta.Respuesta;
         }
     }
-    private string MostrarItemTipos(int itemTiposId) {
+
+    private string MostrarItemTipos(int itemTiposId)
+    {
         var itemTipo = itemTipos?.FirstOrDefault(r => r.Id == itemTiposId);
         return itemTipo?.Nombre ?? "Sin asignar";
     }
-    private void TogglePresupuestos(Obra obra) {
-        if (obraSeleccionada == obra) {
+
+
+    private void TogglePresupuestos(Obra obra)
+    {
+        if (obraSeleccionada == obra)
+        {
+            // Si la obra seleccionada es la misma, la ocultamos
             showPresupuestos = !showPresupuestos;
-        } else {
+        }
+        else
+        {
+            // Si no es la misma obra, mostramos los presupuestos
             obraSeleccionada = obra;
             showPresupuestos = true;
         }
     }
-    private async Task ToggleItems(Presupuesto presupuesto) {
-        if (presupuestoSeleccionado == presupuesto) {
+
+    private async Task ToggleItems(Presupuesto presupuesto)
+    {
+        if (presupuestoSeleccionado == presupuesto)
+        {
             showItems = !showItems;
-        } else {
+        }
+        else
+        {
             presupuestoSeleccionado = presupuesto;
             showItems = true;
-            await LeerItems();
+            await LeerItems();  // Cargar los items cuando se selecciona un presupuesto
         }
     }
-    private async Task Eliminar(int id) {
+
+
+    private async Task Eliminar(int id)
+    {
         var resultado = await js.InvokeAsync<bool>("confirmSwal");
-        if (resultado) {
-            try {
+
+        if (resultado)
+        {
+            try
+            {
                 var resp = await http.Delete($"api/Obras/{id}");
-                if (!resp.Error) {
-                    await Leer();
-                } else {
+                if (!resp.Error)
+                {
+                    await Leer(); // Recarga la lista después de eliminar
+                }
+                else
+                {
                     Mensaje = await resp.ObtenerError();
                 }
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Mensaje = $"Ocurrió un error al eliminar la obra: {ex.Message}";
             }
         }
+
     }
-    private async Task EliminarPresupuesto(int presupuestoId) {
+
+
+    private async Task EliminarPresupuesto(int presupuestoId)
+    {
         var resultado = await js.InvokeAsync<bool>("confirmSwal");
-        if (resultado) {
-            try {
+        if (resultado)
+        {
+            try
+            {
                 var resp = await http.Delete($"api/Presupuestos/{presupuestoId}");
-                if (!resp.Error) {
-                    await LeerPresupuestos();
-                } else {
+                if (!resp.Error)
+                {
+                    await LeerPresupuestos(); // Recargar los presupuestos después de eliminar
+                }
+                else
+                {
                     Mensaje = await resp.ObtenerError();
                 }
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Mensaje = $"Ocurrió un error al eliminar el presupuesto: {ex.Message}";
             }
         }
     }
-    private async Task FinalizarObra(int idObra) {
-        var respuesta = await http.Post($"api/Obras/FinalizarObra/{idObra}", "");
-        if (!respuesta.Error) {
-            await Leer();
-        } else {
-            Mensaje = await respuesta.ObtenerError();
+
+    private async Task EliminarItem(int itemId)
+    {
+        var resultado = await js.InvokeAsync<bool>("confirmSwal");
+        if (resultado)
+        {
+            try
+            {
+                var resp2 = await http.Get<List<Avance>>("api/Avances");
+                listaAvances = resp2.Respuesta;
+                foreach (var itemavance in listaAvances)
+                    {
+                      if (itemavance.Item_Id == itemId)
+                      {
+                          var resp3 = await http.Delete($"api/Avances/{itemavance.Id}");
+                          if (resp3.Error)
+                          {
+                             Mensaje = "No se pudo borrar el avance";
+                          }
+                      }
+                    }
+
+                var resp = await http.Delete($"Api/Items/{itemId}");
+                if (!resp.Error)
+                {
+                    await LeerItems();
+                }
+                else
+                {
+                    Mensaje = await resp.ObtenerError();
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensaje = $"Ocurrió un error al eliminar el presupuesto: {ex.Message}";
+            }
         }
+    }
+
+    private async Task FinalizarObra(int obraId)
+    {
+        try
+        {
+            // Obtener la obra seleccionada
+            var obra = listaObras.FirstOrDefault(o => o.Id == obraId);
+            if (obra == null)
+            {
+                await js.InvokeVoidAsync("alert", "Obra no encontrada.");
+                return;
+            }
+
+            // Obtener todos los presupuestos asociados a la obra
+            var presupuestosResp = await http.Get<List<Presupuesto>>("api/Presupuestos");
+            if (presupuestosResp.Error)
+            {
+                await js.InvokeVoidAsync("alert", "Error al cargar los presupuestos.");
+                return;
+            }
+
+            var presupuestosObra = presupuestosResp.Respuesta
+                .Where(p => p.Obra_Id == obraId)
+                .ToList();
+
+            if (!presupuestosObra.Any())
+            {
+                await js.InvokeVoidAsync("alert", "No hay presupuestos registrados para esta obra.");
+                return;
+            }
+
+            // Obtener todos los ítems asociados a los presupuestos de la obra
+            var itemsResp = await http.Get<List<Item>>("Api/Items");
+            if (itemsResp.Error)
+            {
+                await js.InvokeVoidAsync("alert", "Error al cargar los ítems.");
+                return;
+            }
+
+            var itemsObra = itemsResp.Respuesta
+                .Where(i => presupuestosObra.Any(p => p.Id == i.Presupuesto_Id))
+                .ToList();
+
+            if (!itemsObra.Any())
+            {
+                await js.InvokeVoidAsync("alert", "No hay ítems registrados para esta obra.");
+                return;
+            }
+
+            // Generar el informe de la obra
+            var informe = GenerarInformeObra(obra, presupuestosObra, itemsObra);
+
+            // Mostrar el informe en un PDF
+            await GenerarPDF(informe);
+
+            // Marcar la obra como finalizada
+            obra.FechaFin = DateTime.Now; // Establecer la fecha de finalización
+            var resp = await http.Put($"api/Obras/{obra.Id}", obra);
+            if (resp.Error)
+            {
+                await js.InvokeVoidAsync("alert", "Error al marcar la obra como finalizada.");
+                return;
+            }
+
+            await js.InvokeVoidAsync("alert", "Obra finalizada correctamente.");
+        }
+        catch (Exception ex)
+        {
+            await js.InvokeVoidAsync("alert", $"Ocurrió un error: {ex.Message}");
+        }
+
+    }
+
+    private string GenerarInformeObra(Obra obra, List<Presupuesto> presupuestos, List<Item> items)
+    {
+        var informe = new StringBuilder();
+
+        // Información de la obra
+        informe.AppendLine($"Informe de la Obra: {obra.Nombre}");
+        informe.AppendLine($"Fecha de Inicio: {obra.FechaInicio.ToShortDateString()}");
+        informe.AppendLine($"Fecha de Finalización: {obra.FechaFin.ToShortDateString() ?? "No finalizada"}");
+        informe.AppendLine();
+
+        // Información de los presupuestos
+        foreach (var presupuesto in presupuestos)
+        {
+            informe.AppendLine($"Presupuesto: {presupuesto.Nombre}");
+            informe.AppendLine($"Fecha Inicio Prevista: {presupuesto.FechaInicioPrevista.ToShortDateString()}");
+            informe.AppendLine($"Fecha Fin Prevista: {presupuesto.FechaFinPrevista.ToShortDateString()}");
+            informe.AppendLine();
+
+            // Información de los ítems del presupuesto
+            var itemsPresupuesto = items.Where(i => i.Presupuesto_Id == presupuesto.Id).ToList();
+            if (itemsPresupuesto.Any())
+            {
+                informe.AppendLine("Ítems:");
+                foreach (var item in itemsPresupuesto)
+                {
+                    informe.AppendLine($"- Tipo: {MostrarItemTipos(item.Item_Tipos_Id)}");
+                    informe.AppendLine($"  Tiempo Estimado: {item.Tiempo_estimado} {item.Unidad_Tiempo}");
+                    informe.AppendLine($"  Material Estimado: {item.Material_estimado}");
+                    informe.AppendLine();
+                }
+            }
+            else
+            {
+                informe.AppendLine("No hay ítems registrados para este presupuesto.");
+            }
+            informe.AppendLine();
+        }
+
+        return informe.ToString();
+    }
+
+    private async Task GenerarPDF(string contenido)
+    {
+        await js.InvokeVoidAsync("generarPDF", contenido);
     }
 }
