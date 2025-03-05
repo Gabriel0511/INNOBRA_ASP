@@ -4,7 +4,7 @@ window.confirmSwal = async function () {
         text: "¡Esta acción no se puede deshacer!",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonText: "Sí, eliminar",
+        confirmButtonText: "Sí",
         cancelButtonText: "Cancelar"
     });
     return result.isConfirmed;

@@ -21,5 +21,7 @@ namespace INNOBRA_ASP.Shared.DTO
         public DateTime FechaFin { get; set; }
 
         public byte[]? Imagen { get; set; }  // Propiedad para la imagen
+
+        public bool Finalizada { get; set; } // Añade esta propiedad
     }
 }

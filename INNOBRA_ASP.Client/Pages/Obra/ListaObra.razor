@@ -1,5 +1,6 @@
 ﻿@page "/api/Obras"
 @using System.Text
+@using INNOBRA_ASP.Shared.DTO
 @inject IHttpServicio http
 @inject IJSRuntime js
 @inject MensajeService mensajeService
@@ -46,9 +47,11 @@
                         <td>
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="flex-grow-1">@obra.Nombre</span>
-                                <div style="flex-shrink: 0;">
-                                    
-                                </div>
+                                @if (obra.Finalizada)
+                                {
+                                    <span style="color: red;">Obra Finalizada</span>
+                                }
+                                <div style="flex-shrink: 0;"></div>
                             </div>
                         </td>
                         <td>@obra.FechaInicio.ToString("dd-MM-yyyy")</td>
@@ -64,11 +67,20 @@
                             }
                         </td>
                         <td>
-                            <a class="btn btn-violet btn-sm" href="/api/Presupuestos/lista/@obra.Id" title="Ver Presupuestos"><i class="bi bi-eye" style="color: black;"></i></a>
-                            <a class="btn btn-warning btn-sm" href="/api/Obras/editar/@obra.Id" title="Editar"><i class="bi bi-pencil"></i></a>
-                            <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(obra.Id)" title="Eliminar"><i class="bi bi-trash3"></i></button>
-                            <button class="btn btn-success btn-sm" @onclick="() => FinalizarObra(obra.Id)" title="Finalizar Obra">
-                                <i class="bi bi-house-check"></i>
+                            @if (!obra.Finalizada)
+                            {
+                                <a class="btn btn-violet btn-sm" href="/api/Presupuestos/lista/@obra.Id" title="Ver Presupuestos">
+                                    <i class="bi bi-eye" style="color: black;"></i>
+                                </a>
+                                <a class="btn btn-warning btn-sm" href="/api/Obras/editar/@obra.Id" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(obra.Id)" title="Eliminar">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                            }
+                            <button class="btn btn-success btn-sm" @onclick="() => FinalizarObra(obra.Id)" title="@(obra.Finalizada ? "Generar Informe" : "Finalizar Obra")">
+                                <i class="bi bi-house-check"></i> @(obra.Finalizada ? "Generar Informe" : "Finalizar Obra")
                             </button>
                         </td>
                     </tr>
@@ -76,9 +88,6 @@
             </tbody>
         </table>
         <br />
-        <a class="btn btn-primary" href="/api/Obras/crear">
-            <i class="bi bi-plus-circle"></i> Agregar Obra
-        </a>
     }
     else
     {
@@ -86,6 +95,9 @@
             No hay obras disponibles.
         </div>
     }
+    <a class="btn btn-primary" href="/api/Obras/crear">
+        <i class="bi bi-plus-circle"></i> Agregar Obra
+    </a>
 </div>
 
 <style>
@@ -354,7 +366,6 @@
 
     }
 
-
     private async Task EliminarPresupuesto(int presupuestoId)
     {
         var resultado = await js.InvokeAsync<bool>("confirmSwal");
@@ -419,66 +430,59 @@
 
     private async Task FinalizarObra(int obraId)
     {
+        var obra = listaObras.FirstOrDefault(o => o.Id == obraId);
+        if (obra == null)
+        {
+            await js.InvokeVoidAsync("alert", "Obra no encontrada.");
+            return;
+        }
+
+        if (obra.Finalizada)
+        {
+            // Si la obra ya está finalizada, solo generar el informe
+            var informe = GenerarInformeObra(obra, presupuestos, items);
+            await GenerarPDF(informe);
+            return;
+        }
+
+        // Mostrar confirmación antes de finalizar la obra
+        var confirmacion = await js.InvokeAsync<bool>("confirmSwal", "¿Estás seguro de que deseas finalizar esta obra?");
+        if (!confirmacion)
+        {
+            return;
+        }
+
         try
         {
-            // Obtener la obra seleccionada
-            var obra = listaObras.FirstOrDefault(o => o.Id == obraId);
-            if (obra == null)
-            {
-                await js.InvokeVoidAsync("alert", "Obra no encontrada.");
-                return;
-            }
-
-            // Obtener todos los presupuestos asociados a la obra
-            var presupuestosResp = await http.Get<List<Presupuesto>>("api/Presupuestos");
-            if (presupuestosResp.Error)
-            {
-                await js.InvokeVoidAsync("alert", "Error al cargar los presupuestos.");
-                return;
-            }
-
-            var presupuestosObra = presupuestosResp.Respuesta
-                .Where(p => p.Obra_Id == obraId)
-                .ToList();
-
-            if (!presupuestosObra.Any())
-            {
-                await js.InvokeVoidAsync("alert", "No hay presupuestos registrados para esta obra.");
-                return;
-            }
-
-            // Obtener todos los ítems asociados a los presupuestos de la obra
-            var itemsResp = await http.Get<List<Item>>("Api/Items");
-            if (itemsResp.Error)
-            {
-                await js.InvokeVoidAsync("alert", "Error al cargar los ítems.");
-                return;
-            }
-
-            var itemsObra = itemsResp.Respuesta
-                .Where(i => presupuestosObra.Any(p => p.Id == i.Presupuesto_Id))
-                .ToList();
-
-            if (!itemsObra.Any())
-            {
-                await js.InvokeVoidAsync("alert", "No hay ítems registrados para esta obra.");
-                return;
-            }
-
-            // Generar el informe de la obra
-            var informe = GenerarInformeObra(obra, presupuestosObra, itemsObra);
-
-            // Mostrar el informe en un PDF
-            await GenerarPDF(informe);
-
             // Marcar la obra como finalizada
-            obra.FechaFin = DateTime.Now; // Establecer la fecha de finalización
-            var resp = await http.Put($"api/Obras/{obra.Id}", obra);
+            obra.Finalizada = true;
+            obra.FechaFin = DateTime.Now;
+
+            // Crear un DTO para enviar al servidor
+            var obraDTO = new EditarObraDTO
+                {
+                    Id = obra.Id,
+                    Nombre = obra.Nombre,
+                    FechaInicio = obra.FechaInicio,
+                    FechaFin = obra.FechaFin,
+                    Imagen = obra.Imagen,
+                    Finalizada = obra.Finalizada // Asegúrate de incluir esta propiedad
+                };
+
+            var resp = await http.Put($"api/Obras/{obra.Id}", obraDTO);
             if (resp.Error)
             {
-                await js.InvokeVoidAsync("alert", "Error al marcar la obra como finalizada.");
+                var mensajeError = await resp.ObtenerError(); // Usa ObtenerError() para obtener el mensaje
+                await js.InvokeVoidAsync("alert", "Error al marcar la obra como finalizada: " + mensajeError);
                 return;
             }
+
+            // Generar el informe
+            var informe = GenerarInformeObra(obra, presupuestos, items);
+            await GenerarPDF(informe);
+
+            // Recargar la lista de obras
+            await Leer();
 
             await js.InvokeVoidAsync("alert", "Obra finalizada correctamente.");
         }
@@ -486,7 +490,6 @@
         {
             await js.InvokeVoidAsync("alert", $"Ocurrió un error: {ex.Message}");
         }
-
     }
 
     private string GenerarInformeObra(Obra obra, List<Presupuesto> presupuestos, List<Item> items)

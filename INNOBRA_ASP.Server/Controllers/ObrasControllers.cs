@@ -92,10 +92,12 @@ namespace INNOBRA_ASP.Server.Controllers
                 return NotFound("No existe la obra buscada.");
             }
 
+            // Actualizar todas las propiedades, incluyendo Finalizada
             obra.Nombre = entidadDTO.Nombre;
             obra.FechaInicio = entidadDTO.FechaInicio;
             obra.FechaFin = entidadDTO.FechaFin;
             obra.Imagen = entidadDTO.Imagen;
+            obra.Finalizada = entidadDTO.Finalizada; // Añade esta línea
 
             try
             {
