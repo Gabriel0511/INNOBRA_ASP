@@ -87,14 +87,21 @@
                 }
             </tbody>
         </table>
-        <br />
     }
     else
     {
-        <div class="alert alert-warning" role="alert">
-            No hay obras disponibles.
-        </div>
+        if (cargando)
+        {
+
+        }
+        else
+        {
+            <div class="alert alert-warning" role="alert">
+                No hay Obras disponibles.
+            </div>
+        }
     }
+    <br />
     <a class="btn btn-primary" href="/api/Obras/crear">
         <i class="bi bi-plus-circle"></i> Agregar Obra
     </a>
