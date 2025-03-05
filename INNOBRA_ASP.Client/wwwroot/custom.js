@@ -25,4 +25,4 @@ window.confirmSwal = async function () {
     if (event.target === modal) {
         closeModal();
         }
-    }
+}

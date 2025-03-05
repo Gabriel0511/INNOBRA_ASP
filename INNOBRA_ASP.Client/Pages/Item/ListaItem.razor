@@ -96,6 +96,50 @@
         }
 </style>
 
+<script>
+    function generarPDF(contenido) {
+        // Crear una instancia de jsPDF
+        const doc = new jspdf.jsPDF();
+
+        // Configurar título
+        doc.setFont("helvetica", "bold"); // Fuente en negrita
+        doc.setFontSize(16);
+        doc.text("Informe INNOBRA", doc.internal.pageSize.width / 2, 20, { align: "center" });
+
+        // Configurar márgenes y posición inicial
+        const margenIzquierdo = 15;
+        let posicionY = 35; // Posición vertical inicial
+        const anchoMaximo = 180;
+
+        // Dividir el contenido en líneas
+        const lineas = contenido.split("\n");
+
+        // Recorrer cada línea del contenido
+        lineas.forEach(linea => {
+            // Verificar si la línea es un subtítulo
+            if (linea.startsWith("Informe de la Obra:") ||
+                linea.startsWith("Presupuesto:") ||
+                linea.startsWith("Ítems:")) {
+                // Cambiar a fuente en negrita para subtítulos
+                doc.setFont("helvetica", "bold");
+            } else {
+                // Cambiar a fuente normal para el resto del contenido
+                doc.setFont("helvetica", "normal");
+            }
+
+            // Agregar la línea al PDF
+            doc.text(linea, margenIzquierdo, posicionY, { maxWidth: anchoMaximo });
+
+            // Aumentar la posición vertical para la siguiente línea
+            posicionY += 10; // Espaciado entre líneas
+        });
+
+        // Guardar el PDF con un nombre de archivo
+        doc.save("informe.pdf");
+    }
+
+</script>
+
 @code {
     [Parameter] public int idObra { get; set; }
     [Parameter] public int idPresupuesto { get; set; }

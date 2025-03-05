@@ -4,8 +4,8 @@
 
     // Configurar título
     doc.setFont("helvetica", "bold"); // Fuente en negrita
-    doc.setFontSize(16);
-    doc.text("Informe del Item", doc.internal.pageSize.width / 2, 20, { align: "center" });
+    doc.setFontSize(18);
+    doc.text("Informe INNOBRA", doc.internal.pageSize.width / 2, 20, { align: "center" });
 
     // Configurar contenido
     doc.setFont("helvetica", "normal");
